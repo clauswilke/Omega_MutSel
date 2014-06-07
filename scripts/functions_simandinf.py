@@ -1,0 +1,225 @@
+## SJS. Functions that accompany simulate_and_infer.py
+# NOTE: to use simulation library, must cp the src/ directory (*not* contents, the whole directory!) into wdir.
+
+import os
+import re
+import sys
+import subprocess
+import numpy as np
+
+
+# Simulation code
+sys.path.append('src/')
+from misc import *
+from newick import *
+from stateFreqs import *
+from matrixBuilder import *
+from evolver import *
+
+# Nei-Gojobori code
+from mutation_counter import *
+from site_counter import *
+
+# Globals
+zero = 1e-8
+amino_acids  = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
+codons=["AAA", "AAC", "AAG", "AAT", "ACA", "ACC", "ACG", "ACT", "AGA", "AGC", "AGG", "AGT", "ATA", "ATC", "ATG", "ATT", "CAA", "CAC", "CAG", "CAT", "CCA", "CCC", "CCG", "CCT", "CGA", "CGC", "CGG", "CGT", "CTA", "CTC", "CTG", "CTT", "GAA", "GAC", "GAG", "GAT", "GCA", "GCC", "GCG", "GCT", "GGA", "GGC", "GGG", "GGT", "GTA", "GTC", "GTG", "GTT", "TAC", "TAT", "TCA", "TCC", "TCG", "TCT", "TGC", "TGG", "TGT", "TTA", "TTC", "TTG", "TTT"]
+nslist = [['CAA', 'GAA', 'ACA', 'ATA', 'AGA', 'AAC', 'AAT'], ['CAC', 'TAC', 'GAC', 'ACC', 'ATC', 'AGC', 'AAA', 'AAG'], ['CAG', 'GAG', 'ACG', 'ATG', 'AGG', 'AAC', 'AAT'], ['CAT', 'TAT', 'GAT', 'ACT', 'ATT', 'AGT', 'AAA', 'AAG'], ['CCA', 'TCA', 'GCA', 'AAA', 'ATA', 'AGA'], ['CCC', 'TCC', 'GCC', 'AAC', 'ATC', 'AGC'], ['CCG', 'TCG', 'GCG', 'AAG', 'ATG', 'AGG'], ['CCT', 'TCT', 'GCT', 'AAT', 'ATT', 'AGT'], ['GGA', 'AAA', 'ACA', 'ATA', 'AGC', 'AGT'], ['CGC', 'TGC', 'GGC', 'AAC', 'ACC', 'ATC', 'AGA', 'AGG'], ['TGG', 'GGG', 'AAG', 'ACG', 'ATG', 'AGC', 'AGT'], ['CGT', 'TGT', 'GGT', 'AAT', 'ACT', 'ATT', 'AGA', 'AGG'], ['CTA', 'TTA', 'GTA', 'AAA', 'ACA', 'AGA', 'ATG'], ['CTC', 'TTC', 'GTC', 'AAC', 'ACC', 'AGC', 'ATG'], ['CTG', 'TTG', 'GTG', 'AAG', 'ACG', 'AGG', 'ATA', 'ATC', 'ATT'], ['CTT', 'TTT', 'GTT', 'AAT', 'ACT', 'AGT', 'ATG'], ['AAA', 'GAA', 'CCA', 'CTA', 'CGA', 'CAC', 'CAT'], ['AAC', 'TAC', 'GAC', 'CCC', 'CTC', 'CGC', 'CAA', 'CAG'], ['AAG', 'GAG', 'CCG', 'CTG', 'CGG', 'CAC', 'CAT'], ['AAT', 'TAT', 'GAT', 'CCT', 'CTT', 'CGT', 'CAA', 'CAG'], ['ACA', 'TCA', 'GCA', 'CAA', 'CTA', 'CGA'], ['ACC', 'TCC', 'GCC', 'CAC', 'CTC', 'CGC'], ['ACG', 'TCG', 'GCG', 'CAG', 'CTG', 'CGG'], ['ACT', 'TCT', 'GCT', 'CAT', 'CTT', 'CGT'], ['GGA', 'CAA', 'CCA', 'CTA'], ['AGC', 'TGC', 'GGC', 'CAC', 'CCC', 'CTC'], ['TGG', 'GGG', 'CAG', 'CCG', 'CTG'], ['AGT', 'TGT', 'GGT', 'CAT', 'CCT', 'CTT'], ['ATA', 'GTA', 'CAA', 'CCA', 'CGA'], ['ATC', 'TTC', 'GTC', 'CAC', 'CCC', 'CGC'], ['ATG', 'GTG', 'CAG', 'CCG', 'CGG'], ['ATT', 'TTT', 'GTT', 'CAT', 'CCT', 'CGT'], ['AAA', 'CAA', 'GCA', 'GTA', 'GGA', 'GAC', 'GAT'], ['AAC', 'CAC', 'TAC', 'GCC', 'GTC', 'GGC', 'GAA', 'GAG'], ['AAG', 'CAG', 'GCG', 'GTG', 'GGG', 'GAC', 'GAT'], ['AAT', 'CAT', 'TAT', 'GCT', 'GTT', 'GGT', 'GAA', 'GAG'], ['ACA', 'CCA', 'TCA', 'GAA', 'GTA', 'GGA'], ['ACC', 'CCC', 'TCC', 'GAC', 'GTC', 'GGC'], ['ACG', 'CCG', 'TCG', 'GAG', 'GTG', 'GGG'], ['ACT', 'CCT', 'TCT', 'GAT', 'GTT', 'GGT'], ['AGA', 'CGA', 'GAA', 'GCA', 'GTA'], ['AGC', 'CGC', 'TGC', 'GAC', 'GCC', 'GTC'], ['AGG', 'CGG', 'TGG', 'GAG', 'GCG', 'GTG'], ['AGT', 'CGT', 'TGT', 'GAT', 'GCT', 'GTT'], ['ATA', 'CTA', 'TTA', 'GAA', 'GCA', 'GGA'], ['ATC', 'CTC', 'TTC', 'GAC', 'GCC', 'GGC'], ['ATG', 'CTG', 'TTG', 'GAG', 'GCG', 'GGG'], ['ATT', 'CTT', 'TTT', 'GAT', 'GCT', 'GGT'], ['AAC', 'CAC', 'GAC', 'TCC', 'TTC', 'TGC'], ['AAT', 'CAT', 'GAT', 'TCT', 'TTT', 'TGT'], ['ACA', 'CCA', 'GCA', 'TTA'], ['ACC', 'CCC', 'GCC', 'TAC', 'TTC', 'TGC'], ['ACG', 'CCG', 'GCG', 'TTG', 'TGG'], ['ACT', 'CCT', 'GCT', 'TAT', 'TTT', 'TGT'], ['AGC', 'CGC', 'GGC', 'TAC', 'TCC', 'TTC', 'TGG'], ['AGG', 'CGG', 'GGG', 'TCG', 'TTG', 'TGC', 'TGT'], ['AGT', 'CGT', 'GGT', 'TAT', 'TCT', 'TTT', 'TGG'], ['ATA', 'GTA', 'TCA', 'TTC', 'TTT'], ['ATC', 'CTC', 'GTC', 'TAC', 'TCC', 'TGC', 'TTA', 'TTG'], ['ATG', 'GTG', 'TCG', 'TGG', 'TTC', 'TTT'], ['ATT', 'CTT', 'GTT', 'TAT', 'TCT', 'TGT', 'TTA', 'TTG']]
+
+
+
+
+
+
+        
+
+############################# SIMULATION FUNCTION #######################################
+
+def simulate(seqfile, numaa, freqClass, freqBy, treefile, mu, length):
+    ''' Simulate single partition according to mutsel model.
+        Uses equal mutation rates.
+    '''
+    
+    my_tree = readTree(file = treefile)
+    print "building freqs"
+    
+    # Equal frequencies
+    if freqClass == 'equal':
+        fobj = EqualFreqs(by = freqBy, type = 'codon')
+    
+    # Random frequencies
+    elif freqClass == 'random':
+        fobj = RandFreqs(by = freqBy, type = 'codon')
+    
+    # User frequencies
+    elif freqClass == 'user':
+        userFreq = generateExpFreqDict(numaa)
+        fobj = UserFreqs(by = freqBy, type = 'codon', freqs = userFreq)
+    f = fobj.calcFreqs() 
+
+    else:
+        raise AssertionError("Bad freqClass specification. Byebye.")
+   
+    
+    print "building model"
+    model = Model()
+    params = {'mu': {'AC': mu, 'CA':mu, 'AG': mu, 'GA':mu, 'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'CT': mu, 'TC':mu, 'GT': mu, 'TG':mu}}
+    params['stateFreqs'] = f
+    model.params = params
+    mat = mutSel_MatrixBuilder(model)
+    model.Q = mat.buildQ()
+    partitions = [(length, model)]        
+    
+    print "evolving"
+    myEvolver = StaticEvolver(partitions = partitions, tree = my_tree, outfile = seqfile)
+    myEvolver.sim_sub_tree(my_tree)
+    myEvolver.writeSequences()
+    
+    return f
+
+def generateExpFreqDict(size):
+    ''' Generate a dictionary of exponentially distributed amino acid frequencies.'''
+    
+    assert (2 <= size <= 8), "Can do between [2,8] (inclusive) amino acids"  
+    # To ensure reasonable amino acids are used, taking random columns with this number of amino acids from the hrh1 alignment.
+    which_aa = { 2: ['I', 'V'], 3: ['H', 'K', 'R'], 4: ['A', 'I', 'C', 'V'], 5: ['A', 'S', 'T', 'G', 'V'], 6: ['H', 'K', 'N', 'Q', 'P', 'R'], 7: ['I', 'K', 'M', 'N', 'S', 'R', 'T'], 8: ['C', 'F', 'I', 'H', 'L', 'M', 'V', 'Y']}
+    
+    final_dict = {}
+    raw = np.random.exponential(size=size)
+    raw = raw/np.sum(raw)
+    final = raw/np.max(raw)
+    
+    count = 0
+    for aa in which_aa[size]:
+        final_dict[aa] = final[count]
+        count +=1
+    return final_dict 
+
+
+
+############################ HYPHY-RELATED FUNCTIONS #####################################
+def runhyphy(batchfile, seqfile, treefile, cpu, codonfreq):
+    ''' pretty specific function.'''
+    setuphyphy1 = "cp "+seqfile+" temp.fasta"
+    setup1 = subprocess.call(setuphyphy1, shell = True)
+    assert(setup1 == 0), "couldn't create temp.fasta"
+    
+    setuphyphy2 = "cat "+treefile+" >> temp.fasta"
+    setup2 = subprocess.call(setuphyphy2, shell = True)
+    assert(setup2 == 0), "couldn't add tree to hyphy infile"
+    
+    hyf = freq2Hyphy(codonfreq)
+    setuphyphy3 = "sed 's/PLACEHOLDER/"+hyf+"/g' "+batchfile+" > run.bf"
+    setup3 = subprocess.call(setuphyphy3, shell = True)
+    assert(setup3 == 0), "couldn't properly add in frequencies"
+    
+    hyphy = "./HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
+    runhyphy = subprocess.call(hyphy, shell = True)
+    assert (runhyphy == 0), "hyphy fail"
+    
+    # grab hyphy output
+    hyout = open('hyout.txt', 'r')
+    hylines = hyout.readlines()
+    hyout.close()
+    for line in hylines:
+        findw = re.search("^w=(\d+\.*\d*)", line)
+        if findw:
+            hyphy_w = findw.group(1)
+            break
+    return hyphy_w
+    
+def freq2Hyphy(f):
+    ''' Convert codon frequencies to a form hyphy can use. '''
+    hyphy_f = "{"
+    for freq in f:
+        hyphy_f += "{"
+        hyphy_f += str(freq)
+        hyphy_f += "},"
+    hyphy_f = hyphy_f[:-1]
+    hyphy_f += "}"
+    return hyphy_f
+
+
+
+
+############################ PAML-RELATED FUNCTIONS ###############################
+def runpaml(seqfile):
+    setuppaml1 = "cp "+seqfile+" temp.fasta"
+    setup1 = subprocess.call(setuppaml1, shell = True)
+    assert(setup1 == 0), "couldn't create temp.fasta"
+    runpaml = subprocess.call("./codeml", shell=True)
+    assert (runpaml == 0), "paml fail"
+
+    # Grab paml output
+    paml_w = parsePAML("outfile")
+    return paml_w
+    
+def parsePAML(pamlfile):
+    ''' get the omega from a paml file. model run is single omega for an entire alignment. '''
+    paml = open(pamlfile, 'rU')
+    pamlines = paml.readlines()
+    paml.close()
+    omega = None
+    for line in pamlines:
+        findw = re.search("^omega \(dN\/dS\) =  (\d+\.*\d*)", line)
+        if findw:
+            omega = findw.group(1)
+            break
+    assert (omega is not None), "couldn't get omega from paml file"
+    return omega
+
+
+
+
+############################# NEI-GOJOBORI FUNCTIONS ##################################
+def run_neigojo(seqfile):
+    ''' Get omega using counting method '''
+    M = MutationCounter()
+    S = SiteCounter()
+    records = list(SeqIO.parse(seqfile, 'fasta'))
+    s1 = records[0].seq
+    s2 = records[1].seq
+    ( ns_mut, s_mut ) = M.countMutations( s1, s2 )
+    ( ns_sites1, s_sites1 ) = S.countSites( s1 )
+    ( ns_sites2, s_sites2 ) = S.countSites( s2 )
+    dS = 2*sum( s_mut )/(sum( s_sites1 ) + sum( s_sites2 ))
+    dN = 2*sum( ns_mut )/(sum( ns_sites2 ) + sum( ns_sites2 ))
+    return dN/dS
+
+
+
+############################# OMEGA DERIVATION FUNCTIONS ##############################
+
+def deriveOmega(codonFreq):
+    ''' Derive an omega using codon frequencies. ''' 
+    nonZero = getNonZeroFreqs(freqs) # get indices which aren't zero.
+    
+    kN=0. #dN numerator
+    nN=0. #dN denominator. NOTE: Does not correct for consider number of nonsyn options
+
+    # Calculations
+    for i in nonZero:
+        fix_sum=0.
+        
+        ### Nonsynonymous.
+        for nscodon in nslist[i]:
+            nscodon_freq = codonFreq[codons.index(nscodon)]
+            fix_sum += fix(float(codonFreq[i]), float(nscodon_freq))                    
+            nN += codonFreq[i]
+        kN += fix_sum*codonFreq[i]
+
+    # Final dN/dS
+    if kN < zero:
+        return 0.
+    else:
+        return kN/nN
+
+def getNonZeroFreqs(freq):
+    ''' Return indices whose frequencies are not 0.'''
+    nonZero = []
+    for i in range(len(freq)):
+        if freq[i] > zero:
+            nonZero.append(i)
+    return nonZero
+    
+#########################################################################################
