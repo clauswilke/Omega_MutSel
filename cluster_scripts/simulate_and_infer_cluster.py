@@ -29,18 +29,19 @@ rdir = sys.argv[2]
 if rdir[-1] != '/':
 	rdir += '/'
 final_outfile = rdir + sys.argv[3]
-#treefile = sys.argv[4]
+rep = sys.argv[4]
+#treefile = sys.argv[5]
 
-outfile = rdir+"mutsel_"+str(run)+".txt"
-seqfile = str(run)+'.fasta'
+outfile = rdir+"mutsel_"+str(rep)+".txt"
+seqfile = "rep"+str(rep)+'.fasta'
 numaa = 5
 mu = 0.001
-length = 10000
-2tree = "(t1:0.5, t2:0.5);"
+length = 20
+treestring = "(t1:0.5, t2:0.5);"
 
 # Simulate
 print "simulating"
-f = simulate(seqfile, numaa, "user", "amino", 2tree, mu, length)
+f = simulate(seqfile, numaa, "user", "amino", treestring, mu, length)
 
 # Use math to derive an omega for the simulated sequences
 print "deriving"

@@ -35,13 +35,14 @@ nslist = [['CAA', 'GAA', 'ACA', 'ATA', 'AGA', 'AAC', 'AAT'], ['CAC', 'TAC', 'GAC
 
 ############################# SIMULATION FUNCTION #######################################
 
-def simulate(seqfile, numaa, freqClass, freqBy, treefile, mu, length):
+def simulate(seqfile, numaa, freqClass, freqBy, tree, mu, length):
     ''' Simulate single partition according to mutsel model.
         Uses equal mutation rates.
     '''
-    
-    my_tree = readTree(file = treefile)
-    print "building freqs"
+    try:
+        my_tree = readTree(file = treefile)
+    except:
+        my_tree = readTree(tree = tree)
     
     # Equal frequencies
     if freqClass == 'equal':
@@ -55,13 +56,12 @@ def simulate(seqfile, numaa, freqClass, freqBy, treefile, mu, length):
     elif freqClass == 'user':
         userFreq = generateExpFreqDict(numaa)
         fobj = UserFreqs(by = freqBy, type = 'codon', freqs = userFreq)
-    f = fobj.calcFreqs() 
 
     else:
         raise AssertionError("Bad freqClass specification. Byebye.")
    
+    f = fobj.calcFreqs() 
     
-    print "building model"
     model = Model()
     params = {'mu': {'AC': mu, 'CA':mu, 'AG': mu, 'GA':mu, 'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'CT': mu, 'TC':mu, 'GT': mu, 'TG':mu}}
     params['stateFreqs'] = f
@@ -70,12 +70,12 @@ def simulate(seqfile, numaa, freqClass, freqBy, treefile, mu, length):
     model.Q = mat.buildQ()
     partitions = [(length, model)]        
     
-    print "evolving"
     myEvolver = StaticEvolver(partitions = partitions, tree = my_tree, outfile = seqfile)
     myEvolver.sim_sub_tree(my_tree)
     myEvolver.writeSequences()
     
     return f
+
 
 def generateExpFreqDict(size):
     ''' Generate a dictionary of exponentially distributed amino acid frequencies.'''
@@ -86,8 +86,7 @@ def generateExpFreqDict(size):
     
     final_dict = {}
     raw = np.random.exponential(size=size)
-    raw = raw/np.sum(raw)
-    final = raw/np.max(raw)
+    final = raw/np.sum(raw)
     
     count = 0
     for aa in which_aa[size]:
