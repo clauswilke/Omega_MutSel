@@ -84,6 +84,7 @@ def generateExpFreqDict(size, specified=True):
     ''' Generate a dictionary of exponentially distributed amino acid frequencies.
         size = number of amino acids
         specified = use the prespecified amino acids for a given size (True) or get random amino acids (False)
+        NOTE: if size==1 or size>6, we will just get random amino acids, NOT SPECIFIED. When that many, probably physiochemical properties don't mean much anymore.
     '''
 
     # Create the amino acid frequency distribution
@@ -92,15 +93,14 @@ def generateExpFreqDict(size, specified=True):
     final = raw/np.sum(raw)
     
     # Create a dictionary of frequencies using "final"
-    if specified:    
-        assert (2 <= size <= 8), "Can do between [2,8] (inclusive) amino acids when using prespecified aa choices"  
-        prespec_aa = { 2: ['I', 'V'], 3: ['H', 'K', 'R'], 4: ['A', 'I', 'C', 'V'], 5: ['A', 'S', 'T', 'G', 'V'], 6: ['H', 'K', 'N', 'Q', 'P', 'R'], 7: ['I', 'K', 'M', 'N', 'S', 'R', 'T'], 8: ['C', 'F', 'I', 'H', 'L', 'M', 'V', 'Y']}
+    if specified and 2<=size<=6:    
+        prespec_aa = { 2: ['I', 'V'], 3: ['H', 'K', 'R'], 4: ['A', 'S', 'C', 'V'], 5: ['A', 'S', 'T', 'G', 'V'], 6: ['A', 'S', 'T', 'G', 'V', 'C']}
         count = 0
         for aa in prespec_aa[size]:
             final_dict[aa] = final[count]
             count +=1
     else:
-        assert (2 <= size <= 20), "that's a silly size."
+        assert (1 <= size <= 20), "that's a silly size."
         aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
         for i in range(size):
             n = randint(0,len(aminos)-1)
