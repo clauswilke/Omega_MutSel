@@ -3,7 +3,7 @@
 
       seqfile = temp.fasta * sequence data filename
      treefile = tree.tre      * tree structure file name
-      outfile = outfile           * main result file name
+      outfile = pamloutfile           * main result file name
 
         noisy = 0  * 0,1,2,3,9: how much rubbish on the screen
       verbose = 1  * 0: concise; 1: detailed, 2: too much

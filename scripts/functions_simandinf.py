@@ -171,7 +171,7 @@ def runpaml(seqfile):
     assert (runpaml == 0), "paml fail"
 
     # Grab paml output
-    paml_w = parsePAML("outfile")
+    paml_w = parsePAML("pamloutfile")
     return paml_w
     
 def parsePAML(pamlfile):
