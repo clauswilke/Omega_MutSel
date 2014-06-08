@@ -244,9 +244,9 @@ def run_neigojo(seqfile):
 
 ############################# OMEGA DERIVATION FUNCTIONS ##############################
 
-def deriveOmega(codonFreq, correct=True):
+def deriveOmega(codonFreq, correct=False):
     ''' Derive an omega using codon frequencies. 
-        correct = should I correct for number of nonsynomymous codons? Default, yes.    
+        correct = should I correct for number of nonsynomymous codons? Default, no. Probably don't do it, either, since our nei-gojobori implementation doesn't.    
     ''' 
     nonZero = getNonZeroFreqs(codonFreq) # get indices which aren't zero.
     
