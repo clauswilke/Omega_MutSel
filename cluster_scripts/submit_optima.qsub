@@ -1,4 +1,4 @@
-## SJS. shell script to vary numaa from [3,7]. starts with NUMAA=3
+## SJS. shell script to vary numaa from [3,15]. starts with NUMAA=3
 
 # establish initial condition variable
 start=3
