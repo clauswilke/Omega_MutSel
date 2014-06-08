@@ -1,9 +1,11 @@
-global w=MYINITIALW;
+global w;
 global k;
 global t;
 
 LIKELIHOOD_FUNCTION_OUTPUT = 1;
 RANDOM_STARTING_PERTURBATIONS = 1;
+GLOBAL_STARTING_POINT = MYINITIALW;
+
 
 /* Include relevant functions */
 #include "matrices.mdl"; //rate matrices
