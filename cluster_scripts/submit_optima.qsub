@@ -8,7 +8,7 @@ stop=20
 qsub optima.qsub
 
 # submit lots
-for ((i=3;i<$stop;i++)); do
+for ((i=$start;i<$stop;i++)); do
     next=$[i+1]
     sed -i "s/NUMAA=$i/NUMAA=$next/g" optima.qsub 
     qsub optima.qsub
