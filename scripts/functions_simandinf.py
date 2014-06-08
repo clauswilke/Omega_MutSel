@@ -48,14 +48,16 @@ def simulate(seqfile, numaa, freqClass, freqBy, tree, mu, length, prespec = Fals
     # Equal frequencies
     if freqClass == 'equal':
         fobj = EqualFreqs(by = freqBy, type = 'codon')
+        aminos_used = ''
     
     # Random frequencies
     elif freqClass == 'random':
         fobj = RandFreqs(by = freqBy, type = 'codon')
-    
+        aminos_used = ''
+        
     # User frequencies
     elif freqClass == 'user':
-        userFreq = generateExpFreqDict(numaa, prespec)
+        userFreq, aminos_used = generateExpFreqDict(numaa, prespec)
         fobj = UserFreqs(by = freqBy, type = 'codon', freqs = userFreq)
 
     else:
@@ -75,7 +77,7 @@ def simulate(seqfile, numaa, freqClass, freqBy, tree, mu, length, prespec = Fals
     myEvolver.sim_sub_tree(my_tree)
     myEvolver.writeSequences()
     
-    return f
+    return f, aminos_used
 
 
 def generateExpFreqDict(size, specified=True):
@@ -101,11 +103,11 @@ def generateExpFreqDict(size, specified=True):
         assert (2 <= size <= 20), "that's a silly size."
         aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
         for i in range(size):
-            n = randint(0,len(aas)-1)
+            n = randint(0,len(aminos)-1)
             final_dict[aminos[n]] = final[i]
             aminos.pop(n)        
     
-    return final_dict 
+    return final_dict, "".join(final_dict.keys()) 
 
 
 

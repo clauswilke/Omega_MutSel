@@ -41,7 +41,7 @@ numaa = int(sys.argv[5])
 # Global simulation stuff
 seqfile = "rep"+str(rep)+'.fasta'
 mu = 0.001
-length = 10000
+length = 20
 
 
 # Write treestring to file
@@ -53,7 +53,7 @@ treef.close()
 
 # Simulate
 print "simulating"
-f = simulate(seqfile, numaa, "user", "amino", treefile, mu, length, False) # last argument = don't use prespecified amino acid choices.
+f, aminos_used = simulate(seqfile, numaa, "user", "amino", treefile, mu, length, False) # last argument = don't use prespecified amino acid choices.
 
 # Use math to derive an omega for the simulated sequences
 print "deriving"
@@ -74,7 +74,7 @@ hyphy_w_kappafixed = runhyphy("globalGY94.bf", "GY94_fixedkappa", seqfile, treef
 		
 # Now save everything to file
 outf = open("tempout.txt", 'w')
-outf.write(str(numaa) + '\t' + str(derived_w) + '\t' + str(nei_w) + '\t' + str(paml_w) + '\t' + str(hyphy_w_kappafixed)+ '\n')
+outf.write(str(numaa) + '\t' + str(derived_w) + '\t' + str(nei_w) + '\t' + str(paml_w) + '\t' + str(hyphy_w_kappafixed) + '\t' + aminos_used + '\n')
 outf.close()
 
 # And now send to the final outfile
