@@ -7,12 +7,12 @@
 #$ -q wilke
 #$ -m beas
 #$ -t 1-100:1
-#$ -pe serial 14
+#$ -pe serial 16
 
 
 source ~/.bash_profile
 
-CPU=14
+CPU=16
 NUMAA=4
 FINALFILE=mutsel-$JOB_NAME-$NUMAA.txt
 
