@@ -41,7 +41,7 @@ numaa = int(sys.argv[5])
 # Global simulation stuff
 seqfile = "rep"+str(rep)+'.fasta'
 mu = 0.001
-length = 20
+length = 10000
 
 
 # Write treestring to file
