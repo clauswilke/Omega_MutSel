@@ -131,7 +131,7 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, codonfreq, initw):
     setup4 = subprocess.call(setuphyphy4, shell = True)
     assert(setup4 == 0), "couldn't properly define matrix"
     
-    setuphyphy5 = "sed -i 's/INITIALW/"+initw+"/g' run.bf"
+    setuphyphy5 = "sed -i 's/MYINITIALW/"+str(initw)+"/g' run.bf"
     setup5 = subprocess.call(setuphyphy5, shell = True)
     assert(setup5 == 0), "couldn't properly define intial omega guess"
     
@@ -171,7 +171,7 @@ def runpaml(seqfile, initw):
     setup1 = subprocess.call(setuppaml1, shell = True)
     assert(setup1 == 0), "couldn't create temp.fasta"
     
-    setuppaml2 = 'sed "s/MYINITIALW/'+initw+'/g" codeml_raw.txt > codeml.ctl" 
+    setuppaml2 = 'sed "s/MYINITIALW/'+str(initw)+'/g" codeml_raw.txt > codeml.ctl' 
     setup2 = subprocess.call(setuppaml2, shell = True)
     assert(setup2 == 0), "couldn't set paml initial w"
     
