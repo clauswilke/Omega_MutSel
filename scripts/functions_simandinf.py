@@ -112,7 +112,7 @@ def generateExpFreqDict(size, specified=True):
 
 
 ############################ HYPHY-RELATED FUNCTIONS #####################################
-def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, codonfreq, initw):
+def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, codonfreq, initw=0.5):
     ''' pretty specific function.'''
     setuphyphy1 = "cp "+seqfile+" temp.fasta"
     setup1 = subprocess.call(setuphyphy1, shell = True)
@@ -166,7 +166,7 @@ def freq2Hyphy(f):
 
 
 ############################ PAML-RELATED FUNCTIONS ###############################
-def runpaml(seqfile, initw):
+def runpaml(seqfile, initw=0.5):
     setuppaml1 = "cp "+seqfile+" temp.fasta"
     setup1 = subprocess.call(setuppaml1, shell = True)
     assert(setup1 == 0), "couldn't create temp.fasta"
