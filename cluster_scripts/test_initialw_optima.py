@@ -57,9 +57,10 @@ treef.close()
 print "simulating"
 f, aminos_used = simulate(seqfile, numaa, "user", "amino", treefile, mu, length, True) # last argument = don't use prespecified amino acid choices.
 
-# Use math to derive an omega for the simulated sequences
+
+# Use math to derive an omega for the simulated sequences. Also returns the number of codons theoretically sampled.
 print "deriving"
-derived_w = deriveOmega(f)
+derived_w, num_codons = deriveOmega(f)
 
 # Nei-Gojobori Method
 print "nei-gojobori"
@@ -71,7 +72,7 @@ outf = open("tempout.txt", 'w')
 for initw in initial_omega:
     paml_w = runpaml(seqfile, initw)
     hyphy_w_kappafixed = runhyphy("globalGY94.bf", "GY94_fixedkappa", seqfile, treefile, cpu, f, initw)
-    outf.write(rep + '\t' + str(numaa) + '\t' + str(derived_w) + '\t' + str(nei_w) + '\t' + str(initw) + '\t' + str(paml_w) + '\t' + str(hyphy_w_kappafixed) + '\n')
+    outf.write(rep + '\t' + str(numaa) + '\t' + str(derived_w) + '\t' + str(nei_w) + '\t' + str(initw) + '\t' + str(paml_w) + '\t' + str(hyphy_w_kappafixed) + '\t' + aminos_used + '\t' + str(num_codons) + '\n')
 outf.close()
 		
 
