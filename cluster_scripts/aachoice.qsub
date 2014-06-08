@@ -50,6 +50,5 @@ python test_sensitivity_aachoice.py $CPU $RDIR $FINALFILE $SGE_TASK_ID $NUMAA
 cp *.fasta $RDIR
 cp *.tre $RDIR
 cp *.bf $RDIR
-cp *.log $RDIR
-cp mutsel_* $RDIR
+cp pamloutfile RDIR/pamloutfile$SGE_TASK_ID
 rm -rf $WDIR
