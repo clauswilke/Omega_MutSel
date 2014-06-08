@@ -1,18 +1,13 @@
-
-fprintf("hi.log", "1");
-global w;
+global w=0.4;
 global k;
 global t=0.5;
 
 LIKELIHOOD_FUNCTION_OUTPUT = 1;
 RANDOM_STARTING_PERTURBATIONS = 1;
-fprintf("hi.log", "2");
 
 /* Include relevant functions */
 #include "matrices.mdl"; //rate matrices
-fprintf("hi.log", "3");
 #include "GY94_Header.ibf";
-fprintf("hi.log", "4");
 /* Read in the data */
 DataSet	raw_data = ReadDataFile("temp.fasta");
 
@@ -21,8 +16,6 @@ DataSetFilter   filt_data = CreateFilter(raw_data,3,"", "","TAA,TAG,TGA");
 
 /* Set codon frequencies to KNOWN */
 codonFreq_data = PLACEHOLDER;
-fprintf("hi.log", "5");
-fprintf ("hi.log", codonFreq_data);
 
 /* Define the model and tree */
 Model MyModel = (MYMATRIX, codonFreq_data, 1);
