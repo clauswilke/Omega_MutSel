@@ -2,8 +2,8 @@
 ## Script to test whether WHICH amino acids are used produces any systematic bias.
 ## PIPELINE:
 #### 1. Create an exponential distribution of amino acid frequencies
-#### 2. Run that distribution for 100 combinations of [2,10] amino acids
-
+#### 2. Run that distribution for 100 combinations of a certain number of amino acids
+# NOTE: On 6/8/14, tested [4,12] numaa's, as specified in aachoice.qsub and submit_aachoice.qsub
 
 
 import os
