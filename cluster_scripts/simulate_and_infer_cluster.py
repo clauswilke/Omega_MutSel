@@ -30,22 +30,26 @@ if rdir[-1] != '/':
 	rdir += '/'
 final_outfile = rdir + sys.argv[3]
 rep = sys.argv[4]
-#treefile = sys.argv[5]
+numaa = int(sys.argv[5])
 
 outfile = rdir+"mutsel_"+str(rep)+".txt"
 seqfile = "rep"+str(rep)+'.fasta'
-numaa = 5
 mu = 0.001
-length = 20
-treestring = "(t1:0.5, t2:0.5);"
+length = 10000
+
+# Write treestring to file
+treefile = "tree.tre"
+treef = open(treefile, 'w')
+treef.write("(t1:0.5, t2:0.5);")
+treef.close()
 
 # Simulate
 print "simulating"
-f = simulate(seqfile, numaa, "user", "amino", treestring, mu, length)
+f = simulate(seqfile, numaa, "user", "amino", treefile, mu, length)
 
 # Use math to derive an omega for the simulated sequences
 print "deriving"
-derived_w = deriveAverageOmegaAlignment(seqfile, f)
+derived_w = deriveOmega(f)
 
 # Nei-Gojobori Method
 print "nei-gojobori"
@@ -57,11 +61,12 @@ paml_w = runpaml(seqfile)
 
 # Send to HyPhy
 print "hyphy"
-hyphy_w = runhyphy("globalGY94.bf", seqfile, treefile, cpu, f)
+hyphy_w_kappafree = runhyphy("globalGY94.bf", "GY94", seqfile, treefile, cpu, f)
+hyphy_w_kappafixed = runhyphy("globalGY94.bf", "GY94_fixedkappa", seqfile, treefile, cpu, f)
 		
 # Now save everything to file
 outf = open(outfile, 'w')
-outf.write(str(numaa) + '\t' + str(derived_w) + '\t' + str(nei_w) + '\t' + str(paml_w) + '\t' + str(hyphy_w) + '\n')
+outf.write(str(numaa) + '\t' + str(derived_w) + '\t' + str(nei_w) + '\t' + str(paml_w) + '\t' + str(hyphy_w_kappafree) + '\t' + str(hyphy_w_kappafixed)+ '\n')
 outf.close()
 
 # And now send to the final outfile

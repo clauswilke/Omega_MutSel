@@ -40,7 +40,7 @@ def simulate(seqfile, numaa, freqClass, freqBy, tree, mu, length):
         Uses equal mutation rates.
     '''
     try:
-        my_tree = readTree(file = treefile)
+        my_tree = readTree(file = tree)
     except:
         my_tree = readTree(tree = tree)
     
@@ -63,7 +63,7 @@ def simulate(seqfile, numaa, freqClass, freqBy, tree, mu, length):
     f = fobj.calcFreqs() 
     
     model = Model()
-    params = {'mu': {'AC': mu, 'CA':mu, 'AG': mu, 'GA':mu, 'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'CT': mu, 'TC':mu, 'GT': mu, 'TG':mu}}
+    params = {'alpha':1.0, 'beta':1.0, 'mu': {'AC': mu, 'CA':mu, 'AG': mu, 'GA':mu, 'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'CT': mu, 'TC':mu, 'GT': mu, 'TG':mu}}
     params['stateFreqs'] = f
     model.params = params
     mat = mutSel_MatrixBuilder(model)
@@ -97,7 +97,7 @@ def generateExpFreqDict(size):
 
 
 ############################ HYPHY-RELATED FUNCTIONS #####################################
-def runhyphy(batchfile, seqfile, treefile, cpu, codonfreq):
+def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, codonfreq):
     ''' pretty specific function.'''
     setuphyphy1 = "cp "+seqfile+" temp.fasta"
     setup1 = subprocess.call(setuphyphy1, shell = True)
@@ -111,6 +111,12 @@ def runhyphy(batchfile, seqfile, treefile, cpu, codonfreq):
     setuphyphy3 = "sed 's/PLACEHOLDER/"+hyf+"/g' "+batchfile+" > run.bf"
     setup3 = subprocess.call(setuphyphy3, shell = True)
     assert(setup3 == 0), "couldn't properly add in frequencies"
+    
+    setuphyphy4 = "sed -i 's/MYMATRIX/"+matrix_name+"/g' run.bf"
+    setup4 = subprocess.call(setuphyphy4, shell = True)
+    assert(setup4 == 0), "couldn't properly define matrix"
+    
+    
     
     hyphy = "./HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
     runhyphy = subprocess.call(hyphy, shell = True)
@@ -191,7 +197,7 @@ def run_neigojo(seqfile):
 
 def deriveOmega(codonFreq):
     ''' Derive an omega using codon frequencies. ''' 
-    nonZero = getNonZeroFreqs(freqs) # get indices which aren't zero.
+    nonZero = getNonZeroFreqs(codonFreq) # get indices which aren't zero.
     
     kN=0. #dN numerator
     nN=0. #dN denominator. NOTE: Does not correct for consider number of nonsyn options
@@ -220,5 +226,12 @@ def getNonZeroFreqs(freq):
         if freq[i] > zero:
             nonZero.append(i)
     return nonZero
-    
+
+def fix(fi, fj):
+    if fi == fj:
+        return 1.
+    elif fi == 0.  or fj == 0.:
+        return 0.
+    else:
+        return (np.log(fj) - np.log(fi)) / (1 - fi/fj)
 #########################################################################################
