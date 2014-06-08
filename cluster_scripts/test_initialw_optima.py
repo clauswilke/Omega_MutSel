@@ -55,7 +55,7 @@ treef.close()
 
 # Simulate
 print "simulating"
-f, aminos_used = simulate(seqfile, numaa, "user", "amino", treefile, mu, length, True) # last argument = don't use prespecified amino acid choices.
+f, aminos_used = simulate(seqfile, numaa, "user", "amino", treefile, mu, length)
 
 
 # Use math to derive an omega for the simulated sequences. Also returns the number of codons theoretically sampled.
