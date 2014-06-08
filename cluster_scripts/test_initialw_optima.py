@@ -1,7 +1,7 @@
 ## SJS.
 ## Script to test whether the initial omega guess causes local optima problems.
 ## PIPELINE:
-#### Use prespecified amino acid list for 4,5, and 6 amino acids (set this up in optima.qsub).
+#### Use prespecified amino acid list for [3,7] amino acids (set this up in optima.qsub).
 #### Test the following 4 intial omega guesses - 0.01, 0.1, 0.5, 1.0
 #### Examines if a local optima messes things up.
 
