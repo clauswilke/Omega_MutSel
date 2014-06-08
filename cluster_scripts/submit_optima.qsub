@@ -1,13 +1,14 @@
-## SJS. shell script to vary numaa from [3,15]. starts with NUMAA=3
+## SJS. shell script to vary numaa from [1,20]. starts with NUMAA=1
 
 # establish initial condition variable
-start=3
+start=1
+stop=20
 
 # submit initial NUMAA=3 condition
 qsub optima.qsub
 
 # submit lots
-for ((i=3;i<7;i++)); do
+for ((i=3;i<$stop;i++)); do
     next=$[i+1]
     sed -i "s/NUMAA=$i/NUMAA=$next/g" optima.qsub 
     qsub optima.qsub
