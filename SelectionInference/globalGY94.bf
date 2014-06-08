@@ -1,6 +1,6 @@
-global w=0.4;
+global w=MYINITIALW;
 global k;
-global t=0.5;
+global t;
 
 LIKELIHOOD_FUNCTION_OUTPUT = 1;
 RANDOM_STARTING_PERTURBATIONS = 1;
@@ -15,7 +15,7 @@ DataSet	raw_data = ReadDataFile("temp.fasta");
 DataSetFilter   filt_data = CreateFilter(raw_data,3,"", "","TAA,TAG,TGA");
 
 /* Set codon frequencies to KNOWN */
-codonFreq_data = PLACEHOLDER;
+codonFreq_data = MYFREQUENCIES;
 
 /* Define the model and tree */
 Model MyModel = (MYMATRIX, codonFreq_data, 1);
