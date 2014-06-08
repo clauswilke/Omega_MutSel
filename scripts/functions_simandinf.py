@@ -112,7 +112,7 @@ def generateExpFreqDict(size, specified=True):
 
 
 ############################ HYPHY-RELATED FUNCTIONS #####################################
-def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, codonfreq):
+def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, codonfreq, initw):
     ''' pretty specific function.'''
     setuphyphy1 = "cp "+seqfile+" temp.fasta"
     setup1 = subprocess.call(setuphyphy1, shell = True)
@@ -123,7 +123,7 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, codonfreq):
     assert(setup2 == 0), "couldn't add tree to hyphy infile"
     
     hyf = freq2Hyphy(codonfreq)
-    setuphyphy3 = "sed 's/PLACEHOLDER/"+hyf+"/g' "+batchfile+" > run.bf"
+    setuphyphy3 = "sed 's/MYFREQUENCIES/"+hyf+"/g' "+batchfile+" > run.bf"
     setup3 = subprocess.call(setuphyphy3, shell = True)
     assert(setup3 == 0), "couldn't properly add in frequencies"
     
@@ -131,6 +131,9 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, codonfreq):
     setup4 = subprocess.call(setuphyphy4, shell = True)
     assert(setup4 == 0), "couldn't properly define matrix"
     
+    setuphyphy5 = "sed -i 's/INITIALW/"+initw+"/g' run.bf"
+    setup5 = subprocess.call(setuphyphy5, shell = True)
+    assert(setup5 == 0), "couldn't properly define intial omega guess"
     
     
     hyphy = "./HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
@@ -163,10 +166,15 @@ def freq2Hyphy(f):
 
 
 ############################ PAML-RELATED FUNCTIONS ###############################
-def runpaml(seqfile):
+def runpaml(seqfile, initw):
     setuppaml1 = "cp "+seqfile+" temp.fasta"
     setup1 = subprocess.call(setuppaml1, shell = True)
     assert(setup1 == 0), "couldn't create temp.fasta"
+    
+    setuppaml2 = 'sed "s/MYINITIALW/'+initw+'/g" codeml_raw.txt > codeml.ctl" 
+    setup2 = subprocess.call(setuppaml2, shell = True)
+    assert(setup2 == 0), "couldn't set paml initial w"
+    
     runpaml = subprocess.call("./codeml", shell=True)
     assert (runpaml == 0), "paml fail"
 
