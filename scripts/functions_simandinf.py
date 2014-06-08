@@ -181,7 +181,7 @@ def parsePAML(pamlfile):
     paml.close()
     omega = None
     for line in pamlines:
-        findw = re.search("^omega \(dN\/dS\) =  (\d+\.*\d*)", line)
+        findw = re.search("^omega \(dN\/dS\)\s*=\s*(\d+\.*\d*)", line)
         if findw:
             omega = findw.group(1)
             break
