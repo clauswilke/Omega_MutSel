@@ -1,4 +1,4 @@
-## SJS. Functions that accompany simulate_and_infer.py
+## SJS. Functions that accompany simulate_and_infer.py and all derivatives.
 # NOTE: to use simulation library, must cp the src/ directory (*not* contents, the whole directory!) into wdir.
 
 import os
@@ -6,6 +6,7 @@ import re
 import sys
 import subprocess
 import numpy as np
+from random import randint
 
 
 # Simulation code
@@ -33,9 +34,9 @@ nslist = [['CAA', 'GAA', 'ACA', 'ATA', 'AGA', 'AAC', 'AAT'], ['CAC', 'TAC', 'GAC
 
         
 
-############################# SIMULATION FUNCTION #######################################
+############################# SIMULATION FUNCTIONS #######################################
 
-def simulate(seqfile, numaa, freqClass, freqBy, tree, mu, length):
+def simulate(seqfile, numaa, freqClass, freqBy, tree, mu, length, prespec = False):
     ''' Simulate single partition according to mutsel model.
         Uses equal mutation rates.
     '''
@@ -54,7 +55,7 @@ def simulate(seqfile, numaa, freqClass, freqBy, tree, mu, length):
     
     # User frequencies
     elif freqClass == 'user':
-        userFreq = generateExpFreqDict(numaa)
+        userFreq = generateExpFreqDict(numaa, prespec)
         fobj = UserFreqs(by = freqBy, type = 'codon', freqs = userFreq)
 
     else:
@@ -77,21 +78,33 @@ def simulate(seqfile, numaa, freqClass, freqBy, tree, mu, length):
     return f
 
 
-def generateExpFreqDict(size):
-    ''' Generate a dictionary of exponentially distributed amino acid frequencies.'''
-    
-    assert (2 <= size <= 8), "Can do between [2,8] (inclusive) amino acids"  
-    # To ensure reasonable amino acids are used, taking random columns with this number of amino acids from the hrh1 alignment.
-    which_aa = { 2: ['I', 'V'], 3: ['H', 'K', 'R'], 4: ['A', 'I', 'C', 'V'], 5: ['A', 'S', 'T', 'G', 'V'], 6: ['H', 'K', 'N', 'Q', 'P', 'R'], 7: ['I', 'K', 'M', 'N', 'S', 'R', 'T'], 8: ['C', 'F', 'I', 'H', 'L', 'M', 'V', 'Y']}
-    
+def generateExpFreqDict(size, specified=True):
+    ''' Generate a dictionary of exponentially distributed amino acid frequencies.
+        size = number of amino acids
+        specified = use the prespecified amino acids for a given size (True) or get random amino acids (False)
+    '''
+
+    # Create the amino acid frequency distribution
     final_dict = {}
     raw = np.random.exponential(size=size)
     final = raw/np.sum(raw)
     
-    count = 0
-    for aa in which_aa[size]:
-        final_dict[aa] = final[count]
-        count +=1
+    # Create a dictionary of frequencies using "final"
+    if specified:    
+        assert (2 <= size <= 8), "Can do between [2,8] (inclusive) amino acids when using prespecified aa choices"  
+        prespec_aa = { 2: ['I', 'V'], 3: ['H', 'K', 'R'], 4: ['A', 'I', 'C', 'V'], 5: ['A', 'S', 'T', 'G', 'V'], 6: ['H', 'K', 'N', 'Q', 'P', 'R'], 7: ['I', 'K', 'M', 'N', 'S', 'R', 'T'], 8: ['C', 'F', 'I', 'H', 'L', 'M', 'V', 'Y']}
+        count = 0
+        for aa in prespec_aa[size]:
+            final_dict[aa] = final[count]
+            count +=1
+    else:
+        assert (2 <= size <= 20), "that's a silly size."
+        aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
+        for i in range(size):
+            n = randint(0,len(aas)-1)
+            final_dict[aminos[n]] = final[i]
+            aminos.pop(n)        
+    
     return final_dict 
 
 
