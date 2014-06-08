@@ -224,8 +224,10 @@ def run_neigojo(seqfile):
 
 ############################# OMEGA DERIVATION FUNCTIONS ##############################
 
-def deriveOmega(codonFreq):
-    ''' Derive an omega using codon frequencies. ''' 
+def deriveOmega(codonFreq, correct=True):
+    ''' Derive an omega using codon frequencies. 
+        correct = should I correct for number of nonsynomymous codons? Default, yes.    
+    ''' 
     nonZero = getNonZeroFreqs(codonFreq) # get indices which aren't zero.
     
     kN=0. #dN numerator
@@ -238,8 +240,11 @@ def deriveOmega(codonFreq):
         ### Nonsynonymous.
         for nscodon in nslist[i]:
             nscodon_freq = codonFreq[codons.index(nscodon)]
-            fix_sum += fix(float(codonFreq[i]), float(nscodon_freq))                    
-            nN += codonFreq[i]
+            fix_sum += fix(float(codonFreq[i]), float(nscodon_freq))
+            if correct:                    
+                nN += codonFreq[i] * len(nslist[i])
+            else:
+                nN += codonFreq[i]
         kN += fix_sum*codonFreq[i]
 
     # Final dN/dS
