@@ -97,7 +97,7 @@ def checkGrantham(aalist, cutoff):
                 aa2 = aalist[j]
                 key = "".join(sorted(aa1 + aa2))
                 scores.append(grantham[key])
-    if np.mean(scores) <= float(cutoff):
+    if np.mean(scores) <= float(cutoff) or len(aalist)==1:
         return True
     else:
         return False
