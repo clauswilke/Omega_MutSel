@@ -43,7 +43,7 @@ numaa = int(sys.argv[5])
 seqfile = "rep"+str(rep)+'.fasta'
 mu = 0.001
 length = 10000
-intial_omega = [0.01, 0.1, 0.5, 1.0]
+initial_omega = [0.01, 0.1, 0.5, 1.0]
 
 
 # Write treestring to file
