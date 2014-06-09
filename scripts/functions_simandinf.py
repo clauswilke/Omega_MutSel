@@ -38,50 +38,54 @@ grantham = {'AA':0, 'AC':195, 'AD':126, 'AE':107, 'AF':113, 'AG':60, 'AH':86, 'A
 
 ############################# SIMULATION FUNCTIONS #######################################
 
-def simulate(seqfile, numaa, freqClass, freqBy, tree, mu, length):
-    ''' Simulate single partition according to mutsel model.
-        Uses equal mutation rates.
+def simulate(f, seqfile, tree, mu, length, beta=None):
+    ''' Simulate single partition according to either codon or mutsel model (check beta value for which model).
+        Uses equal mutation rates, with kappa=1.0 .
     '''
     try:
         my_tree = readTree(file = tree)
     except:
         my_tree = readTree(tree = tree)
     
+    model = Model()
+    if beta:
+        params = {'alpha':1.0, 'beta':float(beta), 'mu': {'AC': 1.0, 'AG': 1.0, 'AT': 1.0, 'CG': 1.0, 'CT': 1.0, 'GT': 1.0}}
+        params['stateFreqs'] = f
+        model.params = params
+        mat = mechCodon_MatrixBuilder(model)
+    else:
+        params = {'alpha':1.0, 'beta':1.0, 'mu': {'AC': mu, 'CA':mu, 'AG': mu, 'GA':mu, 'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'CT': mu, 'TC':mu, 'GT': mu, 'TG':mu}}
+        params['stateFreqs'] = f
+        model.params = params
+        mat = mutSel_MatrixBuilder(model)
+    
+    model.Q = mat.buildQ()
+    partitions = [(length, model)]        
+    myEvolver = StaticEvolver(partitions = partitions, tree = my_tree, outfile = seqfile)
+    myEvolver.sim_sub_tree(my_tree)
+    myEvolver.writeSequences()
+
+
+
+
+def setFreqs(freqClass, freqBy, numaa = None):
     # Equal frequencies
     if freqClass == 'equal':
         fobj = EqualFreqs(by = freqBy, type = 'codon')
-        aminos_used = ''
-    
+        return fobj.calcFreqs()  
     # Random frequencies
     elif freqClass == 'random':
         fobj = RandFreqs(by = freqBy, type = 'codon')
-        aminos_used = ''
-        
+        return fobj.calcFreqs()      
     # User frequencies
     elif freqClass == 'user':
         userFreq, aminos_used = generateExpFreqDict(numaa)
         fobj = UserFreqs(by = freqBy, type = 'codon', freqs = userFreq)
-
+        return fobj.calcFreqs(), aminos_used
     else:
         raise AssertionError("Bad freqClass specification. Byebye.")
-   
-    f = fobj.calcFreqs() 
-    
-    model = Model()
-    params = {'alpha':1.0, 'beta':1.0, 'mu': {'AC': mu, 'CA':mu, 'AG': mu, 'GA':mu, 'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'CT': mu, 'TC':mu, 'GT': mu, 'TG':mu}}
-    params['stateFreqs'] = f
-    model.params = params
-    mat = mutSel_MatrixBuilder(model)
-    model.Q = mat.buildQ()
-    partitions = [(length, model)]        
-    
-    myEvolver = StaticEvolver(partitions = partitions, tree = my_tree, outfile = seqfile)
-    myEvolver.sim_sub_tree(my_tree)
-    myEvolver.writeSequences()
-    
-    return f, aminos_used
 
-
+     
 
 def checkGrantham(aalist, cutoff):
     ''' Given a list of amino acids, ensure that they can reasonably co-occur based on Grantham indices.
@@ -138,7 +142,7 @@ def generateExpFreqDict(size):
 
 
 ############################ HYPHY-RELATED FUNCTIONS #####################################
-def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, codonfreq, initw=0.5):
+def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, codonfreq, initw=0.4):
     ''' pretty specific function.'''
     setuphyphy1 = "cp "+seqfile+" temp.fasta"
     setup1 = subprocess.call(setuphyphy1, shell = True)
@@ -192,7 +196,7 @@ def freq2Hyphy(f):
 
 
 ############################ PAML-RELATED FUNCTIONS ###############################
-def runpaml(seqfile, initw=0.5):
+def runpaml(seqfile, initw=0.4):
     setuppaml1 = "cp "+seqfile+" temp.fasta"
     setup1 = subprocess.call(setuppaml1, shell = True)
     assert(setup1 == 0), "couldn't create temp.fasta"
