@@ -71,11 +71,13 @@ def simulate(f, seqfile, tree, mu, length, beta=None):
 def setFreqs(freqClass, freqBy, numaa = None):
     # Equal frequencies
     if freqClass == 'equal':
-        fobj = EqualFreqs(by = freqBy, type = 'codon')
+        aalist = generateAAlist(numaa)
+        fobj = EqualFreqs(by = freqBy, type = 'codon', restrict = aalist)
         return fobj.calcFreqs()  
     # Random frequencies
     elif freqClass == 'random':
-        fobj = RandFreqs(by = freqBy, type = 'codon')
+        aalist = generateAAlist(numaa)
+        fobj = RandFreqs(by = freqBy, type = 'codon', restrict = aalist)
         return fobj.calcFreqs()      
     # User frequencies
     elif freqClass == 'user':
@@ -107,18 +109,11 @@ def checkGrantham(aalist, cutoff):
         return False
         
 
-def generateExpFreqDict(size):
-    ''' Generate a dictionary of exponentially distributed amino acid frequencies.
-        size = number of amino acids
-        If size==1, need to make sure that the amino picked has MULTIPLE synonymous codons, otherwise evolution is broken. = NOT AMINO ACID 10,18 (M and W)
-    '''
 
-    # Create the amino acid frequency distribution
-    final_dict = {}
-    raw = np.random.exponential(size=size)
-    final = raw/np.sum(raw)
-    
-    # Get a list of size amino acids. Ensure acceptable distribution by making mean Grantham <=100.
+def generateAAlist(size):
+    ''' Generate a list of size of reasonable co-occuring amino acids.
+        Ensure acceptable choices by making mean pairwise Grantham <=100.
+    '''
     list_is_ok = False
     while not list_is_ok:
         aalist = []
@@ -131,7 +126,20 @@ def generateExpFreqDict(size):
             aalist.append(amino[n])
             amino.pop(n)
         list_is_ok = checkGrantham(aalist, 100)  
+    return aalist
+
+def generateExpFreqDict(size):
+    ''' Generate a dictionary of exponentially distributed amino acid frequencies.
+        size = number of amino acids
+        If size==1, need to make sure that the amino picked has MULTIPLE synonymous codons, otherwise evolution is broken. = NOT AMINO ACID 10,18 (M and W)
+    '''
+
+    # Create the amino acid frequency distribution
+    final_dict = {}
+    raw = np.random.exponential(size=size)
+    final = raw/np.sum(raw)
     
+    aalist = generateAAlist(size)
     count = 0
     for amino in aalist:
         final_dict[amino] = final[count]
