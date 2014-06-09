@@ -38,7 +38,7 @@ numaa = int(sys.argv[5])
 # Global stuff
 seqfile = "rep"+str(rep)+'.fasta'
 mu = 0.005
-length = 50000
+length = 10000
 omegas = [0.05, 0.1, 0.25, 0.5, 0.75, 1.0]
 
 
@@ -59,13 +59,12 @@ for omega in omegas:
     
     # Use math to derive an omega for the simulated sequences. Also returns the number of codons theoretically sampled.
     print "deriving"
-    derived_w, num_codons = deriveOmega(f)
+    #derived_w, num_codons = deriveOmega(f)
 
     # Nei-Gojobori Method
     print "nei-gojobori"
-    nei_w = run_neigojo(seqfile)
-    
-    
+    nei_w, ns_mut, s_mut = run_neigojo(seqfile)
+
     # PAML and HyPhy
     paml_w = runpaml(seqfile)
     hyphy_w_kappafixed = runhyphy("globalGY94.bf", "GY94_fixedkappa", seqfile, treefile, cpu, f)
