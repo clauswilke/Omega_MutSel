@@ -49,7 +49,7 @@ def simulate(f, seqfile, tree, mu, length, beta=None):
     
     model = Model()
     if beta:
-        params = {'alpha':1.0, 'beta':float(beta), 'mu': {'AC': 1.0, 'AG': 1.0, 'AT': 1.0, 'CG': 1.0, 'CT': 1.0, 'GT': 1.0}}
+        params = {'alpha':1.0, 'beta':float(beta), 'mu': {'AC': mu, 'AG': mu, 'AT': mu, 'CG': mu, 'CT': mu, 'GT': mu}}
         params['stateFreqs'] = f
         model.params = params
         mat = mechCodon_MatrixBuilder(model)
@@ -242,7 +242,7 @@ def run_neigojo(seqfile):
     ( ns_sites2, s_sites2 ) = S.countSites( s2 )
     dS = 2*sum( s_mut )/(sum( s_sites1 ) + sum( s_sites2 ))
     dN = 2*sum( ns_mut )/(sum( ns_sites2 ) + sum( ns_sites2 ))
-    return dN/dS
+    return dN/dS, ns_mut, s_mut
 
 
 
