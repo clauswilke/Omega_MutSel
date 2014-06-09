@@ -13,7 +13,7 @@
 source ~/.bash_profile
 
 CPU=16
-NUMAA=1
+NUMAA=3
 FINALFILE=mutsel-$JOB_NAME-$NUMAA.txt
 
 # Set up directories
