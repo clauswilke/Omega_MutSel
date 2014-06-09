@@ -33,7 +33,7 @@ from functions_simandinf import *
 cpu = sys.argv[1]
 rdir = sys.argv[2]
 if rdir[-1] != '/':
-	rdir += '/'
+    rdir += '/'
 final_outfile = rdir + "../" + sys.argv[3]
 rep = sys.argv[4]
 numaa = int(sys.argv[5])
@@ -74,7 +74,7 @@ for initw in initial_omega:
     hyphy_w_kappafixed = runhyphy("globalGY94.bf", "GY94_fixedkappa", seqfile, treefile, cpu, f, initw)
     outf.write(rep + '\t' + str(numaa) + '\t' + str(derived_w) + '\t' + str(nei_w) + '\t' + str(initw) + '\t' + str(paml_w) + '\t' + str(hyphy_w_kappafixed) + '\t' + aminos_used + '\t' + str(num_codons) + '\n')
 outf.close()
-		
+
 
 # And now send to the final outfile
 save = "cat tempout.txt >> "+final_outfile

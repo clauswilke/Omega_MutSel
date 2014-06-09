@@ -32,7 +32,7 @@ from functions_simandinf import *
 cpu = sys.argv[1]
 rdir = sys.argv[2]
 if rdir[-1] != '/':
-	rdir += '/'
+    rdir += '/'
 final_outfile = rdir + "../" + sys.argv[3]
 rep = sys.argv[4]
 numaa = int(sys.argv[5])
@@ -72,7 +72,7 @@ paml_w = runpaml(seqfile)
 print "hyphy"
 #hyphy_w_kappafree = runhyphy("globalGY94.bf", "GY94", seqfile, treefile, cpu, f)
 hyphy_w_kappafixed = runhyphy("globalGY94.bf", "GY94_fixedkappa", seqfile, treefile, cpu, f)
-		
+
 # Now save everything to file
 outf = open("tempout.txt", 'w')
 outf.write(rep + '\t' + str(numaa) + '\t' + str(derived_w) + '\t' + str(nei_w) + '\t' + str(paml_w) + '\t' + str(hyphy_w_kappafixed) + '\t' + aminos_used + '\n')
