@@ -14,6 +14,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.Alphabet import *
 
+
 sys.path.append('src/')
 from misc import *
 from newick import *
@@ -53,7 +54,7 @@ outf = open("tempout.txt", 'w')
 for omega in omegas:
     # Simulate
     print "simulating"
-    f, aminos_used = setFreqs("user", "amino", numaa)
+    f, aminos_used = setFreqs("equal", numaa)
     simulate(f, seqfile, treefile, mu, length, omega)
     
     

@@ -68,24 +68,23 @@ def simulate(f, seqfile, tree, mu, length, beta=None):
 
 
 
-def setFreqs(freqClass, freqBy, numaa = None):
-    # Equal frequencies
-    if freqClass == 'equal':
-        aalist = generateAAlist(numaa)
-        fobj = EqualFreqs(by = freqBy, type = 'codon', restrict = aalist)
-        return fobj.calcFreqs()  
-    # Random frequencies
-    elif freqClass == 'random':
-        aalist = generateAAlist(numaa)
-        fobj = RandFreqs(by = freqBy, type = 'codon', restrict = aalist)
-        return fobj.calcFreqs()      
-    # User frequencies
-    elif freqClass == 'user':
+def setFreqs(freqClass, numaa = None):
+
+    if freqClass == 'user':
         userFreq, aminos_used = generateExpFreqDict(numaa)
-        fobj = UserFreqs(by = freqBy, type = 'codon', freqs = userFreq)
-        return fobj.calcFreqs(), aminos_used
+        fobj = UserFreqs(by = 'amino', type = 'codon', freqs = userFreq)
     else:
-        raise AssertionError("Bad freqClass specification. Byebye.")
+        aalist = generateAAlist(numaa)
+        aminos_used = "".join(aalist)
+        
+        if freqClass == 'equal':
+            fobj = EqualFreqs(by = 'amino', type = 'codon', restrict = aalist)
+        elif freqClass == 'random':
+            fobj = RandFreqs(by = 'amino', type = 'codon', restrict = aalist)              
+        else:
+            raise AssertionError("Bad freqClass specification. Byebye.")
+    
+    return fobj.calcFreqs(), aminos_used
 
      
 
