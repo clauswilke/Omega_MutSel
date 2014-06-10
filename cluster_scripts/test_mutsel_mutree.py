@@ -44,7 +44,7 @@ for treebl in branches:
     treef.close()
     
     for mu in mutations:
-        seqfile = 'seqs'+str(rep)+'_'+str(branches.index(treebl)+'_'+str(mutations.index(mu) + '.fasta'
+        seqfile = 'seqs'+str(rep)+'_'+str(branches.index(treebl))+'_'+str(mutations.index(mu)) + '.fasta'
 
         # Simulate
         print "simulating"
