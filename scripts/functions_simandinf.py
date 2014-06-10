@@ -159,28 +159,34 @@ def generateExpFreqDict(size):
 ############################ HYPHY-RELATED FUNCTIONS #####################################
 def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, codonfreq, initw=0.4):
     ''' pretty specific function.'''
+    
+    # Set up sequence file
     setuphyphy1 = "cp "+seqfile+" temp.fasta"
     setup1 = subprocess.call(setuphyphy1, shell = True)
     assert(setup1 == 0), "couldn't create temp.fasta"
     
+    # Add tree to sequence file
     setuphyphy2 = "cat "+treefile+" >> temp.fasta"
     setup2 = subprocess.call(setuphyphy2, shell = True)
     assert(setup2 == 0), "couldn't add tree to hyphy infile"
     
+    # Set up codon frequencies
     hyf = freq2Hyphy(codonfreq)
     setuphyphy3 = "sed 's/MYFREQUENCIES/"+hyf+"/g' "+batchfile+" > run.bf"
     setup3 = subprocess.call(setuphyphy3, shell = True)
     assert(setup3 == 0), "couldn't properly add in frequencies"
     
+    # Set up matrix, within run.bf
     setuphyphy4 = "sed -i 's/MYMATRIX/"+matrix_name+"/g' run.bf"
     setup4 = subprocess.call(setuphyphy4, shell = True)
     assert(setup4 == 0), "couldn't properly define matrix"
     
+    # Set up initial omega, within run.bf
     setuphyphy5 = "sed -i 's/MYINITIALW/"+str(initw)+"/g' run.bf"
     setup5 = subprocess.call(setuphyphy5, shell = True)
     assert(setup5 == 0), "couldn't properly define intial omega guess"
     
-    
+    # Run hyphy
     hyphy = "./HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
     runhyphy = subprocess.call(hyphy, shell = True)
     assert (runhyphy == 0), "hyphy fail"
@@ -211,15 +217,24 @@ def freq2Hyphy(f):
 
 
 ############################ PAML-RELATED FUNCTIONS ###############################
-def runpaml(seqfile, initw=0.4):
+def runpaml(seqfile, codonFreq = "3", initw = 0.4):
+    
+    # Set up sequende file
     setuppaml1 = "cp "+seqfile+" temp.fasta"
     setup1 = subprocess.call(setuppaml1, shell = True)
     assert(setup1 == 0), "couldn't create temp.fasta"
     
+    # Set up initial omega
     setuppaml2 = 'sed "s/MYINITIALW/'+str(initw)+'/g" codeml_raw.txt > codeml.ctl' 
     setup2 = subprocess.call(setuppaml2, shell = True)
     assert(setup2 == 0), "couldn't set paml initial w"
     
+    # Set up codon frequency specification NOTE: 0:1/61 each, 1:F1X4, 2:F3X4, 3:codon table
+    setuppaml3 = 'sed -i "s/MYCODONFREQ/'+str(codonFreq)+'/g" codeml.ctl' 
+    setup3 = subprocess.call(setuppaml3, shell = True)
+    assert(setup3 == 0), "couldn't set paml codon frequencies"
+    
+    # Run paml
     runpaml = subprocess.call("./codeml", shell=True)
     assert (runpaml == 0), "paml fail"
 
