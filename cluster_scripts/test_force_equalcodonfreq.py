@@ -1,7 +1,7 @@
 ## SJS.
 ## Script to see behavior when we force equal codon frequencies (1/61 for all, REGARDLESS of true dist). 
 ## Use PAML for this since easier!
-## Can do equal or exponential amino acid distributions.
+## Runs with both equal and exponential amino acid distributions.
 
 
 import os
@@ -35,7 +35,8 @@ seqlength = 10000
 treebl =  0.1
 mu = 0.001
 
-outf = open("tempout.txt", 'w')
+pamlFreq = {"0": "1/61", "2": "F3X4", "3": "empirical"}
+freqType = {"user": "expAA", "equal": "equalAA"}
 
 # Write tree given bl specifications
 treefile = "tree.tre"
@@ -43,25 +44,36 @@ treef = open(treefile, 'w')
 treef.write("(t1:" + str(treebl) + ", t2:" + str(treebl) + ");")
 treef.close()
 
-seqfile = 'seqs'+str(rep)+'.fasta'
 
-# Simulate
-print "simulating"
-f, aminos_used = setFreqs("user", numaa)
-simulate(f, seqfile, treefile, mu, seqlength, None) # omega is last arguement. when None, sim via mutsel
 
-# Use math to derive an omega for the simulated sequences. Also returns the number of codons theoretically sampled.
-print "deriving"
-derived_w, num_codons = deriveOmega(f)
+outf = open("tempout.txt", 'w')
+
+
+for type in freqType.keys():
+
+    seqfile = 'seqs_'+freqType+str(rep)+'.fasta'
+
+    # Simulate
+    print "simulating"
+    f, aminos_used = setFreqs(freqType, numaa)
+    simulate(f, seqfile, treefile, mu, seqlength, None) # omega is last arguement. when None, sim via mutsel
     
-# Nei-Gojobori Method
-print "nei-gojobori"
-nei_w, ns_mut, s_mut = run_neigojo(seqfile)
+    # Use math to derive an omega for the simulated sequences. Also returns the number of codons theoretically sampled.
+    print "deriving"
+    derived_w, num_codons = deriveOmega(f)
+       
+    # Nei-Gojobori Method
+    print "nei-gojobori"
+    nei_w, ns_mut, s_mut = run_neigojo(seqfile)
 
-# HyPhy
-print "ML"
-paml_w = runpaml(seqfile, "1") # codonFreq=1 sets 1/61, regardless of reality.
-outf.write(rep + '\t' + str(numaa) + '\t' + str(derived_w) + '\t' + str(nei_w) + '\t' + str(paml_w) + '\t' + aminos_used + '\n')
-
+    # PAML
+    print "ML"
+    pamlw = []
+    for cf in pamlFreq.keys():
+        pamlw.append( runpaml(seqfile, cf) )
+    
+    # Save. CURRECTLY HARDCODED THAT PAMLW HAS LENGTH 3. 
+    outf.write(rep + '\t' + str(numaa) + '\t' + freqType[type] + '\t' + str(derived_w) + '\t' + str(nei_w) + '\t' + str(pamlw[0]) + '\t' + str(pamlw[1]) + '\t' + str(pamlw[2]) + '\n')
+    
 outf.close()
 
