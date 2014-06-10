@@ -1,8 +1,8 @@
-## SJS. shell script to vary numaa from [3,15]. starts with NUMAA=3
+## SJS. shell script to vary numaa and submit dnds.qsub
 
 # establish initial condition variable
 START=3
-STOP=15
+STOP=20
 
 
 # submit initial condition
