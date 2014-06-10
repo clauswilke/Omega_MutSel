@@ -117,18 +117,22 @@ def generateAAlist(size):
     list_is_ok = False
     while not list_is_ok:
         aalist = []
+        
         amino = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
-        for i in range(size):
-            n = randint(0,len(amino)-1)
-            if size == 1:
-                while n == 10 or n == 18:
-                    n = randint(0,len(amino)-1)
-            aalist.append(amino[n])
-            amino.pop(n)
-        if size == 1 or size >= 10:
-            list_is_ok = True
-        else:
-            list_is_ok = checkGrantham(aalist, 100)  
+        if size == 20:
+            return amino
+        else:         
+            for i in range(size):
+                n = randint(0,len(amino)-1)
+                if size == 1:
+                    while n == 10 or n == 18:
+                        n = randint(0,len(amino)-1)
+                aalist.append(amino[n])
+                amino.pop(n)
+            if size == 1 or size >= 10:
+                list_is_ok = True
+            else:
+                list_is_ok = checkGrantham(aalist, 100)  
     return aalist
 
 def generateExpFreqDict(size):
