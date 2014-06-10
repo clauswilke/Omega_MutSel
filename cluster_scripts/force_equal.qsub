@@ -6,14 +6,14 @@
 #$ -S /bin/bash
 #$ -q wilke
 #$ -m beas
-#$ -t 1-50:1
+#$ -t 1-100:1
 #$ -pe serial 16
 
 
 source ~/.bash_profile
 
 CPU=16
-NUMAA=7
+NUMAA=3
 
 # Set up directories
 SIMDIR=/home/sjs3495/MutSel/Simulator/src

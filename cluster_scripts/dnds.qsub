@@ -19,7 +19,7 @@ FINALFILE=mutsel-$JOB_NAME-$NUMAA.txt
 # Set up directories
 SIMDIR=/home/sjs3495/MutSel/Simulator/src
 WDIR=/state/partition1/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
-RDIR=/home/sjs3495/Out_dnds/$JOB_NAME-$JOB_ID-$NUMAA
+RDIR=/home/sjs3495/Out_dnds_equalamino_tiny/$JOB_NAME-$JOB_ID-$NUMAA
 
 mkdir -p $RDIR
 mkdir -p $WDIR
