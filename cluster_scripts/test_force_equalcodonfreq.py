@@ -35,7 +35,6 @@ seqlength = 10000
 treebl =  0.1
 mu = 0.001
 
-pamlFreq = {"0": "1/61", "2": "F3X4", "3": "empirical"}
 freqType = {"user": "expAA", "equal": "equalAA"}
 
 # Write tree given bl specifications
@@ -49,13 +48,13 @@ treef.close()
 outf = open("tempout.txt", 'w')
 
 
-for type in freqType.keys():
+for ftype in freqType.keys():
 
-    seqfile = 'seqs_'+freqType+str(rep)+'.fasta'
+    seqfile = 'seqs_'+freqType[ftype]+str(rep)+'.fasta'
 
     # Simulate
     print "simulating"
-    f, aminos_used = setFreqs(freqType, numaa)
+    f, aminos_used = setFreqs(ftype, numaa)
     simulate(f, seqfile, treefile, mu, seqlength, None) # omega is last arguement. when None, sim via mutsel
     
     # Use math to derive an omega for the simulated sequences. Also returns the number of codons theoretically sampled.
@@ -69,11 +68,11 @@ for type in freqType.keys():
     # PAML
     print "ML"
     pamlw = []
-    for cf in pamlFreq.keys():
-        pamlw.append( runpaml(seqfile, cf) )
+    for cf in range(4): # 1/61, f1x4, f3x4, data
+        pamlw.append( runpaml(seqfile, str(cf)) )
     
-    # Save. CURRECTLY HARDCODED THAT PAMLW HAS LENGTH 3. 
-    outf.write(rep + '\t' + str(numaa) + '\t' + freqType[type] + '\t' + str(derived_w) + '\t' + str(nei_w) + '\t' + str(pamlw[0]) + '\t' + str(pamlw[1]) + '\t' + str(pamlw[2]) + '\n')
+    # Save. CURRECTLY HARDCODED THAT PAMLW HAS LENGTH 4. 
+    outf.write(rep + '\t' + str(numaa) + '\t' + freqType[ftype] + '\t' + str(derived_w) + '\t' + str(nei_w) + '\t' + str(pamlw[0]) + '\t' + str(pamlw[1]) + '\t' + str(pamlw[2]) + '\t' + str(pamlw[3]) + '\n')
     
 outf.close()
 
