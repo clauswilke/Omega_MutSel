@@ -38,7 +38,7 @@ numaa = int(sys.argv[5])
 
 # Global stuff
 seqfile = "rep"+str(rep)+'.fasta'
-mu = 0.005
+mu = 0.001
 length = 10000
 omegas = [0.05, 0.1, 0.25, 0.5, 0.75, 1.0]
 
@@ -46,7 +46,7 @@ omegas = [0.05, 0.1, 0.25, 0.5, 0.75, 1.0]
 # Write treestring to file
 treefile = "tree.tre"
 treef = open(treefile, 'w')
-treef.write("(t1:0.5, t2:0.5);")
+treef.write("(t1:0.01, t2:0.01);")
 treef.close()
 
 outf = open("tempout.txt", 'w')
