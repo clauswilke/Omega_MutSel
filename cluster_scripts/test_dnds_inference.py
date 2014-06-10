@@ -60,7 +60,7 @@ for omega in omegas:
     
     # Use math to derive an omega for the simulated sequences. Also returns the number of codons theoretically sampled.
     print "deriving"
-    #derived_w, num_codons = deriveOmega(f)
+    derived_w, num_codons = deriveOmega(f)
 
     # Nei-Gojobori Method
     print "nei-gojobori"
@@ -69,7 +69,7 @@ for omega in omegas:
     # PAML and HyPhy
     paml_w = runpaml(seqfile)
     hyphy_w_kappafixed = runhyphy("globalGY94.bf", "GY94_fixedkappa", seqfile, treefile, cpu, f)
-    outf.write(rep + '\t' + str(numaa) + '\t' + str(omega) + '\t' + str(derived_w) + '\t' + str(nei_w) +  '\t' + str(paml_w) + '\t' + str(hyphy_w_kappafixed) + '\t' + aminos_used + '\t' + str(num_codons) + '\n')
+    outf.write(rep + '\t' + str(numaa) + '\t' + str(omega) + '\t' + str(derived_w) + '\t' + str(ns_mut) + '\t' + str(s_mut) + '\t' + str(nei_w) +  '\t' + str(paml_w) + '\t' + str(hyphy_w_kappafixed) + '\t' + aminos_used + '\t' + str(num_codons) + '\n')
 
 outf.close()
             
