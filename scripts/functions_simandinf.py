@@ -112,6 +112,7 @@ def checkGrantham(aalist, cutoff):
 def generateAAlist(size):
     ''' Generate a list of size of reasonable co-occuring amino acids.
         Ensure acceptable choices by making mean pairwise Grantham <=100.
+        If size>=10, no need to check Grantham since so many are allowed, properties probably don't matter so much.
     '''
     list_is_ok = False
     while not list_is_ok:
@@ -124,7 +125,10 @@ def generateAAlist(size):
                     n = randint(0,len(amino)-1)
             aalist.append(amino[n])
             amino.pop(n)
-        list_is_ok = checkGrantham(aalist, 100)  
+        if size == 1 or size >= 10:
+            list_is_ok = True
+        else:
+            list_is_ok = checkGrantham(aalist, 100)  
     return aalist
 
 def generateExpFreqDict(size):
