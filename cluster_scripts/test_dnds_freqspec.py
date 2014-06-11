@@ -31,22 +31,18 @@ from functions_simandinf import *
 cpu = sys.argv[1]
 rep = sys.argv[2]
 numaa = int(sys.argv[3])
-seqlength = 10000
-treebl =  0.1
-mu = 0.001
 
 # Global stuff
-seqfile = "rep"+str(rep)+'.fasta'
-mu = 0.001
 length = 10000
-omegas = [0.05, 0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 2.5]
+mu = 1.0
+omegas = [0.05, 0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.5]
 freqType = {"user": "expAA", "equal": "equalAA"}
 
 
 # Write treestring to file
 treefile = "tree.tre"
 treef = open(treefile, 'w')
-treef.write("(t1:0.01, t2:0.01);")
+treef.write("(t1:0.1, t2:0.1);")
 treef.close()
 
 outf = open("tempout.txt", 'w')
@@ -64,6 +60,10 @@ for ftype in freqType.keys():
         print "simulating"
         simulate(f, seqfile, treefile, mu, length, omega)
     
+        # Derive using maths
+        print "deriving"
+        derived_w, num_codons = deriveOmega(f)        
+        
         # Nei-Gojobori Method
         print "nei-gojobori"
         nei_w, ns_mut, s_mut = run_neigojo(seqfile)
@@ -76,7 +76,7 @@ for ftype in freqType.keys():
     
 
         # Save. CURRECTLY HARDCODED THAT PAMLW HAS LENGTH 4. 
-        outf.write(rep + '\t' + str(numaa) + '\t' + freqType[ftype] + '\t' + str(omega) + '\t' + str(nei_w) + '\t' + str(pamlw[0]) + '\t' + str(pamlw[1]) + '\t' + str(pamlw[2]) + '\t' + str(pamlw[3]) + '\n')
+        outf.write(rep + '\t' + str(numaa) + '\t' + freqType[ftype] + '\t' + str(omega) + '\t' + str(derived_w) + '\t' + str(nei_w) + '\t' + str(pamlw[0]) + '\t' + str(pamlw[1]) + '\t' + str(pamlw[2]) + '\t' + str(pamlw[3]) + '\n')
     
 outf.close()
 
