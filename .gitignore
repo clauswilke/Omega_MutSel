@@ -1,1 +1,7 @@
 old_omegamutsel_code.py
+Manuscript/*.aux
+Manuscript/*.bbl
+Manuscript/*.blg
+Manuscript/*.log
+Manuscript/*.synctex.qz
+
