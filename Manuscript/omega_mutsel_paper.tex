@@ -1,0 +1,55 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1.0in]{geometry}
+\linespread{1.5}
+\usepackage{graphicx}
+\usepackage{natbib}
+
+\bibpunct[,]{(}{)}{;}{a}{}{,}
+\usepackage{tablefootnote}
+\usepackage{amsmath}
+
+\renewcommand{\bottomfraction}{.9}
+\renewcommand{\topfraction}{.9}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{.9}
+
+
+\begin{document}
+
+Over the years, a variety of models have been proposed which describe how natural selection acts on protein-coding sequences on phylogenetic timescales. The most widely-accepted models are the so-called mechanistic codon models, first introduced twenty years ago independently by GY and MG (for a comprehensive review, see Anisimova2009). The primary quantity of interest Mechanistic codon models estimate of an evolutionary-rate ratio, $\omega = dN/dS$, which describes the rate of nonsynonymous to synonymous substitution. They have been tremendously successful and have been developed for a sophisticated array of applications. From humble beginnings estimated a gene $dN/dS$, they can now yield site-wise estimates as well as quantify lineage-specific selective pressures. Also mentioned the empirical varieties.
+	
+The second model class are mutation-selection-balance models. These models deal with protein-level evolutionary constraints rather than merely codons. Moreover, they describe the evolutionary process in more fine-grained detail. Rather than focusing only on the result of evolution (substitution), they consider mutation and selection interplay. These models were first introduced a while ago but only recently have implementations arisen that promise its widespread adoption.
+
+Thus, we have two broad, competing methodologies for inferring selection pressure. It is, however, entirely unknown how these models relate to one another. While both models share certain assumptions (fixed differences and independence), they differ in another key assumption: evolutionary rate. Codon models have a specific $\omega$ parameter for this which encompasses all primary modes of selection (purifying, neutral, positive/diversifying). On the other hand, MutSel models assume that purifying selection alone is acting. While this is probably reasonable for most sites in proteins, we have extensive evidence that positive, diversifying selection does occur. 
+
+Recent jesse bloom papers have also demonstrated the superiority of considering a mut-sel type model in terms of phylogenetics. Seems to better approximate the evolutionary process.
+
+Here, using popgen and statphys theory, we establish a theoretical relationship between $dN/dS$ and scaled selection coefficients. We verify this relationship using a simulation approach. We demonstrate that, under conditions of purifying selection, $dN/dS$ models are fully contained within mutation-selection models. 
+
+Section on derivation
+
+Section on proof
+
+Section on simulation results
+
+Discussion points:
+- Important insight is that dN/dS>1 inherently cannot be described by mutation-selection models, and thus at those sites its results may be misleading. In particular, possibly a confounding factor in the Rodrigue implementation, as positively selected sites in the alignment could introduce bias.
+- Importance of examining intersections between models. Must understand how estimates from one relate to another. Helps to ensure robust results; model agreement is key, so we must formulate explicit relationships among them to systematically assess agreement.
+- 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+\bibliographystyle{plain}
+\bibliography{bibliography}	
+	
+\end{document}
+
