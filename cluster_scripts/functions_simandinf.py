@@ -18,8 +18,11 @@ from matrixBuilder import *
 from evolver import *
 
 # Nei-Gojobori code
-from mutation_counter import *
-from site_counter import *
+try:
+    from mutation_counter import *
+    from site_counter import *
+except:
+    pass
 
 # Globals
 zero = 1e-8
