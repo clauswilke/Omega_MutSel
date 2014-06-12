@@ -202,7 +202,7 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu):
             break
     return hyphy_w
     
-def freq2Hyphy(f):
+def freq2hyphy(f):
     ''' Convert codon frequencies to a form hyphy can use. '''
     hyphy_f = "{"
     for freq in f:
