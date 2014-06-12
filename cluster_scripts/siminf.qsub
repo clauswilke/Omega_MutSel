@@ -18,7 +18,7 @@ NUMAA=6
 AADIST=exp
 MU=0.005
 BL=0.5
-SEQLEN=10000
+SEQLEN=100000
 
 
 # Set up directories
@@ -27,7 +27,6 @@ SCRIPTDIR=/home/sjs3495/Omega_MutSel/cluster_scripts
 WDIR=/state/partition1/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
 RDIR=/home/sjs3495/Out_$JOB_NAME-$JOB_ID/$JOB_NAME-$JOB_ID-$NUMAA
 
-mkdir -p $RDIR
 mkdir -p $WDIR
 if [ ! -d $WDIR ]
 then
@@ -40,6 +39,7 @@ cd $WDIR
 cp -r $SIMDIR .
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/run_siminf.py .
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/functions_simandinf.py .
+cp /home/sjs3495/bin/bin/HYPHYMP .
 cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
 
 # Run
@@ -47,6 +47,7 @@ module load python
 python run_siminf.py $SGE_TASK_ID $CPU $NUMAA $AADIST $MU $BL $SEQLEN
 
 # Cleanup
-cat tempout.txt >> $FINALFILE  # final results file
-cp seqs* $RDIR                 # simulated sequences
+mkdir -p $RDIR
+cp params* $RDIR
+cp seqs* $RDIR
 rm -rf $WDIR

@@ -28,32 +28,39 @@ bl = sys.argv[6]
 seqlength = int(sys.argv[7])
 
 outfile = "params"+str(rep)+".txt"
-seqfile = "seqs"+str(rep)+".txt"
+outf = open(outfile,'w')
+outf.write('rep\tnumaa\taadist\tmu\tbl\tseqlength\tderived_w\thyphy_w\n')
 
-# Write tree given bl specifications
-treefile = "tree.tre"
-treef = open(treefile, 'w')
-treef.write("(t1:" + str(bl) + ", t2:" + str(bl) + ");")
-treef.close()
 
-# Simulate
-print "simulating"
-f, aminos_used = setFreqs(ftype, numaa)
-simulate(f, seqfile, treefile, mu, seqlength, None) # omega is last arguement. when None, sim via mutsel
+seqfile = "seq.fasta"
+
+derived_w = None
+
+for bl in [0.05, 0.1, 0.5, 0.75]:
+    # Write tree given bl specifications
+    treefile = "tree.tre"
+    treef = open(treefile, 'w')
+    treef.write("(t1:" + str(bl) + ", t2:" + str(bl) + ");")
+    treef.close()
     
-# Derive omega
-print "deriving"
-derived_w, num_codons = deriveOmega(f)
-
-# HyPhy omega
-print "ML"
-hyphy_w = runhyphy("globalGY94.bf", "GY94_fixedkappa", seqfile, treefile, cpu)
-
-# Save
-outf = open(outfile, 'w')
-outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(derived_w) + '\t' + str(hyphy_w) + '\n')
+    for mu in [0.001, 0.01, 0.1, 1.0]:
+     
+        # Simulate
+        print "simulating"
+        f, aminos_used = setFreqs(aadist, numaa)
+        simulate(f, seqfile, treefile, mu, seqlength, None) # omega is last arguement. when None, sim via mutsel
+            
+        # Derive omega
+        print "deriving"
+        if derived_w is None:
+            derived_w, num_codons = deriveOmega(f)
+        
+        # HyPhy omega
+        print "ML"
+        hyphy_w = runhyphy("globalGY94.bf", "GY94_fixedkappa", seqfile, treefile, cpu)
+        
+        # Save
+        outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(derived_w) + '\t' + str(hyphy_w) + '\n')
 outf.close()
-
-
 
 
