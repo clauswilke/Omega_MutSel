@@ -49,7 +49,7 @@ derived_w, num_codons = deriveOmega(f)
 print "ML"
 hyphy_w = runhyphy("globalGY94.bf", "GY94_fixedkappa", seqfile, treefile, cpu)
 
-# Save.
+# Save
 outf = open(outfile, 'w')
 outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(derived_w) + '\t' + str(hyphy_w) + '\n')
 outf.close()
