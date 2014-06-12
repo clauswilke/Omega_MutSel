@@ -157,21 +157,23 @@ def generateExpFreqDict(size):
 
 
 ############################ HYPHY-RELATED FUNCTIONS #####################################
-def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, codonfreq, initw=0.4):
+def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu):
     ''' pretty specific function.'''
     
-    # Set up sequence file
+  
+    # Set up sequence file with tree
     setuphyphy1 = "cp "+seqfile+" temp.fasta"
     setup1 = subprocess.call(setuphyphy1, shell = True)
     assert(setup1 == 0), "couldn't create temp.fasta"
-    
-    # Add tree to sequence file
     setuphyphy2 = "cat "+treefile+" >> temp.fasta"
     setup2 = subprocess.call(setuphyphy2, shell = True)
     assert(setup2 == 0), "couldn't add tree to hyphy infile"
     
-    # Set up codon frequencies
-    hyf = freq2Hyphy(codonfreq)
+    # Set up codon frequencies and create run.bf
+    eqf_raw = np.zeros(61)
+    for i in range(61):
+        eqf_raw[i] = 1./61.
+    hyf = freq2hyphy(eqf_raw)
     setuphyphy3 = "sed 's/MYFREQUENCIES/"+hyf+"/g' "+batchfile+" > run.bf"
     setup3 = subprocess.call(setuphyphy3, shell = True)
     assert(setup3 == 0), "couldn't properly add in frequencies"
@@ -180,12 +182,7 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, codonfreq, initw=0.
     setuphyphy4 = "sed -i 's/MYMATRIX/"+matrix_name+"/g' run.bf"
     setup4 = subprocess.call(setuphyphy4, shell = True)
     assert(setup4 == 0), "couldn't properly define matrix"
-    
-    # Set up initial omega, within run.bf
-    setuphyphy5 = "sed -i 's/MYINITIALW/"+str(initw)+"/g' run.bf"
-    setup5 = subprocess.call(setuphyphy5, shell = True)
-    assert(setup5 == 0), "couldn't properly define intial omega guess"
-    
+
     # Run hyphy
     hyphy = "./HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
     runhyphy = subprocess.call(hyphy, shell = True)
