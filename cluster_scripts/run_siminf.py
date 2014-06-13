@@ -29,21 +29,24 @@ seqlength = int(sys.argv[7])
 
 outfile = "params"+str(rep)+".txt"
 outf = open(outfile,'w')
-outf.write('rep\tnumaa\taadist\tmu\tbl\tseqlength\tderived_w\thyphy_w\n')
+#outf.write('rep\tnumaa\taadist\tmu\tbl\tseqlength\tderived_w\thyphy_w\n')
 
 
 seqfile = "seq.fasta"
 
 derived_w = None
 
-for bl in [0.05, 0.1, 0.5, 0.75]:
+bl_values = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5]
+mu_values = [1e-6, 1e-5, 1e-4, 1e-3]
+
+for bl in values:
     # Write tree given bl specifications
     treefile = "tree.tre"
     treef = open(treefile, 'w')
     treef.write("(t1:" + str(bl) + ", t2:" + str(bl) + ");")
     treef.close()
     
-    for mu in [0.001, 0.01, 0.1, 1.0]:
+    for mu in values:
      
         # Simulate
         print "simulating"
