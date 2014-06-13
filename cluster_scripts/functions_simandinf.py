@@ -87,9 +87,9 @@ def setFreqs(freqClass, numaa = None):
             raise AssertionError("Bad freqClass specification. Byebye.")
     
     f = fobj.calcFreqs()
-    mean_vol, med_vol = calcCodonVol(f)
+    mean_vol = calcCodonVol(f)
     
-    return f, mean_vol, med_vol
+    return f, mean_vol
 
      
 
@@ -175,11 +175,12 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu):
     assert(setup2 == 0), "couldn't add tree to hyphy infile"
     
     # Set up codon frequencies and create run.bf
-    fobj = EqualFreqs(by = 'amino', type = 'codon')
-    eqf  = fobj.calcFreqs()
-    #eqf_raw = np.zeros(61)
-    #for i in range(61):
-    #    eqf_raw[i] = 1./61.
+    ### NOTE: if you use byamino to get the equal freqs, then error is introduced which scales pretty well with volatility. This doesn't really exist when bycodon (1/61 for all).
+    #fobj = EqualFreqs(by = 'amino', type = 'codon')
+    #eqf  = fobj.calcFreqs()
+    eqf = np.zeros(61)
+    for i in range(61):
+        eqf[i] = 1./61.
     hyf = freq2hyphy(eqf)
     setuphyphy3 = "sed 's/MYFREQUENCIES/"+hyf+"/g' "+batchfile+" > run.bf"
     setup3 = subprocess.call(setuphyphy3, shell = True)
@@ -281,14 +282,14 @@ def run_neigojo(seqfile):
 ################################### MISC OTHER THINGS? ###################################
 
 def calcCodonVol(codonFreqs):
-    ''' Calculate mean and median volatility from list of codon frequencies'''
+    ''' Calculate mean volatility from list of codon frequencies'''
     vol_list = []
     for i in range(61):
         if codonFreqs[i] > 0.:
             vol_list.append(codon_volat[i])
         else:
             continue
-    return np.mean(vol_list), np.median(vol_list)
+    return np.mean(vol_list)
 
 
 

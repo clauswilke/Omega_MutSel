@@ -30,10 +30,10 @@ seqlength = int(sys.argv[7])
 
 outfile = "params"+str(rep)+".txt"
 outf = open(outfile,'w')
-#outf.write('rep\tnumaa\taadist\tmu\tbl\tseqlength\tderived_w\tml_w\n')
+#outf.write('rep\tnumaa\taadist\tmu\tbl\tseqlength\tderived_w\tml_w\tmean_volatility\tmedian_volatility\n')
 
 
-seqfile = "seq"+str(rep)+".fasta"
+seqfile = "seqs"+str(rep)+".fasta"
 
 # Write tree given bl specifications
 treefile = "tree.tre"
@@ -43,8 +43,8 @@ treef.close()
 
 # Simulate
 print "simulating"
-f, aminos_used = setFreqs(aadist, numaa)
-simulate(f, seqfile, treefile, mu, seqlength, None) # omega is last arguement. when None, sim via mutsel
+f, mean_vol = setFreqs(aadist, numaa)
+simulate(f, seqfile, treefile, mu, seqlength, None) # omega is last argument. when None, sim via mutsel
 
 # Derive omega
 print "deriving"
@@ -56,7 +56,7 @@ ml_w = runhyphy("globalGY94.bf", "GY94_fixedkappa", seqfile, treefile, cpu)
 #ml_w = runpaml(seqfile, "0")
 
 # Save
-outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(derived_w) + '\t' + str(ml_w) + '\n')
+outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(derived_w) + '\t' + str(ml_w) + '\t' + str(mean_vol) + '\n')
 outf.close()
 
 

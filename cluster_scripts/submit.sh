@@ -1,10 +1,10 @@
 ## SJS. shell script to vary numaa for submission a qsub script.
 
-SCRIPT=force_equal.qsub
+SCRIPT=convergence.qsub
 
 # establish initial condition variable
-START=3
-STOP=20
+START=4
+STOP=15
 
 
 # submit initial condition

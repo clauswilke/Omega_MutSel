@@ -1,6 +1,6 @@
 
 #!/bin/bash
-#$ -N siminf
+#$ -N conv_exp
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
@@ -14,7 +14,7 @@ source ~/.bash_profile
 
 # INPUT ARGS VARIABLES
 CPU=16
-NUMAA=5
+NUMAA=4
 
 # Set up directories
 SIMDIR=/home/sjs3495/MutSel/Simulator/src

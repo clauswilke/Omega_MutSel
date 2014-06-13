@@ -14,10 +14,10 @@ source ~/.bash_profile
 
 # INPUT ARGS VARIABLES
 CPU=16
-NUMAA=3
+NUMAA=10
 AADIST=exp
 MU=1e-6
-BL=0.001
+BL=0.1
 SEQLEN=100000
 
 

@@ -1,6 +1,6 @@
 # SJS
-# Code to demonstrate convergence. Fix to mu = 1e-5, bl = 0.1. 
-# Vary seqlength from 100->1000000. Fix numaa=6.
+# Code to demonstrate convergence. Fix to mu = 1e-6, bl = 0.1. 
+# Vary seqlength from 100->1000000.
 
 import sys
 import numpy as np
@@ -21,7 +21,7 @@ rep = sys.argv[1]
 cpu = sys.argv[2]
 numaa = int(sys.argv[3])
 aadist = "exp"
-mu = 1e-5
+mu = 1e-6
 bl = 0.1
 seqlengths = [1e2, 1e3, 1e4, 1e5, 1e6]
 
@@ -32,18 +32,18 @@ treef.write("(t1:" + str(bl) + ", t2:" + str(bl) + ");")
 treef.close()
 
 # Set frequencies 
-f, aminos_used = setFreqs(aadist, numaa)
+f, mean_vol = setFreqs(aadist, numaa)
 derived_w = None
 
 outfile = "params"+str(rep)+".txt"
-outf = open(outfile,'w') #outf.write('rep\tnumaa\taadist\tmu\tbl\tseqlength\tderived_w\tml_w\n')
+outf = open(outfile,'w') #outf.write('rep\tnumaa\taadist\tmu\tbl\tseqlength\tderived_w\tml_w\tmean_vol\n')
 
 for seqlength in seqlengths:
     seqfile = "seqs"+str(rep)+"_"+str(seqlength)+".fasta"
 
     # Simulate
     print "simulating"
-    simulate(f, seqfile, treefile, mu, seqlength, None) # omega is last arguement. when None, sim via mutsel
+    simulate(f, seqfile, treefile, mu, int(seqlength), None) # omega is last arguement. when None, sim via mutsel
 
     # Derive omega
     if derived_w is None:
@@ -56,7 +56,7 @@ for seqlength in seqlengths:
     #ml_w = runpaml(seqfile, "0")
 
     # Save
-    outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(derived_w) + '\t' + str(ml_w) + '\n')
+    outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(derived_w) + '\t' + str(ml_w) + '\t' + str(mean_vol) + '\n')
 
 outf.close()
 

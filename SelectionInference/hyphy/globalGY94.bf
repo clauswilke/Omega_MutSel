@@ -5,7 +5,6 @@ global t;
 LIKELIHOOD_FUNCTION_OUTPUT = 1;
 RANDOM_STARTING_PERTURBATIONS = 1;
 
-
 /* Include relevant functions */
 #include "matrices.mdl"; //rate matrices
 #include "GY94_Header.ibf";
