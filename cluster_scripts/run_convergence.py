@@ -19,7 +19,7 @@ if (len(sys.argv) != 4):
     sys.exit()
 rep = sys.argv[1]
 cpu = sys.argv[2]
-numaa = sys.argv[3]
+numaa = int(sys.argv[3])
 aadist = "exp"
 mu = 1e-5
 bl = 0.1
