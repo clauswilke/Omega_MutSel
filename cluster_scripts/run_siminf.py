@@ -39,14 +39,14 @@ derived_w = None
 bl_values = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5]
 mu_values = [1e-6, 1e-5, 1e-4, 1e-3]
 
-for bl in values:
+for bl in bl_values:
     # Write tree given bl specifications
     treefile = "tree.tre"
     treef = open(treefile, 'w')
     treef.write("(t1:" + str(bl) + ", t2:" + str(bl) + ");")
     treef.close()
     
-    for mu in values:
+    for mu in mu_values:
      
         # Simulate
         print "simulating"
