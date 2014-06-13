@@ -1,6 +1,6 @@
 
 #!/bin/bash
-#$ -N siminf_paml
+#$ -N siminf
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
@@ -14,10 +14,10 @@ source ~/.bash_profile
 
 # INPUT ARGS VARIABLES
 CPU=16
-NUMAA=6
+NUMAA=3
 AADIST=exp
-MU=0.005
-BL=0.5
+MU=1e-6
+BL=0.001
 SEQLEN=100000
 
 
@@ -41,12 +41,12 @@ cp /home/sjs3495/Omega_MutSel/cluster_scripts/run_siminf.py .
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/functions_simandinf.py .
 
 # Paml
-cp /home/sjs3495/bin/codeml .
-cp /home/sjs3495/Omega_MutSel/SelectionInference/paml/codeml_raw.txt
+#cp /home/sjs3495/bin/codeml .
+#cp /home/sjs3495/Omega_MutSel/SelectionInference/paml/codeml_raw.txt .
 
 #Hyphy
-#cp /home/sjs3495/bin/bin/HYPHYMP .
-#cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
+cp /home/sjs3495/bin/bin/HYPHYMP .
+cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
 
 # Run
 module load python
