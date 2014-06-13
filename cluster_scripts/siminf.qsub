@@ -1,6 +1,6 @@
 
 #!/bin/bash
-#$ -N siminf
+#$ -N siminf_paml
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
@@ -39,8 +39,14 @@ cd $WDIR
 cp -r $SIMDIR .
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/run_siminf.py .
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/functions_simandinf.py .
-cp /home/sjs3495/bin/bin/HYPHYMP .
-cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
+
+# Paml
+cp /home/sjs3495/bin/codeml .
+cp /home/sjs3495/Omega_MutSel/SelectionInference/paml/codeml_raw.txt
+
+#Hyphy
+#cp /home/sjs3495/bin/bin/HYPHYMP .
+#cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
 
 # Run
 module load python

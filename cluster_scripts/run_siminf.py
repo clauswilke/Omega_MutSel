@@ -58,12 +58,13 @@ for bl in bl_values:
         if derived_w is None:
             derived_w, num_codons = deriveOmega(f)
         
-        # HyPhy omega
+        # HyPhy/PAML omega
         print "ML"
-        hyphy_w = runhyphy("globalGY94.bf", "GY94_fixedkappa", seqfile, treefile, cpu)
+        #ml_w = runhyphy("globalGY94.bf", "GY94_fixedkappa", seqfile, treefile, cpu)
+        ml_w = runpaml(seqfile, codonFreq = "0", initw = 0.4):
         
         # Save
-        outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(derived_w) + '\t' + str(hyphy_w) + '\n')
+        outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(derived_w) + '\t' + str(ml_w) + '\n')
 outf.close()
 
 
