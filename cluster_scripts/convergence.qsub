@@ -14,7 +14,8 @@ source ~/.bash_profile
 
 # INPUT ARGS VARIABLES
 CPU=16
-NUMAA=4
+NUMAA=6
+DIST=exp
 
 # Set up directories
 SIMDIR=/home/sjs3495/MutSel/Simulator/src
@@ -45,7 +46,7 @@ cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
 
 # Run
 module load python
-python run_convergence.py $SGE_TASK_ID $CPU $NUMAA
+python run_convergence.py $SGE_TASK_ID $CPU $NUMAA $DIST
 
 # Cleanup
 mkdir -p $RDIR
