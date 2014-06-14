@@ -320,7 +320,7 @@ def deriveOmega(codonFreq):
         num_temp += fix_sum*codonFreq[i]
         dnds_2 += (num_temp/denom_temp)
     dnds_1 = num_sum/denom_sum        
-    return dnds_1, dnds_2
+    return [dnds_1, dnds_2]
 
 
 def getNonZeroFreqs(freq):
