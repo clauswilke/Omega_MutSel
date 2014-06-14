@@ -14,13 +14,13 @@ from matrixBuilder import *
 from evolver import *
 
 # Input parameters and global stuff
-if (len(sys.argv) != 4):
-    print "\n\nUsage: python run_convergence.py <rep> <cpu> <numaa>\n."
+if (len(sys.argv) != 5):
+    print "\n\nUsage: python run_convergence.py <rep> <cpu> <numaa> <aadist> \n."
     sys.exit()
 rep = sys.argv[1]
 cpu = sys.argv[2]
 numaa = int(sys.argv[3])
-aadist = "exp"
+aadist = sys.argv[4]
 mu = 1e-6
 bl = 0.1
 seqlengths = [1e2, 1e3, 1e4, 1e5, 1e6]
@@ -33,7 +33,7 @@ treef.close()
 
 # Set frequencies 
 f, mean_vol = setFreqs(aadist, numaa)
-derived_w = None
+derived_w = [None, None] # 2 methods to estimate/derive dN/dS
 
 outfile = "params"+str(rep)+".txt"
 outf = open(outfile,'w') #outf.write('rep\tnumaa\taadist\tmu\tbl\tseqlength\tderived_w\tml_w\tmean_vol\n')
@@ -45,10 +45,10 @@ for seqlength in seqlengths:
     print "simulating"
     simulate(f, seqfile, treefile, mu, int(seqlength), None) # omega is last arguement. when None, sim via mutsel
 
-    # Derive omega
-    if derived_w is None:
+    # Derive omega, but only do this once
+    if derived_w[0] is None:
         print "deriving"
-        derived_w, num_codons = deriveOmega(f)
+        derived_w = deriveOmega(f)
 
     # HyPhy/PAML omega
     print "ML"
@@ -56,7 +56,7 @@ for seqlength in seqlengths:
     #ml_w = runpaml(seqfile, "0")
 
     # Save
-    outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(derived_w) + '\t' + str(ml_w) + '\t' + str(mean_vol) + '\n')
+    outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(derived_w[0]) + '\t' + str(derived_w[1]) + '\t' + str(ml_w) + '\t' + str(mean_vol) + '\n')
 
 outf.close()
 
