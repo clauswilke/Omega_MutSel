@@ -296,29 +296,32 @@ def calcCodonVol(codonFreqs):
 
 ############################### OMEGA DERIVATION FUNCTIONS ###############################
 
-def deriveOmega(codonFreq, correct=False):
+def deriveOmega(codonFreq):
     ''' Derive an omega using codon frequencies. 
-        correct = should I correct for number of nonsynomymous codons? Default, no. Probably don't do it, either, since our nei-gojobori implementation doesn't.    
+        dnds_1 -> get numerator, denominator, divide once at end
+        dnds_2 -> add num/denom fractions as you go.
     ''' 
     nonZero = getNonZeroFreqs(codonFreq) # get indices which aren't zero.
-    kN=0. #dN numerator
-    nN=0. #dN denominator. NOTE: Does not correct for consider number of nonsyn options
+    num_sum = 0. #dN numerator
+    denom_sum = 0. #dN denominator.
+    dnds_2 = 0.
+    
     # Calculations
     for i in nonZero:
+        num_temp = 0.
+        denom_temp = 0.
         fix_sum=0.
         for nscodon in nslist[i]:
             nscodon_freq = codonFreq[codons.index(nscodon)]
-            fix_sum += fix(float(codonFreq[i]), float(nscodon_freq))
-            if correct:                    
-                nN += codonFreq[i] * len(nslist[i])
-            else:
-                nN += codonFreq[i]
-        kN += fix_sum*codonFreq[i]
-    # Final dN/dS
-    if kN < zero:
-        return 0., len(nonZero)
-    else:
-        return kN/nN, len(nonZero)
+            fix_sum += calcFix( float(codonFreq[i]), float(nscodon_freq) )                   
+            denom_sum += codonFreq[i] #  * len(nslist[i])   #to correct for num nonsyn
+            denom_temp += codonFreq[i]
+        num_sum += fix_sum*codonFreq[i]
+        num_temp += fix_sum*codonFreq[i]
+        dnds_2 += (num_temp/denom_temp)
+    dnds_1 = num_sum/denom_sum        
+    return dnds_1, dnds_2
+
 
 def getNonZeroFreqs(freq):
     ''' Return indices whose frequencies are not 0.'''
@@ -328,7 +331,7 @@ def getNonZeroFreqs(freq):
             nonZero.append(i)
     return nonZero
 
-def fix(fi, fj):
+def calcFix(fi, fj):
     if fi == fj:
         return 1.
     elif fi == 0.  or fj == 0.:
