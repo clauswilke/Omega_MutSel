@@ -303,6 +303,20 @@ def getNucleotideDiff(source, target):
     for i in range(3):
         if source[i] != target[i]:    
             return "".join(sorted(source[i]+target[i]))
+
+def calcNS(codon, codonFreq, i, list):
+    numer = 0.
+    denom = 0.
+    fix_sum=0.
+    for other_codon in list[i]:
+        if codon != other_codon:
+            diff = getNucleotideDiff(codon,other_codon)
+            freq = codonFreq[codons.index(other_codon)]
+            fix_sum += calcFix( float(codonFreq), float(freq) ) # * mu_dict[diff]                  
+            denom += codonFreq[i]
+    numer += fix_sum*codonFreq[i]
+    return numer, denom
+
             
 def deriveOmegaDiffMu(codonFreq, mu_dict = {'AT':1.0, 'AC':1.0, 'AG':1.0, 'CG':1.0, 'CT':1.0, 'GT':1.0}):
     ''' Derive an omega using codon frequencies. Single calculation. Get numerator, get denominator, divide once at end.
@@ -326,21 +340,35 @@ def deriveOmegaDiffMu(codonFreq, mu_dict = {'AT':1.0, 'AC':1.0, 'AG':1.0, 'CG':1
             if codon != nscodon:
                 diff = getNucleotideDiff(codon,nscodon)
                 nscodon_freq = codonFreq[codons.index(nscodon)]
-                fix_sum += calcFix( float(codonFreq[i]), float(nscodon_freq) ) * mu_dict[diff]                  
+                fix_sum += calcFix( float(codonFreq[i]), float(nscodon_freq) )# * mu_dict[diff]                  
                 nN += codonFreq[i]
         kN += fix_sum*codonFreq[i]
-        # Synonymous calculation
+        
+        # Synonymous calculation. NOW IS ESSENTIALLY SAME AS NS CODONS.
+        fix_sum=0.
+        for scodon in slist[i]:
+            if codon != scodon:
+                diff = getNucleotideDiff(codon,scodon)
+                scodon_freq = codonFreq[codons.index(scodon)]
+                fix_sum += calcFix( float(codonFreq[i]), float(scodon_freq) )# * mu_dict[diff]                  
+                nS += codonFreq[i]
+        kS += fix_sum*codonFreq[i]        
+        '''
         mu_sum=0.
         for scodon in slist[i]:
             if codon != scodon:
                 kS += mu_dict[ getNucleotideDiff(codon,scodon) ]
                 nS += codonFreq[i]
         kS += mu_sum * codonFreq[i]                
-
+        '''
     if kS == 0.:
         return 0.
     else:
         return (kN/nN)/(kS/nS)
+        
+        
+        
+        
         
 def deriveOmega(codonFreq):
     ''' Derive an omega using codon frequencies. 
