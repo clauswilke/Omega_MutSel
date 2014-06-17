@@ -53,7 +53,7 @@ def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
         
     model = Model()
     if beta:
-        params = {'alpha':1.0, 'beta':float(beta), 'mu': {'AC': mu, 'AG': mu*kappa, 'AT': mu, 'CG': mu, 'CT': mu*kapa, 'GT': mu}}
+        params = {'alpha':1.0, 'beta':float(beta), 'mu': {'AC': mu, 'AG': mu*kappa, 'AT': mu, 'CG': mu, 'CT': mu*kappa, 'GT': mu}}
         params['stateFreqs'] = f
         model.params = params
         mat = mechCodon_MatrixBuilder(model)
@@ -163,7 +163,7 @@ def generateExpFreqDict(size):
 
 
 ############################ HYPHY-RELATED FUNCTIONS #####################################
-def runhyphy(batchfile, seqfile, treefile, cpu, kappa = 1.0):
+def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa = 1.0):
     ''' pretty specific function.'''
     
   
@@ -183,11 +183,17 @@ def runhyphy(batchfile, seqfile, treefile, cpu, kappa = 1.0):
     setup3 = subprocess.call(setuphyphy3, shell = True)
     assert(setup3 == 0), "couldn't properly add in frequencies"
     
-    # Set up kappa (and accordingly, matrix)
+    # Set up kappa
     if kappa != 'free':
         sedkappa = "sed -i 's/k/"+str(kappa)+"/g' matrices.mdl"
         runsedkappa = subprocess.call(sedkappa, shell=True)
         assert(runsedkappa == 0), "couldn't set up kappa"
+    
+    # Set up matrix, within run.bf
+    setuphyphy4 = "sed -i 's/MYMATRIX/"+matrix_name+"/g' run.bf"
+    setup4 = subprocess.call(setuphyphy4, shell = True)
+    assert(setup4 == 0), "couldn't properly define matrix"
+    
 
     # Run hyphy
     hyphy = "./HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
