@@ -384,7 +384,7 @@ def deriveOmegaDiffMu(codonFreq, mu_dict = {'AT':1.0, 'AC':1.0, 'AG':1.0, 'CG':1
     if kS == 0.:
         return 0.
     else:
-        return (kN/nN)/(kS/nS)
+        return kN/nN, kS/nS, (kN/nN)/(kS/nS)
         
         
         
