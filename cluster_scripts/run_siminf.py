@@ -49,7 +49,8 @@ simulate(f, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argum
 
 # Derive omega
 print "deriving"
-derived_w, num_codons = deriveOmegaDiffMu(f, {'AT':1.0, 'AC':1.0, 'AG':2.0, 'CG':1.0, 'CT':2.0, 'GT':1.0}) # kappa = 2 here
+mu_dict = {'AT':1.0, 'AC':1.0, 'AG':2.0, 'CG':1.0, 'CT':2.0, 'GT':1.0} # kappa = 2 here
+derived_w = deriveOmegaDiffMu(f, mu_dict)
 
 # HyPhy/PAML omega
 print "ML"
