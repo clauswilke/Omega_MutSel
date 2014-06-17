@@ -49,25 +49,16 @@ def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
     try:
         my_tree = readTree(file = tree)
     except:
-        my_tree = readTree(tree = tree)
-    
-    # set up kappa. note that the asymmetry mu's will be only for the mutSel, hence the try/except
-    mu['AG'] = mu['AG'] * kappa
-    mu['CT'] = mu['CT'] * kappa
-    try:
-        mu['GA'] = mu['AG']
-        mu['TC'] = mu['CT']
-    except:
-        pass    
+        my_tree = readTree(tree = tree) 
         
     model = Model()
     if beta:
-        params = {'alpha':1.0, 'beta':float(beta), 'mu': {'AC': mu, 'AG': mu, 'AT': mu, 'CG': mu, 'CT': mu, 'GT': mu}}
+        params = {'alpha':1.0, 'beta':float(beta), 'mu': {'AC': mu, 'AG': mu*kappa, 'AT': mu, 'CG': mu, 'CT': mu*kapa, 'GT': mu}}
         params['stateFreqs'] = f
         model.params = params
         mat = mechCodon_MatrixBuilder(model)
     else:
-        params = {'alpha':1.0, 'beta':1.0, 'mu': {'AC': mu, 'CA':mu, 'AG': mu, 'GA':mu, 'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'CT': mu, 'TC':mu, 'GT': mu, 'TG':mu}}
+        params = {'alpha':1.0, 'beta':1.0, 'mu': {'AC': mu, 'CA':mu, 'AG': mu*kappa, 'GA':mu*kappa, 'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'CT': mu*kappa, 'TC':mu*kappa, 'GT': mu, 'TG':mu}}
         params['stateFreqs'] = f
         model.params = params
         mat = mutSel_MatrixBuilder(model)
