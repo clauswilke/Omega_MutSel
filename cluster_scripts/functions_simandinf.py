@@ -201,7 +201,7 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa = 1.0):
     assert (runhyphy == 0), "hyphy fail"
     
     # grab hyphy output
-    if 'GY94' in model:
+    if matrix_name == 'GY94':
         return parseHyphyGY94('hyout.txt')
     else:
         return parseHyphyMG94('hyout.txt')
@@ -213,10 +213,12 @@ def parseHyphyGY94(file):
     hyout.close()
     for line in hylines:
         findw = re.search("^w=(\d+\.*\d*)", line)
+        findk = re.search("^k=(\d+\.*\d*)", line)
         if findw:
             hyphy_w = findw.group(1)
-            break
-    return hyphy_w
+        if findk:
+            hyphy_k = findk.group(1)
+    return float(hyphy_w), float(hyphy_k)
 
 def parseHyphyMG94(file):
     hyout = open(file, 'r')
@@ -229,7 +231,7 @@ def parseHyphyMG94(file):
              hyphy_alpha = finda.group(1)
         if findb:
             hyphy_beta = findb.group(1)
-    return hyphy_alpha, hyphy_beta
+    return float(hyphy_alpha), float(hyphy_beta)
 
 def freq2hyphy(f):
     ''' Convert codon frequencies to a form hyphy can use. '''
