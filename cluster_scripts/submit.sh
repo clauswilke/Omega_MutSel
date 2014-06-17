@@ -1,10 +1,10 @@
 ## SJS. shell script to vary numaa for submission a qsub script.
 
-SCRIPT=convergence.qsub
+SCRIPT=siminf.qsub
 
 # establish initial condition variable
-START=4
-STOP=15
+START=5
+STOP=10
 
 
 # submit initial condition
