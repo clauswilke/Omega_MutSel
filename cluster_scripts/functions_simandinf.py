@@ -35,8 +35,6 @@ genetic_code = [["GCA", "GCC", "GCG", "GCT"], ["TGC","TGT"], ["GAC", "GAT"], ["G
 # matrix in python dict form.
 grantham = {'AA':0, 'AC':195, 'AD':126, 'AE':107, 'AF':113, 'AG':60, 'AH':86, 'AI':94, 'AK':106, 'AL':96, 'AM':84, 'AN':111, 'AP':27, 'AQ':91, 'AR':112, 'AS':99, 'AT':58, 'AV':64, 'AW':148, 'AY':112, 'CA':195, 'CC':0, 'CD':154, 'CE':170, 'CF':205, 'CG':159, 'CH':174, 'CI':198, 'CK':202, 'CL':198, 'CM':196, 'CN':139, 'CP':169, 'CQ':154, 'CR':180, 'CS':112, 'CT':149, 'CV':192, 'CW':215, 'CY':194, 'DA':126, 'DC':154, 'DD':0, 'DE':45, 'DF':177, 'DG':94, 'DH':81, 'DI':168, 'DK':101, 'DL':172, 'DM':160, 'DN':23, 'DP':108, 'DQ':61, 'DR':96, 'DS':65, 'DT':85, 'DV':152, 'DW':181, 'DY':160, 'EA':107, 'EC':170, 'ED':45, 'EE':0, 'EF':140, 'EG':98, 'EH':40, 'EI':134, 'EK':56, 'EL':138, 'EM':126, 'EN':42, 'EP':93, 'EQ':29, 'ER':54, 'ES':80, 'ET':65, 'EV':121, 'EW':152, 'EY':122, 'FA':113, 'FC':205, 'FD':177, 'FE':140, 'FF':0, 'FG':153, 'FH':100, 'FI':21, 'FK':102, 'FL':22, 'FM':28, 'FN':158, 'FP':114, 'FQ':116, 'FR':97, 'FS':155, 'FT':103, 'FV':50, 'FW':40, 'FY':22, 'GA':60, 'GC':159, 'GD':94, 'GE':98, 'GF':153, 'GG':0, 'GH':98, 'GI':135, 'GK':127, 'GL':138, 'GM':127, 'GN':80, 'GP':42, 'GQ':87, 'GR':125, 'GS':56, 'GT':59, 'GV':109, 'GW':184, 'GY':147, 'HA':86, 'HC':174, 'HD':81, 'HE':40, 'HF':100, 'HG':98, 'HH':0, 'HI':94, 'HK':32, 'HL':99, 'HM':87, 'HN':68, 'HP':77, 'HQ':24, 'HR':29, 'HS':89, 'HT':47, 'HV':84, 'HW':115, 'HY':83, 'IA':94, 'IC':198, 'ID':168, 'IE':134, 'IF':21, 'IG':135, 'IH':94, 'II':0, 'IK':102, 'IL':5, 'IM':10, 'IN':149, 'IP':95, 'IQ':109, 'IR':97, 'IS':142, 'IT':89, 'IV':29, 'IW':61, 'IY':33, 'KA':106, 'KC':202, 'KD':101, 'KE':56, 'KF':102, 'KG':127, 'KH':32, 'KI':102, 'KK':0, 'KL':107, 'KM':95, 'KN':94, 'KP':103, 'KQ':53, 'KR':26, 'KS':121, 'KT':78, 'KV':97, 'KW':110, 'KY':85, 'LA':96, 'LC':198, 'LD':172, 'LE':138, 'LF':22, 'LG':138, 'LH':99, 'LI':5, 'LK':107, 'LL':0, 'LM':15, 'LN':153, 'LP':98, 'LQ':113, 'LR':102, 'LS':145, 'LT':92, 'LV':32, 'LW':61, 'LY':36, 'MA':84, 'MC':196, 'MD':160, 'ME':126, 'MF':28, 'MG':127, 'MH':87, 'MI':10, 'MK':95, 'ML':15, 'MM':0, 'MN':142, 'MP':87, 'MQ':101, 'MR':91, 'MS':135, 'MT':81, 'MV':21, 'MW':67, 'MY':36, 'NA':111, 'NC':139, 'ND':23, 'NE':42, 'NF':158, 'NG':80, 'NH':68, 'NI':149, 'NK':94, 'NL':153, 'NM':142, 'NN':0, 'NP':91, 'NQ':46, 'NR':86, 'NS':46, 'NT':65, 'NV':133, 'NW':174, 'NY':143, 'PA':27, 'PC':169, 'PD':108, 'PE':93, 'PF':114, 'PG':42, 'PH':77, 'PI':95, 'PK':103, 'PL':98, 'PM':87, 'PN':91, 'PP':0, 'PQ':76, 'PR':103, 'PS':74, 'PT':38, 'PV':68, 'PW':147, 'PY':110, 'QA':91, 'QC':154, 'QD':61, 'QE':29, 'QF':116, 'QG':87, 'QH':24, 'QI':109, 'QK':53, 'QL':113, 'QM':101, 'QN':46, 'QP':76, 'QQ':0, 'QR':43, 'QS':68, 'QT':42, 'QV':96, 'QW':130, 'QY':99, 'RA':112, 'RC':180, 'RD':96, 'RE':54, 'RF':97, 'RG':125, 'RH':29, 'RI':97, 'RK':26, 'RL':102, 'RM':91, 'RN':86, 'RP':103, 'RQ':43, 'RR':0, 'RS':110, 'RT':71, 'RV':96, 'RW':101, 'RY':77, 'SA':99, 'SC':112, 'SD':65, 'SE':80, 'SF':155, 'SG':56, 'SH':89, 'SI':142, 'SK':121, 'SL':145, 'SM':135, 'SN':46, 'SP':74, 'SQ':68, 'SR':110, 'SS':0, 'ST':58, 'SV':124, 'SW':177, 'SY':144, 'TA':58, 'TC':149, 'TD':85, 'TE':65, 'TF':103, 'TG':59, 'TH':47, 'TI':89, 'TK':78, 'TL':92, 'TM':81, 'TN':65, 'TP':38, 'TQ':42, 'TR':71, 'TS':58, 'TT':0, 'TV':69, 'TW':128, 'TY':92, 'VA':64, 'VC':192, 'VD':152, 'VE':121, 'VF':50, 'VG':109, 'VH':84, 'VI':29, 'VK':97, 'VL':32, 'VM':21, 'VN':133, 'VP':68, 'VQ':96, 'VR':96, 'VS':124, 'VT':69, 'VV':0, 'VW':88, 'VY':55, 'WA':148, 'WC':215, 'WD':181, 'WE':152, 'WF':40, 'WG':184, 'WH':115, 'WI':61, 'WK':110, 'WL':61, 'WM':67, 'WN':174, 'WP':147, 'WQ':130, 'WR':101, 'WS':177, 'WT':128, 'WV':88, 'WW':0, 'WY':37, 'YA':112, 'YC':194, 'YD':160, 'YE':122, 'YF':22, 'YG':147, 'YH':83, 'YI':33, 'YK':85, 'YL':36, 'YM':36, 'YN':143, 'YP':110, 'YQ':99, 'YR':77, 'YS':144, 'YT':92, 'YV':55, 'YW':37, 'YY':0}
 
-# the hamming distance one. coded for codons.
-codon_volat = [0.88, 0.89, 0.88, 0.89, 0.67, 0.67, 0.67, 0.67, 0.75, 0.89, 0.78, 0.89, 0.78, 0.78, 1., 0.78, 0.88, 0.89, 0.88, 0.89, 0.67, 0.67, 0.67, 0.67, 0.5, 0.67, 0.56, 0.67, 0.56, 0.67, 0.56, 0.67, 0.88, 0.89, 0.88, 0.89, 0.67, 0.67, 0.67, 0.67, 0.63, 0.67, 0.67, 0.67, 0.67, 0.67, 0.67, 0.67, 0.86, 0.86, 0.57, 0.67, 0.63, 0.67, 0.88, 1., 0.88, 0.71, 0.89, 0.75, 0.89]
 
 
         
@@ -213,12 +211,9 @@ def parseHyphyGY94(file):
     hyout.close()
     for line in hylines:
         findw = re.search("^w=(\d+\.*\d*)", line)
-        #findk = re.search("^k=(\d+\.*\d*)", line)
         if findw:
             hyphy_w = findw.group(1)
-        #if findk:
-        #    hyphy_k = findk.group(1)
-    return float(hyphy_w) #, float(hyphy_k)
+    return float(hyphy_w)
 
 def parseHyphyMG94(file):
     hyout = open(file, 'r')
@@ -244,6 +239,100 @@ def freq2hyphy(f):
     hyphy_f += "}"
     return hyphy_f
 
+
+
+
+
+
+####################################### OMEGA DERIVATION FUNCTIONS ######################################
+
+def deriveOmega(codonFreq, mu_dict = {'AT':1.0, 'AC':1.0, 'AG':1.0, 'CG':1.0, 'CT':1.0, 'GT':1.0}):
+    ''' Derive an omega using codon frequencies. Single calculation. Get numerator, get denominator, divide once at end.
+        Default mutational scheme is all mu's are equal.
+        Requires symmetric mutational scheme.
+    ''' 
+    
+    kN = 0.; nN = 0.; kS = 0.; nS = 0.
+    
+    # codon indices which do not have zero frequency
+    nonZero = getNonZeroFreqs(codonFreq)
+    
+    # Calculations
+    for i in nonZero:
+        codon = codons[i]
+        # Nonsynonymous calculation
+        num, den = calcNS(codon, codonFreq, i, nslist, mu_dict)
+        kN += num
+        nN += den
+        
+        # Synonymous calculation
+        num, den = calcNS(codon, codonFreq, i, slist, mu_dict)
+        kS += num
+        nS += den
+   
+    if kS == 0.:
+        dnds = 0.
+    else:
+        dnds = (kN/nN)/(kS/nS)
+    return dnds
+
+
+
+def getNonZeroFreqs(freq):
+    ''' Return indices whose frequencies are not 0.'''
+    nonZero = []
+    for i in range(len(freq)):
+        if freq[i] > zero:
+            nonZero.append(i)
+    return nonZero
+
+def getNucleotideDiff(source, target):
+    for i in range(3):
+        if source[i] != target[i]:    
+            return "".join(sorted(source[i]+target[i]))
+    
+def calcFix(fi, fj):
+    if fi == fj:
+        return 1.
+    elif fi == 0.  or fj == 0.:
+        return 0.
+    else:
+        return (np.log(fj) - np.log(fi)) / (1 - fi/fj)
+
+def calcNS(codon, codonFreq, i, list, mu_dict):
+    numer = 0.
+    denom = 0.
+    fix_sum=0.
+    for other_codon in list[i]:
+        if codon != other_codon:
+            diff = getNucleotideDiff(codon,other_codon)
+            freq = codonFreq[codons.index(other_codon)]
+            fix_sum += calcFix( float(codonFreq), float(freq) ) * mu_dict[diff]                  
+            denom += codonFreq[i]
+    numer += fix_sum*codonFreq[i]
+    return numer, denom
+#########################################################################################
+
+
+
+
+
+
+
+############################# NEI-GOJOBORI FUNCTIONS ##################################
+def run_neigojo(seqfile):
+    ''' Get omega using counting method '''
+    M = MutationCounter()
+    S = SiteCounter()
+    records = list(SeqIO.parse(seqfile, 'fasta'))
+    s1 = records[0].seq
+    s2 = records[1].seq
+    ( ns_mut, s_mut ) = M.countMutations( s1, s2 )
+    ( ns_sites1, s_sites1 ) = S.countSites( s1 )
+    ( ns_sites2, s_sites2 ) = S.countSites( s2 )
+    dS = 2*sum( s_mut )/(sum( s_sites1 ) + sum( s_sites2 ))
+    dN = 2*sum( ns_mut )/(sum( ns_sites2 ) + sum( ns_sites2 ))
+    return dN/dS, np.mean(ns_mut), np.mean(s_mut)
 
 
 
@@ -287,151 +376,3 @@ def parsePAML(pamlfile):
     assert (omega is not None), "couldn't get omega from paml file"
     return omega
 
-
-
-
-############################# NEI-GOJOBORI FUNCTIONS ##################################
-def run_neigojo(seqfile):
-    ''' Get omega using counting method '''
-    M = MutationCounter()
-    S = SiteCounter()
-    records = list(SeqIO.parse(seqfile, 'fasta'))
-    s1 = records[0].seq
-    s2 = records[1].seq
-    ( ns_mut, s_mut ) = M.countMutations( s1, s2 )
-    ( ns_sites1, s_sites1 ) = S.countSites( s1 )
-    ( ns_sites2, s_sites2 ) = S.countSites( s2 )
-    dS = 2*sum( s_mut )/(sum( s_sites1 ) + sum( s_sites2 ))
-    dN = 2*sum( ns_mut )/(sum( ns_sites2 ) + sum( ns_sites2 ))
-    return dN/dS, np.mean(ns_mut), np.mean(s_mut)
-
-################################### MISC OTHER THINGS? ###################################
-
-def calcCodonVol(codonFreqs):
-    ''' Calculate mean volatility from list of codon frequencies'''
-    vol_list = []
-    for i in range(61):
-        if codonFreqs[i] > 0.:
-            vol_list.append(codon_volat[i])
-        else:
-            continue
-    return np.mean(vol_list)
-
-
-
-
-############################### OMEGA DERIVATION FUNCTIONS ###############################
-def getNucleotideDiff(source, target):
-    for i in range(3):
-        if source[i] != target[i]:    
-            return "".join(sorted(source[i]+target[i]))
-
-def calcNS(codon, codonFreq, i, list):
-    numer = 0.
-    denom = 0.
-    fix_sum=0.
-    for other_codon in list[i]:
-        if codon != other_codon:
-            diff = getNucleotideDiff(codon,other_codon)
-            freq = codonFreq[codons.index(other_codon)]
-            fix_sum += calcFix( float(codonFreq), float(freq) ) # * mu_dict[diff]                  
-            denom += codonFreq[i]
-    numer += fix_sum*codonFreq[i]
-    return numer, denom
-
-            
-def deriveOmegaDiffMu(codonFreq, mu_dict = {'AT':1.0, 'AC':1.0, 'AG':1.0, 'CG':1.0, 'CT':1.0, 'GT':1.0}):
-    ''' Derive an omega using codon frequencies. Single calculation. Get numerator, get denominator, divide once at end.
-        Default mutational scheme is all mu's are 1.
-        Requires symmetric mutational scheme.
-    ''' 
-    kN = 0. #dN numerator.   nonsynonymous rate
-    nN = 0. #dN denominator. nonsynonymous sites
-    kS = 0. #dS numerator.   synonymous rate
-    nS = 0. #dS denominator. synonymous sites
-    
-    # codon indices which do not have zero frequency
-    nonZero = getNonZeroFreqs(codonFreq)
-    
-    # Calculations
-    for i in nonZero:
-        codon = codons[i]
-        # Nonsynonymous calculation
-        fix_sum=0.
-        for nscodon in nslist[i]:
-            if codon != nscodon:
-                diff = getNucleotideDiff(codon,nscodon)
-                nscodon_freq = codonFreq[codons.index(nscodon)]
-                fix_sum += calcFix( float(codonFreq[i]), float(nscodon_freq) ) * mu_dict[diff]                  
-                nN += codonFreq[i]
-        kN += fix_sum*codonFreq[i]
-        
-        # Synonymous calculation. NOW IS ESSENTIALLY SAME AS NS CODONS.
-        fix_sum=0.
-        for scodon in slist[i]:
-            if codon != scodon:
-                diff = getNucleotideDiff(codon,scodon)
-                scodon_freq = codonFreq[codons.index(scodon)]
-                fix_sum += calcFix( float(codonFreq[i]), float(scodon_freq) ) * mu_dict[diff]                  
-                nS += codonFreq[i]
-        kS += fix_sum*codonFreq[i]        
-        '''
-        mu_sum=0.
-        for scodon in slist[i]:
-            if codon != scodon:
-                kS += mu_dict[ getNucleotideDiff(codon,scodon) ]
-                nS += codonFreq[i]
-        kS += mu_sum * codonFreq[i]                
-        '''
-    if kS == 0.:
-        return 0.
-    else:
-        return kN/nN, kS/nS, (kN/nN)/(kS/nS)
-        
-        
-        
-        
-        
-def deriveOmega(codonFreq):
-    ''' Derive an omega using codon frequencies. 
-        dnds_1 -> get numerator, denominator, divide once at end
-        dnds_2 -> add num/denom fractions as you go. currently commented out.
-    ''' 
-    nonZero = getNonZeroFreqs(codonFreq) # get indices which aren't zero.
-    num_sum = 0. #dN numerator
-    denom_sum = 0. #dN denominator.
-    dnds_2 = 0.
-    
-    # Calculations
-    for i in nonZero:
-        #num_temp = 0.
-        #denom_temp = 0.
-        fix_sum=0.
-        for nscodon in nslist[i]:
-            nscodon_freq = codonFreq[codons.index(nscodon)]
-            fix_sum += calcFix( float(codonFreq[i]), float(nscodon_freq) )                   
-            denom_sum += codonFreq[i] #  * len(nslist[i])   #to correct for num nonsyn
-            #denom_temp += codonFreq[i]
-        num_sum += fix_sum*codonFreq[i]
-        #num_temp += fix_sum*codonFreq[i]
-        #dnds_2 += (num_temp/denom_temp)
-    dnds_1 = num_sum/denom_sum        
-    return dnds_1 #, dnds_2
-
-
-def getNonZeroFreqs(freq):
-    ''' Return indices whose frequencies are not 0.'''
-    nonZero = []
-    for i in range(len(freq)):
-        if freq[i] > zero:
-            nonZero.append(i)
-    return nonZero
-
-def calcFix(fi, fj):
-    if fi == fj:
-        return 1.
-    elif fi == 0.  or fj == 0.:
-        return 0.
-    else:
-        return (np.log(fj) - np.log(fi)) / (1 - fi/fj)
-#########################################################################################
