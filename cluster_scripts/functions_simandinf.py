@@ -73,7 +73,7 @@ def simulate(f, seqfile, tree, mu, length, beta=None):
 
 
 
-def setFreqs(freqClass, numaa = None):
+def setFreqs(freqClass, numaa = None, vol=False):
 
     if freqClass == 'exp':
         userFreq, aminos_used = generateExpFreqDict(numaa)
@@ -88,9 +88,10 @@ def setFreqs(freqClass, numaa = None):
             raise AssertionError("Bad freqClass specification. Byebye.")
     
     f = fobj.calcFreqs()
-    mean_vol = calcCodonVol(f)
-    
-    return f, mean_vol
+    if vol:
+        return f, calcCodonVol(f)
+    else:
+        return f
 
      
 
