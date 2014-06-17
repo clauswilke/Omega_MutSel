@@ -163,7 +163,7 @@ def generateExpFreqDict(size):
 
 
 ############################ HYPHY-RELATED FUNCTIONS #####################################
-def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa = 1.0):
+def runhyphy(batchfile, seqfile, treefile, cpu, kappa = 1.0):
     ''' pretty specific function.'''
     
   
