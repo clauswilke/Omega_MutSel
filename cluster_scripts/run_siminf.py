@@ -40,7 +40,7 @@ treefile = "tree.tre"
 treef = open(treefile, 'w')
 treef.write("(t1:" + str(bl) + ", t2:" + str(bl) + ");")
 treef.close()
-derived_w = None
+
 
 for kappa in [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]:
     # Simulate
@@ -50,11 +50,10 @@ for kappa in [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]:
 
     # Derive omega
     print "deriving"
-    if derived_w is None:
-        mu_dict = {'AT':1.0, 'AC':1.0, 'AG':1.0, 'CG':1.0, 'CT':1.0, 'GT':1.0}
-        mu_dict['AG'] = mu_dict['AG'] * kappa
-        mu_dict['CT'] = mu_dict['CT'] * kappa
-        derived_dN, derived_dS, derived_w = deriveOmegaDiffMu(f, mu_dict)
+    mu_dict = {'AT':1.0, 'AC':1.0, 'AG':1.0, 'CG':1.0, 'CT':1.0, 'GT':1.0}
+    mu_dict['AG'] = mu_dict['AG'] * kappa
+    mu_dict['CT'] = mu_dict['CT'] * kappa
+    derived_dN, derived_dS, derived_w = deriveOmegaDiffMu(f, mu_dict)
 
     # HyPhy/PAML omega
     print "ML"
