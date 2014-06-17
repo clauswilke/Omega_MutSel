@@ -1,3 +1,5 @@
+global a;
+global b;
 global w;
 global k;
 global t;
@@ -18,7 +20,7 @@ DataSetFilter   filt_data = CreateFilter(raw_data,3,"", "","TAA,TAG,TGA");
 codonFreq_data = MYFREQUENCIES;
 
 /* Define the model and tree */
-Model MyModel = (GY94, codonFreq_data, 1);
+Model MyModel = (MYMATRIX, codonFreq_data, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
