@@ -213,12 +213,12 @@ def parseHyphyGY94(file):
     hyout.close()
     for line in hylines:
         findw = re.search("^w=(\d+\.*\d*)", line)
-        findk = re.search("^k=(\d+\.*\d*)", line)
+        #findk = re.search("^k=(\d+\.*\d*)", line)
         if findw:
             hyphy_w = findw.group(1)
-        if findk:
-            hyphy_k = findk.group(1)
-    return float(hyphy_w), float(hyphy_k)
+        #if findk:
+        #    hyphy_k = findk.group(1)
+    return float(hyphy_w) #, float(hyphy_k)
 
 def parseHyphyMG94(file):
     hyout = open(file, 'r')
