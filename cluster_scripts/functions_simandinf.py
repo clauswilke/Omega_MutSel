@@ -270,11 +270,10 @@ def deriveOmega(codonFreq, mu_dict = {'AT':1.0, 'AC':1.0, 'AG':1.0, 'CG':1.0, 'C
         kS += num
         nS += den
    
-    if kS == 0.:
-        dnds = 0.
-    else:
-        dnds = (kN/nN)/(kS/nS)
-    return dnds
+    assert( nS != 0. and nN != 0.), "Omega derivation indicates no evolution, maybe?"
+    dN = kN/nN
+    dS = kS/nS
+    return dN, dS, dN/dS
 
 
 
