@@ -30,7 +30,7 @@ seqlength = int(sys.argv[7])
 
 outfile = "params"+str(rep)+".txt"
 outf = open(outfile,'w')
-#outf.write('rep\tnumaa\taadist\tmu\tbl\tseqlength\tderived_w\tml_w\tmean_volatility\tmedian_volatility\n')
+#outf.write('rep\tnumaa\taadist\tmu\tbl\tseqlength\tderived_w\tml_w\n')
 
 
 seqfile = "seqs"+str(rep)+".fasta"
@@ -43,20 +43,24 @@ treef.close()
 
 # Simulate
 print "simulating"
-f, mean_vol = setFreqs(aadist, numaa)
-simulate(f, seqfile, treefile, mu, seqlength, None) # omega is last argument. when None, sim via mutsel
+f = setFreqs(aadist, numaa)
+kappa = 2.0
+simulate(f, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
 
 # Derive omega
 print "deriving"
-derived_w, num_codons = deriveOmega(f)
+derived_w, num_codons = deriveOmegaDiffMu(f, mudict = {'AT':1.0, 'AC':1.0, 'AG':2.0, 'CG':1.0, 'CT':2.0, 'GT':1.0}) # kappa = 2 here
 
 # HyPhy/PAML omega
 print "ML"
-ml_w = runhyphy("globalGY94.bf", "GY94_fixedkappa", seqfile, treefile, cpu)
+ml_w = runhyphy("globalGY94.bf", seqfile, treefile, cpu, 2.0)
 #ml_w = runpaml(seqfile, "0")
 
 # Save
 outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(derived_w) + '\t' + str(ml_w) + '\t' + str(mean_vol) + '\n')
 outf.close()
+
+
+
 
 

@@ -29,6 +29,7 @@ zero = 1e-8
 amino_acids  = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
 codons=["AAA", "AAC", "AAG", "AAT", "ACA", "ACC", "ACG", "ACT", "AGA", "AGC", "AGG", "AGT", "ATA", "ATC", "ATG", "ATT", "CAA", "CAC", "CAG", "CAT", "CCA", "CCC", "CCG", "CCT", "CGA", "CGC", "CGG", "CGT", "CTA", "CTC", "CTG", "CTT", "GAA", "GAC", "GAG", "GAT", "GCA", "GCC", "GCG", "GCT", "GGA", "GGC", "GGG", "GGT", "GTA", "GTC", "GTG", "GTT", "TAC", "TAT", "TCA", "TCC", "TCG", "TCT", "TGC", "TGG", "TGT", "TTA", "TTC", "TTG", "TTT"]
 nslist = [['CAA', 'GAA', 'ACA', 'ATA', 'AGA', 'AAC', 'AAT'], ['CAC', 'TAC', 'GAC', 'ACC', 'ATC', 'AGC', 'AAA', 'AAG'], ['CAG', 'GAG', 'ACG', 'ATG', 'AGG', 'AAC', 'AAT'], ['CAT', 'TAT', 'GAT', 'ACT', 'ATT', 'AGT', 'AAA', 'AAG'], ['CCA', 'TCA', 'GCA', 'AAA', 'ATA', 'AGA'], ['CCC', 'TCC', 'GCC', 'AAC', 'ATC', 'AGC'], ['CCG', 'TCG', 'GCG', 'AAG', 'ATG', 'AGG'], ['CCT', 'TCT', 'GCT', 'AAT', 'ATT', 'AGT'], ['GGA', 'AAA', 'ACA', 'ATA', 'AGC', 'AGT'], ['CGC', 'TGC', 'GGC', 'AAC', 'ACC', 'ATC', 'AGA', 'AGG'], ['TGG', 'GGG', 'AAG', 'ACG', 'ATG', 'AGC', 'AGT'], ['CGT', 'TGT', 'GGT', 'AAT', 'ACT', 'ATT', 'AGA', 'AGG'], ['CTA', 'TTA', 'GTA', 'AAA', 'ACA', 'AGA', 'ATG'], ['CTC', 'TTC', 'GTC', 'AAC', 'ACC', 'AGC', 'ATG'], ['CTG', 'TTG', 'GTG', 'AAG', 'ACG', 'AGG', 'ATA', 'ATC', 'ATT'], ['CTT', 'TTT', 'GTT', 'AAT', 'ACT', 'AGT', 'ATG'], ['AAA', 'GAA', 'CCA', 'CTA', 'CGA', 'CAC', 'CAT'], ['AAC', 'TAC', 'GAC', 'CCC', 'CTC', 'CGC', 'CAA', 'CAG'], ['AAG', 'GAG', 'CCG', 'CTG', 'CGG', 'CAC', 'CAT'], ['AAT', 'TAT', 'GAT', 'CCT', 'CTT', 'CGT', 'CAA', 'CAG'], ['ACA', 'TCA', 'GCA', 'CAA', 'CTA', 'CGA'], ['ACC', 'TCC', 'GCC', 'CAC', 'CTC', 'CGC'], ['ACG', 'TCG', 'GCG', 'CAG', 'CTG', 'CGG'], ['ACT', 'TCT', 'GCT', 'CAT', 'CTT', 'CGT'], ['GGA', 'CAA', 'CCA', 'CTA'], ['AGC', 'TGC', 'GGC', 'CAC', 'CCC', 'CTC'], ['TGG', 'GGG', 'CAG', 'CCG', 'CTG'], ['AGT', 'TGT', 'GGT', 'CAT', 'CCT', 'CTT'], ['ATA', 'GTA', 'CAA', 'CCA', 'CGA'], ['ATC', 'TTC', 'GTC', 'CAC', 'CCC', 'CGC'], ['ATG', 'GTG', 'CAG', 'CCG', 'CGG'], ['ATT', 'TTT', 'GTT', 'CAT', 'CCT', 'CGT'], ['AAA', 'CAA', 'GCA', 'GTA', 'GGA', 'GAC', 'GAT'], ['AAC', 'CAC', 'TAC', 'GCC', 'GTC', 'GGC', 'GAA', 'GAG'], ['AAG', 'CAG', 'GCG', 'GTG', 'GGG', 'GAC', 'GAT'], ['AAT', 'CAT', 'TAT', 'GCT', 'GTT', 'GGT', 'GAA', 'GAG'], ['ACA', 'CCA', 'TCA', 'GAA', 'GTA', 'GGA'], ['ACC', 'CCC', 'TCC', 'GAC', 'GTC', 'GGC'], ['ACG', 'CCG', 'TCG', 'GAG', 'GTG', 'GGG'], ['ACT', 'CCT', 'TCT', 'GAT', 'GTT', 'GGT'], ['AGA', 'CGA', 'GAA', 'GCA', 'GTA'], ['AGC', 'CGC', 'TGC', 'GAC', 'GCC', 'GTC'], ['AGG', 'CGG', 'TGG', 'GAG', 'GCG', 'GTG'], ['AGT', 'CGT', 'TGT', 'GAT', 'GCT', 'GTT'], ['ATA', 'CTA', 'TTA', 'GAA', 'GCA', 'GGA'], ['ATC', 'CTC', 'TTC', 'GAC', 'GCC', 'GGC'], ['ATG', 'CTG', 'TTG', 'GAG', 'GCG', 'GGG'], ['ATT', 'CTT', 'TTT', 'GAT', 'GCT', 'GGT'], ['AAC', 'CAC', 'GAC', 'TCC', 'TTC', 'TGC'], ['AAT', 'CAT', 'GAT', 'TCT', 'TTT', 'TGT'], ['ACA', 'CCA', 'GCA', 'TTA'], ['ACC', 'CCC', 'GCC', 'TAC', 'TTC', 'TGC'], ['ACG', 'CCG', 'GCG', 'TTG', 'TGG'], ['ACT', 'CCT', 'GCT', 'TAT', 'TTT', 'TGT'], ['AGC', 'CGC', 'GGC', 'TAC', 'TCC', 'TTC', 'TGG'], ['AGG', 'CGG', 'GGG', 'TCG', 'TTG', 'TGC', 'TGT'], ['AGT', 'CGT', 'GGT', 'TAT', 'TCT', 'TTT', 'TGG'], ['ATA', 'GTA', 'TCA', 'TTC', 'TTT'], ['ATC', 'CTC', 'GTC', 'TAC', 'TCC', 'TGC', 'TTA', 'TTG'], ['ATG', 'GTG', 'TCG', 'TGG', 'TTC', 'TTT'], ['ATT', 'CTT', 'GTT', 'TAT', 'TCT', 'TGT', 'TTA', 'TTG']]
+slist=[['AAG'], ['AAT'], ['AAA'], ['AAC'], ['ACC', 'ACT', 'ACG'], ['ACA', 'ACT', 'ACG'], ['ACA', 'ACC', 'ACT'], ['ACA', 'ACC', 'ACG'], ['CGA', 'AGG'], ['AGT'], ['CGG', 'AGA'], ['AGC'], ['ATC', 'ATT'], ['ATA', 'ATT'], [], ['ATA', 'ATC'], ['CAG'], ['CAT'], ['CAA'], ['CAC'], ['CCC', 'CCT', 'CCG'], ['CCA', 'CCT', 'CCG'], ['CCA', 'CCC', 'CCT'], ['CCA', 'CCC', 'CCG'], ['AGA', 'CGC', 'CGT', 'CGG'], ['CGA', 'CGT', 'CGG'], ['AGG', 'CGA', 'CGC', 'CGT'], ['CGA', 'CGC', 'CGG'], ['TTA', 'CTC', 'CTT', 'CTG'], ['CTA', 'CTT', 'CTG'], ['TTG', 'CTA', 'CTC', 'CTT'], ['CTA', 'CTC', 'CTG'], ['GAG'], ['GAT'], ['GAA'], ['GAC'], ['GCC', 'GCT', 'GCG'], ['GCA', 'GCT', 'GCG'], ['GCA', 'GCC', 'GCT'], ['GCA', 'GCC', 'GCG'], ['GGC', 'GGT', 'GGG'], ['GGA', 'GGT', 'GGG'], ['GGA', 'GGC', 'GGT'], ['GGA', 'GGC', 'GGG'], ['GTC', 'GTT', 'GTG'], ['GTA', 'GTT', 'GTG'], ['GTA', 'GTC', 'GTT'], ['GTA', 'GTC', 'GTG'], ['TAT'], ['TAC'], ['TCC', 'TCT', 'TCG'], ['TCA', 'TCT', 'TCG'], ['TCA', 'TCC', 'TCT'], ['TCA', 'TCC', 'TCG'], ['TGT'], [], ['TGC'], ['CTA', 'TTG'], ['TTT'], ['CTG', 'TTA'], ['TTC']]
 genetic_code = [["GCA", "GCC", "GCG", "GCT"], ["TGC","TGT"], ["GAC", "GAT"], ["GAA", "GAG"], ["TTC", "TTT"], ["GGA", "GGC", "GGG", "GGT"], ["CAC", "CAT"], ["ATA", "ATC", "ATT"], ["AAA", "AAG"], ["CTA", "CTC", "CTG", "CTT", "TTA", "TTG"], ["ATG"], ["AAC", "AAT"], ["CCA", "CCC", "CCG", "CCT"], ["CAA", "CAG"], ["AGA", "AGG", "CGA", "CGC", "CGG", "CGT"] , ["AGC", "AGT", "TCA", "TCC", "TCG", "TCT"], ["ACA", "ACC", "ACG", "ACT"], ["GTA", "GTC", "GTG", "GTT"], ["TGG"], ["TAC", "TAT"]]
 
 # matrix in python dict form.
@@ -42,15 +43,23 @@ codon_volat = [0.88, 0.89, 0.88, 0.89, 0.67, 0.67, 0.67, 0.67, 0.75, 0.89, 0.78,
 
 ############################# SIMULATION FUNCTIONS #######################################
 
-def simulate(f, seqfile, tree, mu, length, beta=None):
+def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
     ''' Simulate single partition according to either codon or mutsel model (check beta value for which model).
-        Uses equal mutation rates, with kappa=1.0 .
     '''
     try:
         my_tree = readTree(file = tree)
     except:
         my_tree = readTree(tree = tree)
     
+    # set up kappa. note that the asymmetry mu's will be only for the mutSel, hence the try/except
+    mu['AG'] = mu['AG'] * kappa
+    mu['CT'] = mu['CT'] * kappa
+    try:
+        mu['GA'] = mu['AG']
+        mu['TC'] = mu['CT']
+    except:
+        pass    
+        
     model = Model()
     if beta:
         params = {'alpha':1.0, 'beta':float(beta), 'mu': {'AC': mu, 'AG': mu, 'AT': mu, 'CG': mu, 'CT': mu, 'GT': mu}}
@@ -72,7 +81,7 @@ def simulate(f, seqfile, tree, mu, length, beta=None):
 
 
 
-def setFreqs(freqClass, numaa = None):
+def setFreqs(freqClass, numaa, vol=False):
 
     if freqClass == 'exp':
         userFreq, aminos_used = generateExpFreqDict(numaa)
@@ -87,9 +96,10 @@ def setFreqs(freqClass, numaa = None):
             raise AssertionError("Bad freqClass specification. Byebye.")
     
     f = fobj.calcFreqs()
-    mean_vol = calcCodonVol(f)
-    
-    return f, mean_vol
+    if vol:
+        return f, calcCodonVol(f)
+    else:
+        return f
 
      
 
@@ -162,7 +172,7 @@ def generateExpFreqDict(size):
 
 
 ############################ HYPHY-RELATED FUNCTIONS #####################################
-def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu):
+def runhyphy(batchfile, seqfile, treefile, cpu, kappa = 1.0):
     ''' pretty specific function.'''
     
   
@@ -174,10 +184,6 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu):
     setup2 = subprocess.call(setuphyphy2, shell = True)
     assert(setup2 == 0), "couldn't add tree to hyphy infile"
     
-    # Set up codon frequencies and create run.bf
-    ### NOTE: if you use byamino to get the equal freqs, then error is introduced which scales pretty well with volatility. This doesn't really exist when bycodon (1/61 for all).
-    #fobj = EqualFreqs(by = 'amino', type = 'codon')
-    #eqf  = fobj.calcFreqs()
     eqf = np.zeros(61)
     for i in range(61):
         eqf[i] = 1./61.
@@ -186,10 +192,11 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu):
     setup3 = subprocess.call(setuphyphy3, shell = True)
     assert(setup3 == 0), "couldn't properly add in frequencies"
     
-    # Set up matrix, within run.bf
-    setuphyphy4 = "sed -i 's/MYMATRIX/"+matrix_name+"/g' run.bf"
-    setup4 = subprocess.call(setuphyphy4, shell = True)
-    assert(setup4 == 0), "couldn't properly define matrix"
+    # Set up kappa (and accordingly, matrix)
+    if kappa != 'free':
+        sedkappa = "sed -i 's/k/"+str(kappa)+"/g' matrices.mdl"
+        runsedkappa = subprocess.call(sedkappa, shell=True)
+        assert(runsetkappa == 0), "couldn't set up kappa"
 
     # Run hyphy
     hyphy = "./HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
@@ -224,7 +231,7 @@ def freq2hyphy(f):
 ############################ PAML-RELATED FUNCTIONS ###############################
 def runpaml(seqfile, codonFreq = "3", initw = 0.4):
     
-    # Set up sequende file
+    # Set up sequence file
     setuppaml1 = "cp "+seqfile+" temp.fasta"
     setup1 = subprocess.call(setuppaml1, shell = True)
     assert(setup1 == 0), "couldn't create temp.fasta"
@@ -295,11 +302,53 @@ def calcCodonVol(codonFreqs):
 
 
 ############################### OMEGA DERIVATION FUNCTIONS ###############################
+def getNucleotideDiff(source, target):
+    for i in range(3):
+        if source[i] != target[i]:    
+            return "".join(sorted(source[i]+target[i]))
+            
+def deriveOmegaDiffMu(codonFreq, mu_dict = {'AT':1.0, 'AC':1.0, 'AG':1.0, 'CG':1.0, 'CT':1.0, 'GT':1.0}):
+    ''' Derive an omega using codon frequencies. Single calculation. Get numerator, get denominator, divide once at end.
+        Default mutational scheme is all mu's are 1.
+        Requires symmetric mutational scheme.
+    ''' 
+    kN = 0. #dN numerator.   nonsynonymous rate
+    nN = 0. #dN denominator. nonsynonymous sites
+    kS = 0. #dS numerator.   synonymous rate
+    nS = 0. #dS denominator. synonymous sites
+    
+    # codon indices which do not have zero frequency
+    nonZero = getNonZeroFreqs(codonFreq)
+    
+    # Calculations
+    for i in nonZero:
+        codon = codons[i]
+        # Nonsynonymous calculation
+        fix_sum=0.
+        for nscodon in nslist[i]:
+            if codon != nscodon:
+                diff = getNucleotideDiff(codon,nscodon)
+                nscodon_freq = codonFreq[codons.index(nscodon)]
+                fix_sum += calcFix( float(codonFreq[i]), float(nscodon_freq) ) * mu_dict[diff]                  
+                nN += codonFreq[i]
+        kN += fix_sum*codonFreq[i]
+        # Synonymous calculation
+        mu_sum=0.
+        for scodon in slist[i]:
+            if codon != scodon:
+                kS += mu_dict[ getNucleotideDiff(codon,scodon) ]
+                nS += codonFreq[i]
+        kS += mu_sum * codonFreq[i]                
 
+    if kS == 0.:
+        return 0.
+    else:
+        return (kN/nN)/(kS/nS)
+        
 def deriveOmega(codonFreq):
     ''' Derive an omega using codon frequencies. 
         dnds_1 -> get numerator, denominator, divide once at end
-        dnds_2 -> add num/denom fractions as you go.
+        dnds_2 -> add num/denom fractions as you go. currently commented out.
     ''' 
     nonZero = getNonZeroFreqs(codonFreq) # get indices which aren't zero.
     num_sum = 0. #dN numerator
@@ -308,19 +357,19 @@ def deriveOmega(codonFreq):
     
     # Calculations
     for i in nonZero:
-        num_temp = 0.
-        denom_temp = 0.
+        #num_temp = 0.
+        #denom_temp = 0.
         fix_sum=0.
         for nscodon in nslist[i]:
             nscodon_freq = codonFreq[codons.index(nscodon)]
             fix_sum += calcFix( float(codonFreq[i]), float(nscodon_freq) )                   
             denom_sum += codonFreq[i] #  * len(nslist[i])   #to correct for num nonsyn
-            denom_temp += codonFreq[i]
+            #denom_temp += codonFreq[i]
         num_sum += fix_sum*codonFreq[i]
-        num_temp += fix_sum*codonFreq[i]
-        dnds_2 += (num_temp/denom_temp)
+        #num_temp += fix_sum*codonFreq[i]
+        #dnds_2 += (num_temp/denom_temp)
     dnds_1 = num_sum/denom_sum        
-    return [dnds_1, dnds_2]
+    return dnds_1 #, dnds_2
 
 
 def getNonZeroFreqs(freq):
