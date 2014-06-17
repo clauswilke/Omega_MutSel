@@ -43,15 +43,23 @@ codon_volat = [0.88, 0.89, 0.88, 0.89, 0.67, 0.67, 0.67, 0.67, 0.75, 0.89, 0.78,
 
 ############################# SIMULATION FUNCTIONS #######################################
 
-def simulate(f, seqfile, tree, mu, length, beta=None):
+def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
     ''' Simulate single partition according to either codon or mutsel model (check beta value for which model).
-        Uses equal mutation rates, with kappa=1.0 .
     '''
     try:
         my_tree = readTree(file = tree)
     except:
         my_tree = readTree(tree = tree)
     
+    # set up kappa. note that the asymmetry mu's will be only for the mutSel, hence the try/except
+    mu['AG'] = mu['AG'] * kappa
+    mu['CT'] = mu['CT'] * kappa
+    try:
+        mu['GA'] = mu['AG']
+        mu['TC'] = mu['CT']
+    except:
+        pass    
+        
     model = Model()
     if beta:
         params = {'alpha':1.0, 'beta':float(beta), 'mu': {'AC': mu, 'AG': mu, 'AT': mu, 'CG': mu, 'CT': mu, 'GT': mu}}
