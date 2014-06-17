@@ -299,7 +299,7 @@ def getNucleotideDiff(source, target):
         if source[i] != target[i]:    
             return "".join(sorted(source[i]+target[i]))
             
-def deriveOmegaDiffMu(codonFreq, mu_dict = {'AT':.01, 'AC':.10, 'AG':.01, 'CG':.01, 'CT':.01, 'GT':.01}):
+def deriveOmegaDiffMu(codonFreq, mu_dict = {'AT':1.0, 'AC':.10, 'AG':1.0, 'CG':1.0, 'CT':1.0, 'GT':1.0}):
     ''' Derive an omega using codon frequencies. Single calculation. Get numerator, get denominator, divide once at end.
         Default mutational scheme is all mu's are 1.
         Requires symmetric mutational scheme.
@@ -332,7 +332,7 @@ def deriveOmegaDiffMu(codonFreq, mu_dict = {'AT':.01, 'AC':.10, 'AG':.01, 'CG':.
                 nS += codonFreq[i]
         kS += mu_sum * codonFreq[i]                
 
-    if kN == 0. and kS == 0.:
+    if kS == 0.:
         return 0.
     else:
         return (kN/nN)/(kS/nS)
