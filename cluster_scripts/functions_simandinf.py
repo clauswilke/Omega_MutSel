@@ -73,7 +73,7 @@ def simulate(f, seqfile, tree, mu, length, beta=None):
 
 
 
-def setFreqs(freqClass, numaa = None, vol=False):
+def setFreqs(freqClass, numaa, vol=False):
 
     if freqClass == 'exp':
         userFreq, aminos_used = generateExpFreqDict(numaa)
