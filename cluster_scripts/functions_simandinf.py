@@ -187,7 +187,7 @@ def runhyphy(batchfile, seqfile, treefile, cpu, kappa = 1.0):
     if kappa != 'free':
         sedkappa = "sed -i 's/k/"+str(kappa)+"/g' matrices.mdl"
         runsedkappa = subprocess.call(sedkappa, shell=True)
-        assert(runsetkappa == 0), "couldn't set up kappa"
+        assert(runsedkappa == 0), "couldn't set up kappa"
 
     # Run hyphy
     hyphy = "./HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
