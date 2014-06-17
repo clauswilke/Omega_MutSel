@@ -163,7 +163,7 @@ def generateExpFreqDict(size):
 
 
 ############################ HYPHY-RELATED FUNCTIONS #####################################
-def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu):
+def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa = 1.0):
     ''' pretty specific function.'''
     
   
@@ -175,10 +175,6 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu):
     setup2 = subprocess.call(setuphyphy2, shell = True)
     assert(setup2 == 0), "couldn't add tree to hyphy infile"
     
-    # Set up codon frequencies and create run.bf
-    ### NOTE: if you use byamino to get the equal freqs, then error is introduced which scales pretty well with volatility. This doesn't really exist when bycodon (1/61 for all).
-    #fobj = EqualFreqs(by = 'amino', type = 'codon')
-    #eqf  = fobj.calcFreqs()
     eqf = np.zeros(61)
     for i in range(61):
         eqf[i] = 1./61.
@@ -187,10 +183,11 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu):
     setup3 = subprocess.call(setuphyphy3, shell = True)
     assert(setup3 == 0), "couldn't properly add in frequencies"
     
-    # Set up matrix, within run.bf
-    setuphyphy4 = "sed -i 's/MYMATRIX/"+matrix_name+"/g' run.bf"
-    setup4 = subprocess.call(setuphyphy4, shell = True)
-    assert(setup4 == 0), "couldn't properly define matrix"
+    # Set up kappa (and accordingly, matrix)
+    if kappa != 'free':
+        sedkappa = "sed -i 's/k/"+str(kappa)+"/g' matrices.mdl"
+        runsedkappa = subprocess.call(sedkappa, shell=True)
+        assert(runsetkappa == 0), "couldn't set up kappa"
 
     # Run hyphy
     hyphy = "./HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
@@ -225,7 +222,7 @@ def freq2hyphy(f):
 ############################ PAML-RELATED FUNCTIONS ###############################
 def runpaml(seqfile, codonFreq = "3", initw = 0.4):
     
-    # Set up sequende file
+    # Set up sequence file
     setuppaml1 = "cp "+seqfile+" temp.fasta"
     setup1 = subprocess.call(setuppaml1, shell = True)
     assert(setup1 == 0), "couldn't create temp.fasta"
@@ -317,7 +314,6 @@ def deriveOmegaDiffMu(codonFreq, mu_dict = {'AT':.01, 'AC':.10, 'AG':.01, 'CG':.
     # Calculations
     for i in nonZero:
         codon = codons[i]
-
         # Nonsynonymous calculation
         fix_sum=0.
         for nscodon in nslist[i]:
@@ -327,7 +323,6 @@ def deriveOmegaDiffMu(codonFreq, mu_dict = {'AT':.01, 'AC':.10, 'AG':.01, 'CG':.
                 fix_sum += calcFix( float(codonFreq[i]), float(nscodon_freq) ) * mu_dict[diff]                  
                 nN += codonFreq[i]
         kN += fix_sum*codonFreq[i]
-
         # Synonymous calculation
         mu_sum=0.
         for scodon in slist[i]:
