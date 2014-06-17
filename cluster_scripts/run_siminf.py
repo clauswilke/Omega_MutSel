@@ -41,25 +41,25 @@ treef = open(treefile, 'w')
 treef.write("(t1:" + str(bl) + ", t2:" + str(bl) + ");")
 treef.close()
 
+kappa=3.5
 # Simulate
 print "simulating"
 f = setFreqs(aadist, numaa)
-kappa = 1.0
 simulate(f, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
 
 # Derive omega
 print "deriving"
-#mu_dict = {'AT':1.0, 'AC':1.0, 'AG':2.0, 'CG':1.0, 'CT':2.0, 'GT':1.0} # kappa = 2 here
-derived_w, derived_dN, derived_dS = deriveOmegaDiffMu(f, mu_dict)
+mu_dict = {'AT':1.0, 'AC':1.0, 'AG':1.0, 'CG':1.0, 'CT':1.0, 'GT':1.0}
+mu_dict['AG'] = mu_dict['AG'] * kappa
+mu_dict['CT'] = mu_dict['CT'] * kappa
+derived_dN, derived_dS, derived_w = deriveOmegaDiffMu(f, mu_dict)
 
 # HyPhy/PAML omega
 print "ML"
-ml_dN, ml_dS= runhyphy("globalMG94.bf", seqfile, treefile, cpu, 2.0)
-ml_w = ml_dN/ml_dS
-#ml_w = runpaml(seqfile, "0")
+ml_w, ml_kappa = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, "free")
 
 # Save
-outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(derived_dN) + '\t' + str(derived_dS) + '\t' + str(derived_w) + '\t' + str(ml_dN) + '\t' + str(ml_dS) + '\t' + str(ml_w) + '\n')
+outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(kappa) + '\t' + str(ml_kappa) + '\t' + str(derived_w) + '\t' + str(ml_w) + '\n')
 outf.close()
 
 
