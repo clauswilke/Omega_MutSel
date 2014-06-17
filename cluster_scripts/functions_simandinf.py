@@ -362,7 +362,7 @@ def deriveOmegaDiffMu(codonFreq, mu_dict = {'AT':1.0, 'AC':1.0, 'AG':1.0, 'CG':1
             if codon != nscodon:
                 diff = getNucleotideDiff(codon,nscodon)
                 nscodon_freq = codonFreq[codons.index(nscodon)]
-                fix_sum += calcFix( float(codonFreq[i]), float(nscodon_freq) )# * mu_dict[diff]                  
+                fix_sum += calcFix( float(codonFreq[i]), float(nscodon_freq) ) * mu_dict[diff]                  
                 nN += codonFreq[i]
         kN += fix_sum*codonFreq[i]
         
@@ -372,7 +372,7 @@ def deriveOmegaDiffMu(codonFreq, mu_dict = {'AT':1.0, 'AC':1.0, 'AG':1.0, 'CG':1
             if codon != scodon:
                 diff = getNucleotideDiff(codon,scodon)
                 scodon_freq = codonFreq[codons.index(scodon)]
-                fix_sum += calcFix( float(codonFreq[i]), float(scodon_freq) )# * mu_dict[diff]                  
+                fix_sum += calcFix( float(codonFreq[i]), float(scodon_freq) ) * mu_dict[diff]                  
                 nS += codonFreq[i]
         kS += fix_sum*codonFreq[i]        
         '''
