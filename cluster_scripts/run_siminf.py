@@ -44,24 +44,28 @@ outf = open(outfile,'w')
 
 # Simulate
 print "simulating"
-f = setFreqs(aadist, numaa)
-gc_percent = simulate(f, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
+bias = 0.5
+f = setFreqs(aadist, numaa, bias)
 
-# Derive omega
-print "deriving"
-mu_dict = {'AT':mu, 'AC':mu, 'AG':mu, 'CG':mu, 'CT':mu, 'GT':mu}
-mu_dict['AG'] = mu_dict['AG'] * kappa
-mu_dict['CT'] = mu_dict['CT'] * kappa
-derived_dN, derived_dS, derived_w = deriveOmega(f, mu_dict)
-
-
-# HyPhy/PAML omega
-print "ML"
-ml_w = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kappa)
+for kappa in [1.0, 2.0, 3.0, 4.0]:
+    gc_percent = simulate(f, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
+    
+    # Derive omega
+    print "deriving"
+    mu_dict = {'AT':mu, 'AC':mu, 'AG':mu, 'CG':mu, 'CT':mu, 'GT':mu}
+    mu_dict['AG'] = mu_dict['AG'] * kappa
+    mu_dict['CT'] = mu_dict['CT'] * kappa
+    derived_dN, derived_dS, derived_w = deriveOmega(f, mu_dict)
 
 
-# Save
-outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(kappa) + '\t' +  str(derived_w) + '\t' + str(ml_w) + '\t' + str(gc_percent) + '\n')
+    # HyPhy/PAML omega
+    print "ML"
+    ml_dN, ml_dS = runhyphy("globalDNDS.bf", "MG94", seqfile, treefile, cpu, kappa)
+    ml_w = ml_dN/ml_dS
+    ml_w2 = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kappa)
+
+    # Save
+    outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(kappa) + '\t' +  str(derived_dN) + '\t' + str(ml_dN) + '\t' + str(derived_dS) + '\t' + str(ml_dS) + '\t' + str(derived_w) + '\t' + str(ml_w) + '\t' + str(ml_w2) + '\n')
 outf.close()
 
 

@@ -74,17 +74,17 @@ def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
     
 
 
-def setFreqs(freqClass, numaa, vol=False):
+def setFreqs(freqClass, numaa, bias, vol=False):
 
     if freqClass == 'exp':
         userFreq, aminos_used = generateExpFreqDict(numaa)
-        fobj = UserFreqs(by = 'amino', type = 'codon', freqs = userFreq)
+        fobj = UserFreqs(by = 'amino', type = 'codon', freqs = userFreq, bias = bias)
     else:
         aalist = generateAAlist(numaa) 
         if freqClass == 'equal':
-            fobj = EqualFreqs(by = 'amino', type = 'codon', restrict = aalist)
+            fobj = EqualFreqs(by = 'amino', type = 'codon', restrict = aalist, bias = bias)
         elif freqClass == 'random':
-            fobj = RandFreqs(by = 'amino', type = 'codon', restrict = aalist)              
+            fobj = RandFreqs(by = 'amino', type = 'codon', restrict = aalist, bias = bias)              
         else:
             raise AssertionError("Bad freqClass specification. Byebye.")
     
