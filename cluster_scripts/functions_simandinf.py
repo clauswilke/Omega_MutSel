@@ -67,7 +67,11 @@ def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
     myEvolver.sim_sub_tree(my_tree)
     myEvolver.writeSequences()
 
-
+    # Now from those evolved sequences, return GC content
+    fobj = ReadFreqs(by = 'nuc', type = 'nuc', file = seqfile)
+    nuc = fobj.calcFreqs() 
+    return (nuc[1] + nuc[2]) # GC content.
+    
 
 
 def setFreqs(freqClass, numaa, vol=False):
