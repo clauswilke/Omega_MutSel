@@ -306,11 +306,12 @@ def calcNS(codon, codonFreq, i, list, mu_dict):
     numer = 0.
     denom = 0.
     fix_sum=0.
+    freq = codonFreq[i]
     for other_codon in list[i]:
         if codon != other_codon:
             diff = getNucleotideDiff(codon,other_codon)
-            freq = codonFreq[codons.index(other_codon)]
-            fix_sum += calcFix( float(codonFreq), float(freq) ) * mu_dict[diff]                  
+            tempfreq = codonFreq[codons.index(other_codon)]
+            fix_sum += calcFix( float(freq), float(tempfreq) ) * mu_dict[diff]                  
             denom += codonFreq[i]
     numer += fix_sum*codonFreq[i]
     return numer, denom
