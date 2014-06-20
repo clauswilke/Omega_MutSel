@@ -3,11 +3,9 @@
 \usepackage[margin=1.0in]{geometry}
 \linespread{1.5}
 \usepackage{graphicx}
-\usepackage{natbib}
-
-\bibpunct[,]{(}{)}{;}{a}{}{,}
-\usepackage{tablefootnote}
 \usepackage{amsmath}
+\usepackage{cite}
+
 
 \renewcommand{\bottomfraction}{.9}
 \renewcommand{\topfraction}{.9}
@@ -17,7 +15,19 @@
 
 \begin{document}
 
-Over the years, a variety of models have been proposed which describe how natural selection acts on protein-coding sequences on phylogenetic timescales. The most widely-accepted models are the so-called mechanistic codon models, first introduced twenty years ago independently by GY and MG (for a comprehensive review, see Anisimova2009). The primary quantity of interest Mechanistic codon models estimate of an evolutionary-rate ratio, $\omega = dN/dS$, which describes the rate of nonsynonymous to synonymous substitution. They have been tremendously successful and have been developed for a sophisticated array of applications. From humble beginnings estimated a gene $dN/dS$, they can now yield site-wise estimates as well as quantify lineage-specific selective pressures. Also mentioned the empirical varieties.
+\section*{Initial thoughts}
+
+Over the years, a variety of models have been proposed to describe the effects of natural selection on protein-coding sequences, in a phylogenetic context. 
+Traditionally, the focus has been on mechanistic codon-substitution models (see ref.~\cite{Anisimova2009} for a comprehensive review). Since their introduction in the 1990s, these models have seen great success in inferring protein evolutionary rates, or the nonsynonymous/synonymous rate ratio ($dN/dS$). This metric indicates how quickly a protein's constituent amino acids change \cite{GoldmanYang1994, MuseGaut1994, NielsenYang1998}, allowing for the identification of positively-selected regions in protein sequences \cite{ NielsenYang1998,Yang2000}. 
+More recently, a second class of models, known as mutation-selection-balance (MutSel) models, have come into play. Unlike $dN/dS$ models, MutSel models explicitly model the dynamic balance between mutation and selection, rather than merely the final outcome (e.g. substitution) of this process \cite{HalpernBruno1998, Yang2008, Rodrigue2010, Tamuri2012}. Moreover, these models yield estimates of selection coefficients, which indicate the extent to which natural selection favors, or disfavors, particular amino acids at protein positions.
+
+Although these models aim to describe fundamentally the same process (protein evo along phylogeny), their relationship is unknown. They are developed entirely independently.
+Here, we mathematically connect the models and demonstrate the relationship using simulations. Several things emerge from this analysis - 
+1. If you fit a mutsel model and calculate dnds from it, it's just as good as if you had used a mech codon model. 
+2. we prove that dnds, when calc'd from mutsel, must be less than 1. although generally acknowledged that purifying selection is a feature, we demonstrate it precisely and reveal that, in cases of positive selection, mutsel models are likely not appropriate.
+3. we also have a more realistic way to assess performance of dnds models. bias is introduced by codon frequencies used by the model. otherwise, freqs will likely capture selective pressure, rendering omega estimates bonkers. typically highly elevated. More work should be done in this field, for instance, in dnds analyses in which codon frequencies are somehow constrained (eg membrane protein in which hydrophobic enriched) may result in artifactually high dnds.
+
+on phylogenetic timescales. The most widely-accepted models are the so-called mechanistic codon models, first introduced twenty years ago independently by GY and MG (for a comprehensive review, see Anisimova2009). The primary quantity of interest Mechanistic codon models estimate of an evolutionary-rate ratio, $\omega = dN/dS$, which describes the rate of nonsynonymous to synonymous substitution. They have been tremendously successful and have been developed for a sophisticated array of applications. From humble beginnings estimated a gene $dN/dS$, they can now yield site-wise estimates as well as quantify lineage-specific selective pressures. Also mentioned the empirical varieties.
 	
 The second model class are mutation-selection-balance models. These models deal with protein-level evolutionary constraints rather than merely codons. Moreover, they describe the evolutionary process in more fine-grained detail. Rather than focusing only on the result of evolution (substitution), they consider mutation and selection interplay. These models were first introduced a while ago but only recently have implementations arisen that promise its widespread adoption.
 
@@ -37,6 +47,56 @@ Discussion points:
 - Important insight is that dN/dS>1 inherently cannot be described by mutation-selection models, and thus at those sites its results may be misleading. In particular, possibly a confounding factor in the Rodrigue implementation, as positively selected sites in the alignment could introduce bias.
 - Importance of examining intersections between models. Must understand how estimates from one relate to another. Helps to ensure robust results; model agreement is key, so we must formulate explicit relationships among them to systematically assess agreement.
 - 
+
+
+
+
+
+\section*{FROM NRSA PROPOSAL}
+Traditionally, the most commonly used models in evolutionary sequence analyses are codon-substitution models \cite{Anisimova2009}. Since their introduction in the 1990s, these models have seen great success in inferring protein evolutionary rates, or the nonsynonymous/synonymous rate ratio ($dN/dS$). This metric indicates how quickly a protein's constituent amino acids change \cite{GoldmanYang1994, MuseGaut1994, NielsenYang1998}, allowing for the identification of positively-selected regions in protein sequences \cite{ NielsenYang1998,Yang2000}. 
+
+However, while widely-applied, codon-substitution models have several serious drawbacks. One such limitation is that the $dN/dS$ parameter ignores the influence of site-specific amino acid propensities.  It is universally recognized that a particular position in a protein will only tolerate certain amino acids, due either to functional or structural constraints. Indeed, there is evidence that variation in amino acid frequencies at key HIV residues dictates substrate specificity and contributes to overall virion fitness \cite{Bagossi2005,daSilva2006}, indicating that modeling the selective effects of specific amino acids is a promising method for understanding protein function and evolutionary constraints. However, $dN/dS$ ignores this key aspect of protein evolution and considers all nonsynonymous changes, regardless of which amino acid was substituted, as having equal weight on protein fitness \cite{HalpernBruno1998,Sella2005}, a biologically implausible assumption. 
+
+An additional limitation is that codon-substitution models merely describe the result of the evolutionary process, rather than the explicit underlying mechanism producing those results. More precisely, substitutions in protein-coding sequences result from an ongoing mutation-selection balance. When a mutation occurs in a DNA sequence, natural selection must act on this mutation, either by disfavoring it, resulting in the mutation's removal from the population, or favoring it, ultimately yielding an amino acid replacement or substitution. By overlooking this underlying mechanism and focusing only on whether substitutions have occurred, codon substitution models are unable to capture the full extent of the evolutionary process. Instead, an approach which modeled both mutation and selection would yield key insights into how proteins tolerate a variety of mutations. Indeed, characterizing how different mutations affect protein fitness has led to key discoveries of functional protein residues, such as calcium binding sites in synaptotagmin \cite{Xiangyang1998, Nishiki2004}, or of mechanisms contributing vaccine or antibiotic resistance in communicable disease \cite{vanDoorn2003, Bloom2010, Quashie2012, Bloom2013, Acevedo2014}. Computational methods, such as mutation-selection models, that assess the fitness affects of amino acid mutations are therefore extremely useful for generating testable hypotheses about protein function and evolution.
+
+In order to address the concerns surrounding substitution models, a series of mutation-selection codon models, which explicitly model the dynamic balance between mutation and selection, have emerged in the literature \cite{HalpernBruno1998, Yang2008, Rodrigue2010, Tamuri2012}. These models rely on site-specific amino acid preferences and specifically describe how the presence of different amino acids across protein sites affects overall protein fitness. They yield robust estimates of site-wise amino acid propensities, which describe the equilibrium probability of observing each amino acid at a given protein position. In turn, these propensities are used to infer selection coefficients, or the strength and direction of selection acting on different amino acid mutations at a given position. Mutation-selection models represent a statistically rigorous method for examining site-specific amino acid fitnesses, thereby generating testable hypotheses about the evolutionary process. As traditional codon-substitution models do not take the underlying evolutionary process or amino acid preference into account, there is great promise for mutation-selection models to reveal previously unrecognized evolutionary constraints. 
+
+Although mutation-selection models were first introduced over 15 years ago\cite{HalpernBruno1998}, they have seen virtually no use due to their high computational expense. However, algorithmic advances and expansion of computational power have begun to make application of these models possible. The first computationally tractable mutation-selection analytic methods that incorporate site-heterogeneity were introduced within the past four years \cite{Rodrigue2010, Tamuri2012}; even so, at the time of their introduction, these methods still required upwards of one or more months to complete analysis on a single dataset. Importantly, during 2014, these models have been updated to reduce runtime dramatically as well as yield more robust inferences \cite{Rodrigue2014,Tamuri2014}, allowing, for the first time, the potential for large-scale adoption by the scientific community.}
+
+
+\section*{Math from NIH proposal}
+	
+We describe here how to calculate $dN/dS$ from the parameters of a MutSel model. We consider the simplest case: (i) all nucleotide mutations are equally likely, and occur at rate $\mu$ (Jukes-Cantor model \cite{JukesCantor1969}); (ii) all synonymous codons for a given amino acid have the same fitness; there is no synonymous rate variation. (Both of these simplifying assumptions can be relaxed in a more elaborate calculation.)
+
+In the framework of a MutSel model, we can write the steady-state frequency of codon $i$ as
+\begin{equation}\label{eq:fi}
+ f_i=e^{s_i}\Big/\sum_k e^{s_k}\,,
+\end{equation}
+where the sum in the denominator runs over all 61 sense codons \cite{SellaHirsh2005}. Here, $s_i$ is the \emph{scaled selection coefficient} for codon $i$; larger $s_i$ correspond to higher frequencies of codon $i$. The fixation probability for a mutation from $i$ to $j$ is \cite{HalpernBruno1998,SellaHirsh2005}
+\begin{equation}
+  \pi_{i\rightarrow j} = \frac{1-(f_i/f_j)^{1/N}}{1-f_i/f_j}
+  \approx \frac{1}{N_e} \frac{\ln f_j - \ln f_i}{1-f_i/f_j}\,,
+\end{equation}
+where $N_e$ is the effective population size. We can calculate an evolutionary rate by summing over all fixation probabilities weighted by the frequency of the originating codon. For example, we can write the synonymous rate $K_\text{S}$ as
+\begin{equation}\label{eq:KS}
+  K_\text{S} = \mu N_e \sum_i \sum_{j \in {\cal S}_i} f_i  \pi_{i\rightarrow j}\,,
+\end{equation}
+where $\mu$ is the overall mutation rate and ${\cal S}_i$ is the set of codons that are synonymous to codon $i$ and differ from it by one nucleotide substitution. To normalize $K_\text{S}$, we divide it by the number of synonymous sites $L_\text{S}$, which we can calculate as 
+\begin{equation}\label{eq:LS}
+  L_\text{S} = \sum_i \sum_{j \in {\cal S}_i} f_i \,.
+\end{equation}
+Under the assumption that all synonymous codons have equal fitness (all synonymous mutations are neutral), we have $\pi_{i\rightarrow j}=1/N_e$ \cite{CrowKimura1970}, and thus we find for $dS$, the synonymous rate per synonymous site,
+\begin{equation}\label{eq:dS}
+  dS = \frac{K_\text{S}}{L_\text{S}}=\mu.
+\end{equation}
+Similarly, for $dN$, the non-synonymous rate per non-synonymous site, we find
+\begin{equation}\label{eq:dN}
+  dN = \frac{K_\text{N}}{L_\text{N}}=\frac{\mu N_e \sum_i \sum_{j \in {\cal N}_i} f_i  \pi_{i\rightarrow j}}{\sum_i \sum_{j \in {\cal N}_i} f_i}\,,
+\end{equation}
+where ${\cal N}_i$ is the set of codons that are not synonymous to codon $i$ and differ from it by one nucleotide substitution. The quantities $K_\text{N}$ and $L_\text{N}$ are defined as in Eqs.~\eqref{eq:KS} and \eqref{eq:LS} but summing over $j\in {\cal N}_i$ instead of $j\in {\cal S}_i$.
+
+Equations \eqref{eq:fi}--\eqref{eq:dN} establish a connection between the scaled selection coefficients $s_i$ (i.e., the primary parameters of a MutSel model) and the evolutionary rate ratio $dN/dS$.
+
 	
 	
 	
@@ -46,9 +106,8 @@ Discussion points:
 	
 	
 	
-	
-	
-\bibliographystyle{plain}
+\newpage
+\bibliographystyle{plos2009}
 \bibliography{bibliography}	
 	
 \end{document}
