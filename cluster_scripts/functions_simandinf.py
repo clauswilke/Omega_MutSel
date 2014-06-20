@@ -34,6 +34,7 @@ grantham = {'AA':0, 'AC':195, 'AD':126, 'AE':107, 'AF':113, 'AG':60, 'AH':86, 'A
 
 def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
     ''' Simulate single partition according to either codon or mutsel model (check beta value for which model).
+        Symmetric mutation rates, with kappa.
     '''
     try:
         my_tree = readTree(file = tree)
@@ -51,42 +52,31 @@ def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
         params['stateFreqs'] = f
         model.params = params
         mat = mutSel_MatrixBuilder(model)
-    
     model.Q = mat.buildQ()
     partitions = [(length, model)]        
     myEvolver = StaticEvolver(partitions = partitions, tree = my_tree, outfile = seqfile)
     myEvolver.sim_sub_tree(my_tree)
     myEvolver.writeSequences()
 
-def setFreqs(freqClass, numaa, bias, freqfile):
+
+
+def setFreqs(numaa, freqfile):
     ''' Returns codon frequencies and gc content '''
     
     assert(numaa != 1), "Can't only have a single amino acid! omega will always be zero. we're not interested in that."
     
-    if freqClass == 'exp':
-        userFreq = setFreqDict(numaa)
-        fobj = UserFreqs(by = 'amino', type = 'codon', freqs = userFreq, bias = bias, savefile = freqfile)
-    else:
-        aalist = generateAAlist(numaa) 
-        if freqClass == 'equal':
-            fobj = EqualFreqs(by = 'amino', type = 'codon', restrict = aalist, bias = bias, savefile = freqfile)
-        elif freqClass == 'random':
-            fobj = RandFreqs(by = 'amino', type = 'codon', restrict = aalist, bias = bias, savefile = freqfile)              
-        else:
-            raise AssertionError("Bad freqClass specification. Byebye.")
+    # Frequencies based on boltzmann dist, such that amino acid frequencies distributed exponentially.
+    rawfreqs = setBoltzFreqs(numaa) # gets frequencies 
+    aalist = generateAAlist(numaa)  # gets suitable list of amino acids
+    uFreq = dict(zip(aalist, rawfreqs)) # merge to dict
+    
+    # Calculate codon state frequencies given amino acid frequencies, above.
+    fobj = UserFreqs(by = 'amino', type = 'codon', freqs = uFreq, savefile = freqfile)
     codonFreq = fobj.calcFreqs()
     nucFreq = fobj.convert("nuc")
-    return codonFreq, nucFreq[1] + nucFreq[2], "".join(userFreq.keys())
-
-
-def setFreqDict(size):
-    ''' Generate a dictionary of exponentially distributed amino acid frequencies.
-        size = number of amino acids. please never use 1.
-    '''
-    rawfreqs = setBoltzFreqs(size)
-    aalist = generateAAlist(size)
-    return dict(zip(aalist, rawfreqs))
     
+    return codonFreq, nucFreq[1] + nucFreq[2], "".join(aalist)
+
 
 def setBoltzFreqs(size, beta = 1.5):
     ''' Use Boltzmann distribution to get amino acid frequencies for a certain number of amino acids'''
@@ -140,7 +130,7 @@ def generateAAlist(size):
     return aalist
 
 ################################################# HYPHY-RELATED FUNCTIONS ############################################################
-def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, codonFreq, aminos_used, bias, kappa = 1.0):
+def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa = 1.0):
     ''' pretty specific function.'''
     
   
@@ -153,7 +143,7 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, codonFreq, aminos_u
     assert(setup2 == 0), "couldn't add tree to hyphy infile"
     
 
-    hyf = setFreqsForHyphy(codonFreq, aminos_used, bias)
+    hyf = setFreqsForHyphy()
     setuphyphy3 = "sed 's/MYFREQUENCIES/"+hyf+"/g' "+batchfile+" > run.bf"
     setup3 = subprocess.call(setuphyphy3, shell = True)
     assert(setup3 == 0), "couldn't properly add in frequencies"
@@ -205,6 +195,36 @@ def parseHyphyMG94(file):
             hyphy_beta = findb.group(1)
     return float(hyphy_alpha), float(hyphy_beta)
 
+
+def setFreqsForHyphy():
+    ''' Build input hyphy frequencies. NOTE: bias code not used but commented out in case we want it again someday.
+    '''
+    eqf = np.zeros(61)
+    for i in range(61):
+        eqf[i] = 1./61.
+    return freq2hyphy(eqf)    
+#    if bias is not None:
+#        for amino in aminos_used:
+#            aa_ind = amino_acids.index(amino)
+#            syn_codons = genetic_code[aa_ind]
+#            cfreqs = []
+#            cinds=[]
+#            # If only 1 codon, no bias, so move on.
+#            if len(syn_codons) == 1:
+#                continue
+#            for syn in syn_codons:
+#                cinds.append(codons.index(syn))
+#                cfreqs.append(codonFreq[ codons.index(syn) ])
+#
+#            pref_factor = (1. + bias)
+#            unpref_factor = 1. - bias/(len(syn_codons)-1.)
+#            maxFreq = max(cfreqs)
+#            for c in range(len(syn_codons)):
+#                if cfreqs[c] < maxFreq:
+#                    eqf[cinds[c]] = 1./61. * unpref_factor
+#                elif cfreqs[c] == maxFreq:
+#                    eqf[cinds[c]] = 1./61. * pref_factor   
+    
 def freq2hyphy(f):
     ''' Convert codon frequencies to a form hyphy can use. '''
     hyphy_f = "{"
@@ -215,37 +235,6 @@ def freq2hyphy(f):
     hyphy_f = hyphy_f[:-1]
     hyphy_f += "}"
     return hyphy_f
-
-def setFreqsForHyphy(codonFreq, aminos_used, bias):
-    ''' Build input hyphy frequencies.
-        In a **highly** hackish way, will also manipulate the equal freqs by any bias factors.
-    '''
-    eqf = np.zeros(61)
-    for i in range(61):
-        eqf[i] = 1./61.
-    if bias is not None:
-        for amino in aminos_used:
-            aa_ind = amino_acids.index(amino)
-            syn_codons = genetic_code[aa_ind]
-            cfreqs = []
-            cinds=[]
-            # If only 1 codon, no bias, so move on.
-            if len(syn_codons) == 1:
-                continue
-            for syn in syn_codons:
-                cinds.append(codons.index(syn))
-                cfreqs.append(codonFreq[ codons.index(syn) ])
-
-            pref_factor = (1. + bias)
-            unpref_factor = 1. - bias/(len(syn_codons)-1.)
-            maxFreq = max(cfreqs)
-            for c in range(len(syn_codons)):
-                if cfreqs[c] < maxFreq:
-                    eqf[cinds[c]] = 1./61. * unpref_factor
-                elif cfreqs[c] == maxFreq:
-                    eqf[cinds[c]] = 1./61. * pref_factor   
-    return freq2hyphy(eqf)
-
 ####################################### OMEGA DERIVATION FUNCTIONS ######################################
 
 def deriveOmega(codonFreq, mu_dict = {'AT':1.0, 'AC':1.0, 'AG':1.0, 'CG':1.0, 'CT':1.0, 'GT':1.0}):
@@ -275,7 +264,7 @@ def deriveOmega(codonFreq, mu_dict = {'AT':1.0, 'AC':1.0, 'AG':1.0, 'CG':1.0, 'C
     assert( nS != 0. and nN != 0.), "Omega derivation indicates no evolution, maybe?"
     dN = kN/nN
     dS = kS/nS
-    return dN, dS, dN/dS
+    return dN/dS
 
 
 
