@@ -1,5 +1,5 @@
 #!/bin/bash
-#$ -N siminf_codonbias
+#$ -N siminf
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
@@ -18,6 +18,7 @@ AADIST=exp
 MU=1e-6
 BL=0.005
 KAPPA=1.0
+BIAS=0.5
 SEQLEN=100000
 
 
@@ -26,7 +27,7 @@ SEQLEN=100000
 SIMDIR=/home/sjs3495/MutSel/Simulator/src
 SCRIPTDIR=/home/sjs3495/Omega_MutSel/cluster_scripts
 WDIR=/state/partition1/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
-RDIR=/home/sjs3495/$JOB_NAME-${NUMAA}aa
+RDIR=/home/sjs3495/$JOB_NAME-${NUMAA}aa-${KAPPA}kappa-${BIAS}bias
 
 mkdir -p $WDIR
 if [ ! -d $WDIR ]
@@ -47,7 +48,7 @@ cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
 
 # Run
 module load python
-python run_siminf.py $SGE_TASK_ID $CPU $NUMAA $AADIST $MU $KAPPA $BL $SEQLEN
+python run_siminf.py $SGE_TASK_ID $CPU $NUMAA $AADIST $MU $KAPPA $BIAS $BL $SEQLEN
 
 # Cleanup
 mkdir -p $RDIR

@@ -17,8 +17,8 @@ from evolver import *
 
 
 # Input parameters and global stuff
-if (len(sys.argv) != 9):
-    print "\n\nUsage: python run_siminf.py <rep> <cpu> <numaa> <aadist> <mu> <kappa> <bl> <seqlength>\n."
+if (len(sys.argv) != 10):
+    print "\n\nUsage: python run_siminf.py <rep> <cpu> <numaa> <aadist> <mu> <kappa> <bias> <bl> <seqlength>\n."
     sys.exit()
 rep = sys.argv[1]
 cpu = sys.argv[2]
@@ -26,8 +26,9 @@ numaa = int(sys.argv[3])
 aadist = sys.argv[4] # Either "exp", "equal", "random"
 mu = float(sys.argv[5])
 kappa = float(sys.argv[6])
-bl = sys.argv[7]
-seqlength = int(sys.argv[8])
+bias = float(sys.argv[7])
+bl = sys.argv[8]
+seqlength = int(sys.argv[9])
 
 
 
@@ -45,27 +46,25 @@ outf = open(outfile,'w')
 # Simulate
 print "simulating"
 bias = 0.5
-f = setFreqs(aadist, numaa, bias)
+f, gc_content, aminos_used = setFreqs(aadist, numaa, bias)
 
-for kappa in [1.0, 2.0, 3.0, 4.0]:
-    gc_percent = simulate(f, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
+simulate(f, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
     
-    # Derive omega
-    print "deriving"
-    mu_dict = {'AT':mu, 'AC':mu, 'AG':mu, 'CG':mu, 'CT':mu, 'GT':mu}
-    mu_dict['AG'] = mu_dict['AG'] * kappa
-    mu_dict['CT'] = mu_dict['CT'] * kappa
-    derived_dN, derived_dS, derived_w = deriveOmega(f, mu_dict)
+# Derive omega
+print "deriving"
+mu_dict = {'AT':mu, 'AC':mu, 'AG':mu, 'CG':mu, 'CT':mu, 'GT':mu}
+mu_dict['AG'] = mu_dict['AG'] * kappa
+mu_dict['CT'] = mu_dict['CT'] * kappa
+derived_dN, derived_dS, derived_w = deriveOmega(f, mu_dict)
 
+# HyPhy/PAML omega
+print "ML"
+mg94_dN, mg94_dS = runhyphy("globalDNDS.bf", "MG94", seqfile, treefile, cpu, kappa)
+mg94_w = mg94_dN/mg94_dS
+gy94_w = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kappa)
 
-    # HyPhy/PAML omega
-    print "ML"
-    ml_dN, ml_dS = runhyphy("globalDNDS.bf", "MG94", seqfile, treefile, cpu, kappa)
-    ml_w = ml_dN/ml_dS
-    ml_w2 = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kappa)
-
-    # Save
-    outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(kappa) + '\t' +  str(derived_dN) + '\t' + str(ml_dN) + '\t' + str(derived_dS) + '\t' + str(ml_dS) + '\t' + str(derived_w) + '\t' + str(ml_w) + '\t' + str(ml_w2) + '\n')
+# Save
+outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(kappa) + '\t' +  str(bias) + '\t' + str(derived_dN) + '\t' + str(mg94_dN) + '\t' + str(derived_dS) + '\t' + str(mg94_dS) + '\t' + str(derived_w) + '\t' + str(mg94_w) + '\t' + str(gy94_w) + '\n')
 outf.close()
 
 
