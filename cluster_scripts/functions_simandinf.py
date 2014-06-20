@@ -58,24 +58,24 @@ def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
     myEvolver.sim_sub_tree(my_tree)
     myEvolver.writeSequences()
 
-def setFreqs(freqClass, numaa, bias):
+def setFreqs(freqClass, numaa, bias, freqfile):
     ''' Returns codon frequencies and gc content '''
     
-    assert(numaa != 1), "Can't only have a single amino acid! omega will always be zero. we're not interested in that.'''
+    assert(numaa != 1), "Can't only have a single amino acid! omega will always be zero. we're not interested in that."
     
     if freqClass == 'exp':
         userFreq = setFreqDict(numaa)
-        fobj = UserFreqs(by = 'amino', type = 'codon', freqs = userFreq, bias = bias)
+        fobj = UserFreqs(by = 'amino', type = 'codon', freqs = userFreq, bias = bias, savefile = freqfile)
     else:
         aalist = generateAAlist(numaa) 
         if freqClass == 'equal':
-            fobj = EqualFreqs(by = 'amino', type = 'codon', restrict = aalist, bias = bias)
+            fobj = EqualFreqs(by = 'amino', type = 'codon', restrict = aalist, bias = bias, savefile = freqfile)
         elif freqClass == 'random':
-            fobj = RandFreqs(by = 'amino', type = 'codon', restrict = aalist, bias = bias)              
+            fobj = RandFreqs(by = 'amino', type = 'codon', restrict = aalist, bias = bias, savefile = freqfile)              
         else:
             raise AssertionError("Bad freqClass specification. Byebye.")
     codonFreq = fobj.calcFreqs()
-    nucFreq = fobj.codon2nuc()
+    nucFreq = fobj.convert("nuc")
     return codonFreq, nucFreq[1] + nucFreq[2], "".join(userFreq.keys())
 
 
@@ -136,11 +136,11 @@ def generateAAlist(size):
             if size >= 10:
                 list_is_ok = True
             else:
-                list_is_ok = checkGrantham(aalist, 100.)  
+                list_is_ok = checkGrantham(aalist, size, 100.)  
     return aalist
 
 ################################################# HYPHY-RELATED FUNCTIONS ############################################################
-def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa = 1.0):
+def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, codonFreq, aminos_used, bias, kappa = 1.0):
     ''' pretty specific function.'''
     
   
@@ -153,7 +153,7 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa = 1.0):
     assert(setup2 == 0), "couldn't add tree to hyphy infile"
     
 
-    hyf = freq2hyphy(eqf)
+    hyf = setFreqsForHyphy(codonFreq, aminos_used, bias)
     setuphyphy3 = "sed 's/MYFREQUENCIES/"+hyf+"/g' "+batchfile+" > run.bf"
     setup3 = subprocess.call(setuphyphy3, shell = True)
     assert(setup3 == 0), "couldn't properly add in frequencies"
@@ -229,6 +229,9 @@ def setFreqsForHyphy(codonFreq, aminos_used, bias):
             syn_codons = genetic_code[aa_ind]
             cfreqs = []
             cinds=[]
+            # If only 1 codon, no bias, so move on.
+            if len(syn_codons) == 1:
+                continue
             for syn in syn_codons:
                 cinds.append(codons.index(syn))
                 cfreqs.append(codonFreq[ codons.index(syn) ])
@@ -325,11 +328,11 @@ def calcNS(codon, codonFreq, i, list, mu_dict):
 ############################# NEI-GOJOBORI FUNCTIONS ##################################
 def run_neigojo(seqfile):
     ''' Get omega using counting method '''
-    from mutation_counter import *
-    from site_counter import *
+    import mutation_counter as mc
+    import site_counter as sc
     
-    M = MutationCounter()
-    S = SiteCounter()
+    M = mc.MutationCounter()
+    S = sc.SiteCounter()
     records = list(SeqIO.parse(seqfile, 'fasta'))
     s1 = records[0].seq
     s2 = records[1].seq

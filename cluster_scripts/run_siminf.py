@@ -40,13 +40,13 @@ treef.close()
 
 # set up output sequence and parameter files
 seqfile = "seqs"+str(rep)+".fasta"
+freqfile = "codonFreqs" + str(rep)+".txt"
 outfile = "params"+str(rep)+".txt"
 outf = open(outfile,'w')
 
 # Simulate
 print "simulating"
-bias = 0.5
-f, gc_content, aminos_used = setFreqs(aadist, numaa, bias)
+f, gc_content, aminos_used = setFreqs(aadist, numaa, bias, freqfile)
 
 simulate(f, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
     
@@ -59,9 +59,9 @@ derived_dN, derived_dS, derived_w = deriveOmega(f, mu_dict)
 
 # HyPhy/PAML omega
 print "ML"
-mg94_dN, mg94_dS = runhyphy("globalDNDS.bf", "MG94", seqfile, treefile, cpu, kappa)
+mg94_dS, mg94_dN = runhyphy("globalDNDS.bf", "MG94", seqfile, treefile, cpu, f, aminos_used, bias, kappa)
 mg94_w = mg94_dN/mg94_dS
-gy94_w = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kappa)
+gy94_w = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, f, aminos_used, bias, kappa)
 
 # Save
 outf.write(rep + '\t' + str(numaa) + '\t' + str(aadist) + '\t' + str(mu) + '\t' + str(bl) + '\t' + str(seqlength) + '\t' + str(kappa) + '\t' +  str(bias) + '\t' + str(derived_dN) + '\t' + str(mg94_dN) + '\t' + str(derived_dS) + '\t' + str(mg94_dS) + '\t' + str(derived_w) + '\t' + str(mg94_w) + '\t' + str(gy94_w) + '\n')
