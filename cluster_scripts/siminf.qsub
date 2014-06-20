@@ -13,7 +13,7 @@ source ~/.bash_profile
 
 # INPUT ARGS VARIABLES
 CPU=16
-NUMAA=7
+NUMAA=4
 MU=1e-6
 BL=0.005
 KAPPA=1.0
