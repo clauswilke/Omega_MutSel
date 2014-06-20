@@ -17,13 +17,6 @@ from stateFreqs import *
 from matrixBuilder import *
 from evolver import *
 
-# Nei-Gojobori code
-try:
-    from mutation_counter import *
-    from site_counter import *
-except:
-    pass
-
 # Globals
 zero = 1e-8
 amino_acids  = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
@@ -65,8 +58,6 @@ def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
     myEvolver.sim_sub_tree(my_tree)
     myEvolver.writeSequences()
 
-
-
 def setFreqs(freqClass, numaa, bias):
     ''' Returns codon frequencies and gc content '''
     
@@ -85,8 +76,7 @@ def setFreqs(freqClass, numaa, bias):
             raise AssertionError("Bad freqClass specification. Byebye.")
     codonFreq = fobj.calcFreqs()
     nucFreq = fobj.codon2nuc()
-    
-    return codonFreq, nucFreq[1] + nucFreq[2]
+    return codonFreq, nucFreq[1] + nucFreq[2], "".join(userFreq.keys())
 
 
 def setFreqDict(size):
@@ -162,9 +152,7 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa = 1.0):
     setup2 = subprocess.call(setuphyphy2, shell = True)
     assert(setup2 == 0), "couldn't add tree to hyphy infile"
     
-    eqf = np.zeros(61)
-    for i in range(61):
-        eqf[i] = 1./61.
+
     hyf = freq2hyphy(eqf)
     setuphyphy3 = "sed 's/MYFREQUENCIES/"+hyf+"/g' "+batchfile+" > run.bf"
     setup3 = subprocess.call(setuphyphy3, shell = True)
@@ -228,10 +216,32 @@ def freq2hyphy(f):
     hyphy_f += "}"
     return hyphy_f
 
+def setFreqsForHyphy(codonFreq, aminos_used, bias):
+    ''' Build input hyphy frequencies.
+        In a **highly** hackish way, will also manipulate the equal freqs by any bias factors.
+    '''
+    eqf = np.zeros(61)
+    for i in range(61):
+        eqf[i] = 1./61.
+    if bias is not None:
+        for amino in aminos_used:
+            aa_ind = amino_acids.index(amino)
+            syn_codons = genetic_code[aa_ind]
+            cfreqs = []
+            cinds=[]
+            for syn in syn_codons:
+                cinds.append(codons.index(syn))
+                cfreqs.append(codonFreq[ codons.index(syn) ])
 
-
-
-
+            pref_factor = (1. + bias)
+            unpref_factor = 1. - bias/(len(syn_codons)-1.)
+            maxFreq = max(cfreqs)
+            for c in range(len(syn_codons)):
+                if cfreqs[c] < maxFreq:
+                    eqf[cinds[c]] = 1./61. * unpref_factor
+                elif cfreqs[c] == maxFreq:
+                    eqf[cinds[c]] = 1./61. * pref_factor   
+    return freq2hyphy(eqf)
 
 ####################################### OMEGA DERIVATION FUNCTIONS ######################################
 
@@ -308,9 +318,16 @@ def calcNS(codon, codonFreq, i, list, mu_dict):
 
 
 
+
+
+ 
+
 ############################# NEI-GOJOBORI FUNCTIONS ##################################
 def run_neigojo(seqfile):
     ''' Get omega using counting method '''
+    from mutation_counter import *
+    from site_counter import *
+    
     M = MutationCounter()
     S = SiteCounter()
     records = list(SeqIO.parse(seqfile, 'fasta'))
