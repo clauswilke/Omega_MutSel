@@ -59,32 +59,46 @@ def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
     myEvolver.writeSequences()
 
 
-
-def setFreqs(numaa, freqfile, gc_min = 0., gc_max = 1.):
+def setFreqs(freqfile, beta, gc_min = 0., gc_max = 1.):
     ''' Returns codon frequencies and gc content '''
     
-    assert(numaa != 1), "Can't only have a single amino acid! omega will always be zero. we're not interested in that."
     gc = -1.
     while gc < gc_min or gc > gc_max:
         # Frequencies based on boltzmann dist, such that amino acid frequencies distributed exponentially.
-        rawfreqs = setBoltzFreqs(numaa) # gets frequencies 
+        rawfreqs = setBoltzFreqs(beta) # gets frequencies 
+        numaa = sum(rawfreqs >= 0.05) # number of amino acids which have frequencies above random chance (favored). These amino acids should be intelligently chosen.
         aalist = generateAAlist(numaa)  # gets suitable list of amino acids
-        uFreq = dict(zip(aalist, rawfreqs)) # merge to dict
-
+        uFreq = mergeAminoFreqs(aalist, rawfreqs) # merge aalist and rawfreqs into a dictionary, such that the preferred amino acids get assigned the Grantham group
+        
         # Calculate codon state frequencies given amino acid frequencies, above.
-        fobj = UserFreqs(by = 'amino', freqs = uFreq, savefile = freqfile)
-        codonFreq = fobj.calcFreqs(type = 'codon')
-        nucFreq = fobj.convert("nuc")
+        fobj = UserFreqs(by = 'amino', freqs = uFreq)
+        codonFreq = fobj.calcFreqs(type = 'codon', savefile = freqfile)
+        nucFreq = fobj.calcFreqs(type = 'nuc')
         gc = nucFreq[1] + nucFreq[2]
+        print gc, (gc < gc_min or gc > gc_max), gc_min, gc_max
     return codonFreq, gc, "".join(aalist)
 
 
-def setBoltzFreqs(size, beta = 1.5):
+def mergeAminoFreqs(aalist, f):
+    amino = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
+    sorted_f = np.sort(f)[::-1]
+    fdict = {}
+    for i in range(len(aalist)):
+        fdict[aalist[i]] = sorted_f[i]
+        amino.pop(amino.index(aalist[i]))
+    count = 0    
+    for i in range(len(aalist), 20):
+        fdict[amino[count]] = sorted_f[i]
+        count += 1
+    return fdict
+        
+
+def setBoltzFreqs(beta):
     ''' Use Boltzmann distribution to get amino acid frequencies for a certain number of amino acids'''
-    ddg_values = np.random.normal(size = size) 
-    numer_list = np.zeros(size)
+    ddg_values = np.random.normal(size = 20) 
+    numer_list = np.zeros(20)
     denom = 0.
-    for d in range(size):
+    for d in range(20):
         val = np.exp(-1. * beta * ddg_values[d])
         denom += val
         numer_list[d] = val
@@ -116,22 +130,20 @@ def generateAAlist(size):
     list_is_ok = False
     while not list_is_ok:
         aalist = []
-        amino = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
-        if size == 20:
-            return amino
-        else:         
-            for i in range(size):
-                n = randint(0,len(amino)-1)
-                aalist.append(amino[n])
-                amino.pop(n)
-            if size >= 10:
+        amino = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]   
+        for i in range(size):
+            n = randint(0,len(amino)-1)
+            aalist.append(amino[n])
+            amino.pop(n)
+            if size == 1 or size>= 10:
                 list_is_ok = True
             else:
                 list_is_ok = checkGrantham(aalist, size, 100.)  
     return aalist
 
+
 ################################################# HYPHY-RELATED FUNCTIONS ############################################################
-def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa = 1.0):
+def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa):
     ''' pretty specific function.'''
     
   

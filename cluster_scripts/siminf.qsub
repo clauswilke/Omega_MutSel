@@ -13,11 +13,12 @@ source ~/.bash_profile
 
 # INPUT ARGS VARIABLES
 CPU=16
-NUMAA=4
+NUMAA=20
 MU=1e-6
 BL=0.005
 KAPPA=1.0
-SEQLEN=100000
+SEQLEN=10000
+BETA=3
 
 
 
@@ -25,7 +26,7 @@ SEQLEN=100000
 SIMDIR=/home/sjs3495/MutSel/Simulator/src
 SCRIPTDIR=/home/sjs3495/Omega_MutSel/cluster_scripts
 WDIR=/state/partition1/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
-RDIR=/home/sjs3495/$JOB_NAME-${NUMAA}aa-${KAPPA}kappa
+RDIR=/home/sjs3495/$JOB_NAME-${BETA}beta-20aa
 
 mkdir -p $WDIR
 if [ ! -d $WDIR ]
@@ -46,11 +47,11 @@ cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
 
 # Run
 module load python
-python run_siminf.py $SGE_TASK_ID $CPU $NUMAA $MU $KAPPA $BL $SEQLEN
+python run_siminf.py $SGE_TASK_ID $CPU $NUMAA $BETA $MU $KAPPA $BL $SEQLEN
 
 # Cleanup
 mkdir -p $RDIR
 cp params* $RDIR
 cp seqs* $RDIR
-cp codonFreq* $RDIR
+cp codonFreqs* $RDIR
 rm -rf $WDIR
