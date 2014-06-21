@@ -71,8 +71,8 @@ def setFreqs(numaa, freqfile):
     uFreq = dict(zip(aalist, rawfreqs)) # merge to dict
     
     # Calculate codon state frequencies given amino acid frequencies, above.
-    fobj = UserFreqs(by = 'amino', type = 'codon', freqs = uFreq, savefile = freqfile)
-    codonFreq = fobj.calcFreqs()
+    fobj = UserFreqs(by = 'amino', freqs = uFreq, savefile = freqfile)
+    codonFreq = fobj.calcFreqs(type = 'codon')
     nucFreq = fobj.convert("nuc")
     
     return codonFreq, nucFreq[1] + nucFreq[2], "".join(aalist)
