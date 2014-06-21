@@ -41,7 +41,7 @@ outfile = "params"+str(rep)+".txt"
 
 # Simulate
 print "simulating"
-f, gc_content, aminos_used = setFreqs(numaa, freqfile)
+f, gc_content, aminos_used = setFreqs(numaa, freqfile, 0., 1.) # last 2 args are gc min, gc max
 simulate(f, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
     
 # Derive omega
