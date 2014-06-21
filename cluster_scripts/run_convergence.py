@@ -24,7 +24,7 @@ beta = float(sys.argv[3])
 mu = float(sys.argv[4])
 kappa = float(sys.argv[5])
 bl = sys.argv[6]
-seqlens = [500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000]
+seqlens = [500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000, 5000000, 10000000]
 
 # Write tree given bl specifications
 treefile = "tree.tre"
