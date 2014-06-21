@@ -60,22 +60,23 @@ def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
 
 
 
-def setFreqs(numaa, freqfile):
+def setFreqs(numaa, freqfile, gc_min = 0., gc_max = 1.):
     ''' Returns codon frequencies and gc content '''
     
     assert(numaa != 1), "Can't only have a single amino acid! omega will always be zero. we're not interested in that."
-    
-    # Frequencies based on boltzmann dist, such that amino acid frequencies distributed exponentially.
-    rawfreqs = setBoltzFreqs(numaa) # gets frequencies 
-    aalist = generateAAlist(numaa)  # gets suitable list of amino acids
-    uFreq = dict(zip(aalist, rawfreqs)) # merge to dict
-    
-    # Calculate codon state frequencies given amino acid frequencies, above.
-    fobj = UserFreqs(by = 'amino', freqs = uFreq, savefile = freqfile)
-    codonFreq = fobj.calcFreqs(type = 'codon')
-    nucFreq = fobj.convert("nuc")
-    
-    return codonFreq, nucFreq[1] + nucFreq[2], "".join(aalist)
+    gc = -1.
+    while gc < gc_min or gc > gc_max:
+        # Frequencies based on boltzmann dist, such that amino acid frequencies distributed exponentially.
+        rawfreqs = setBoltzFreqs(numaa) # gets frequencies 
+        aalist = generateAAlist(numaa)  # gets suitable list of amino acids
+        uFreq = dict(zip(aalist, rawfreqs)) # merge to dict
+
+        # Calculate codon state frequencies given amino acid frequencies, above.
+        fobj = UserFreqs(by = 'amino', freqs = uFreq, savefile = freqfile)
+        codonFreq = fobj.calcFreqs(type = 'codon')
+        nucFreq = fobj.convert("nuc")
+        gc = nucFreq[1] + nucFreq[2]
+    return codonFreq, gc, "".join(aalist)
 
 
 def setBoltzFreqs(size, beta = 1.5):
