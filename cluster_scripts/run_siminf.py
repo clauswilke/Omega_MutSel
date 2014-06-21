@@ -42,7 +42,7 @@ outfile = "params"+str(rep)+".txt"
 
 # Simulate
 print "simulating"
-f, gc_content, aminos_used = setFreqs(freqfile, beta, 0.7, 0.8) # last 2 args are gc min, gc max
+f, num_pref_aa, gc_content = setFreqs(freqfile, beta, 0.0, 1.0) # last 2 args are gc min, gc max
 simulate(f, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
     
 # Derive omega
@@ -58,7 +58,7 @@ gy94_w = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kappa)
 
 # Save
 outf = open(outfile,'w')
-outf.write(rep + '\t' + str(beta) + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(round(gc_content, 5)) + '\t' + str(round(derived_w, 5)) + '\t' + str(round(gy94_w, 5)) + '\n')
+outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(num_pref_aa) + '\t' + str(round(gc_content, 5)) + '\t' + str(round(derived_w, 5)) + '\t' + str(round(gy94_w, 5)) + '\n')
 outf.close()
 
 

@@ -76,7 +76,7 @@ def setFreqs(freqfile, beta, gc_min = 0., gc_max = 1.):
         nucFreq = fobj.calcFreqs(type = 'nuc')
         gc = nucFreq[1] + nucFreq[2]
         print gc, (gc < gc_min or gc > gc_max), gc_min, gc_max
-    return codonFreq, gc, "".join(aalist)
+    return codonFreq, numaa, gc
 
 
 def mergeAminoFreqs(aalist, f):
