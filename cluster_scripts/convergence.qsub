@@ -46,7 +46,7 @@ cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
 
 # Run
 module load python
-python run_siminf.py $SGE_TASK_ID $CPU $BETA $MU $KAPPA $BL
+python run_convergence.py $SGE_TASK_ID $CPU $BETA $MU $KAPPA $BL
 
 # Cleanup
 mkdir -p $RDIR
