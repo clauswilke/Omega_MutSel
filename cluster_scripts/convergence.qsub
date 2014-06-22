@@ -13,11 +13,11 @@ source ~/.bash_profile
 
 # INPUT ARGS VARIABLES
 CPU=16
-NUMAA=20
 MU=1e-6
 BL=0.005
+
 KAPPA=1
-BETA=3
+BETA=2.5
 
 
 
@@ -51,7 +51,7 @@ python run_convergence.py $SGE_TASK_ID $CPU $BETA $MU $KAPPA $BL
 # Cleanup
 mkdir -p $RDIR
 cp params* $RDIR
-cp seqs* $RDIR
+#cp seqs* $RDIR
 cp codonFreqs* $RDIR
 rm -rf $WDIR
 
