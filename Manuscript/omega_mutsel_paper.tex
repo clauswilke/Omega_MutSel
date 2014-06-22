@@ -7,6 +7,8 @@
 \usepackage{cite}
 
 
+
+
 \renewcommand{\bottomfraction}{.9}
 \renewcommand{\topfraction}{.9}
 \renewcommand{\textfraction}{0.1}
@@ -15,14 +17,13 @@
 
 \begin{document}
 
-\section*{Initial thoughts}
+\section*{Introduction, Rough}
 
 Over the years, a variety of models have been proposed to describe the effects of natural selection on protein-coding sequences, in a phylogenetic context. Traditionally, the focus has been on mechanistic codon-substitution models (see ref.~\cite{Anisimova2009} for a comprehensive review). Since their introduction in the 1990s, these models have seen great success in inferring protein evolutionary rates, or the nonsynonymous/synonymous rate ratio ($dN/dS$). This metric indicates how quickly a protein's constituent amino acids change \cite{GoldmanYang1994, MuseGaut1994, NielsenYang1998}, allowing for the identification of positively-selected regions in protein sequences \cite{ NielsenYang1998,Yangetal2000}. 
 
 More recently, a second class of models, known as mutation-selection-balance (MutSel) models, has emerged as a popular alternative to $dN/dS$ models. Unlike mechanistic codon models, MutSel models explicitly model the dynamic balance between mutation and selection, rather than merely the final outcome (e.g. substitution) of this process \cite{HalpernBruno1998, YangNielsen2008, Rodrigueetal2010, Tamurietal2012}. Moreover, these models yield estimates of amino acid selection coefficients, which indicate the extent to which natural selection favors, or disfavors, particular amino acids at protein positions. These selection coefficients, which can in turn be scaled relative to a focal amino acid, the primary parameters of interest that MutSel models produce. Although MutSel models were first introduced over 15 years ago \cite{HalpernBruno1998}, they have seen virtually no use due to their high computational expense. However, recently, several computationally tractable model implementations have emerged \cite{RodrigueLartillot2014,Tamurietal2014}, allowing for the first time the potential for widespread use. 
 
 Some have argued that MutSel models are more robust than $dN/dS$ and can better describe the evo process owing to their treatment of amino acid identities. More fine-grained modeling results than a $dN/dS$ analysis would yield. However, it is virtually unknown how these models really relate, so it remains unclear whether one model should be preferred over another. We don't know how parameter estimates even relate.
-
 
 Although both $dN/dS$ and MutSel models describe the same fundamental process of protein evolution along a phylogeny, the relationship between these models is largely unknown. These two classes of models have largely been developed independently, and as a consequence we do not know whether parameters estimated from a $dN/dS$ model are similar, distinct, or even contradictory to those estimated from from a MutSel model of coding sequence evolution. Here, we aim to formalize the relationship between $dN/dS$ and MutSel models by examining the extent to which their focal parameters, $dN/dS$ and scaled amino acid selection coefficients, yield overlapping information about the evolutionary process. To this end, we derive a mathematical relationship between these two parameter classes, and we demonstrate that MutSel models fully embody the $dN/dS$ values. Using a simulation approach, we show that we can accurately estimate $dN/dS$ values using MutSel model parameter estimates, and these estimates correspond precisely to those inferred using a traditional $dN/dS$ maximum likelihood inference approach.  Importantly, we additionally show that this relationship holds only under regimes of purifying selection or neutral evolution ($dN/dS \leq 1$). Therefore, MutSel models are inherently unable to describe protein evolution under a regime of positive selection, in which $dN/dS > 1$. 
  
@@ -59,12 +60,31 @@ where ${\cal N}_i$ is the set of codons that are not synonymous to codon $i$ and
 
 Equations \eqref{eq:fi}--\eqref{eq:dN} establish a connection between the scaled selection coefficients $s_i$ (i.e., the primary parameters of a MutSel model) and the evolutionary rate ratio $dN/dS$.
 
-\section*{Simulation etc}
-We evolve protein-coding sequences along a lineage according to a MutSel model. Models are parameterized with symmetric mutation rates, and fitness values (scaled selection coefficients) for codons are 
+\section*{Methods, INCREDIBLY ROUGH}
+
+\subsection*{Sequence simulation and omega inference}
+We simulated protein-coding sequences according as a continuous-time Markovprocess according to the MutSel model proposed by \cite{HalpernBruno1998}. This model's instantaneous rate matrix $Q = q_{ij}$, which describes the probability of substitution of from codon $i$ to codon $j$, is given by 
+
+\begin{equation}
+Q_{ij} = \left\{ \begin{array}{rl}
+              0                                           &\mbox{multiple nucleotide changes} \\
+              \mu_{ij}f_{ij}                          &\mbox{single nucleotide transversion} \\
+              \kappa\mu_{ij}f_{ij}               &\mbox{single nucleotide transition} \\
+         \end{array} \right.,
+\end{equation} where $\mu_{ij}$ is the symmetric nucleotide mutation rate and $f_{ij}$ is the fixation probability from codon $i$ to $j$. The fixation probability is defined as \begin{equation}f_{ij} = ln\bigg{(}\frac{\pi_j\mu_{ij}}{\pi_i\mu_{ji}}\bigg{)}\bigg{/}\bigg{(}1 - \frac{\pi_i\mu_{ji}}{\pi_j\mu_{ij}}\bigg{)},\end{equation} where $\pi_i$ is the equilibrium frequency of codon $i$.
+
+For each simulation, we derived Boltzmann distributed values for the steady-state amino acid frequencies, where
+\begin{equation} F(a) = \frac{e^{s_a\beta}}{\sum_b e^{s_b\beta}} \end{equation}, and the denominator sums over all 20 amino acids. $s_a$ represents the scaled selection coefficient for amino acid $a$, analogous to the primary parameter given by a MutSel model. We sampled values for selection coefficients from a normal distribution. We fixed $\beta$ to 3(??). 
+  
+Once amino acid frequencies were determined, we assigned them to individual amino acids as follows. There was a certain number of values, out of 20, greater than 0.05 (the freq expected by random chance). For this number, we got a set of reasonably co-occurring amino acids based on mean pair-wise grantham scores. We selected a random group of aa's such that the mean distance was less than or equal to 100. The remaining frequencies were assigned randomly to the remaining amino acids.
+
+Simulation parameters - 2 taxon tree with branch lengths fixed at 0.005. Mu, the symmetric base mutation rate was fixed at 1e-6, and we varied kappa from time to time. We evolved each position according to the same model; no site-wise variation.
+
+For each simulated sequence set, we inferred $dN/dS$ values using two approaches: the derivation presented in this paper (see Results) and using the standard maximum likelihood GY94 model \cite{GoldmanYang1994} within the HyPhy package \cite{KosakovskyPondetal2005}. This model includes two primary parameters, $\omega$ and $\kappa$. For each inference, we fixed $\kappa$ to the known simulated value, and we provided HyPhy with equal equilibrium codon frequencies, such that each codon had a frequency of $1/61$. This was necessary to achieve accurate $dN/dS$ estimates, and is discussed more in depth in Results. Using ML, we estimated a single average $\omega$ value for each alignment.
 
 
- From these evolved sequences, we can calculate a $dN/dS$
 	
+\newpage
 	
 	
 	
