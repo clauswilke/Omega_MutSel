@@ -1,0 +1,62 @@
+#!/bin/bash
+#$ -N convergence
+#$ -e e_$JOB_NAME
+#$ -o o_$JOB_NAME
+#$ -S /bin/bash
+#$ -q wilke
+#$ -m beas
+#$ -t 1-100:1
+#$ -pe serial 16
+
+
+source ~/.bash_profile
+
+# INPUT ARGS VARIABLES
+CPU=16
+MU=1e-6
+BL=0.005
+KAPPA=1
+BETA=2
+SEQLEN=1000000
+GC=2
+
+
+
+# Set up directories
+SIMDIR=/home/sjs3495/MutSel/Simulator/src
+SCRIPTDIR=/home/sjs3495/Omega_MutSel/cluster_scripts
+WDIR=/state/partition1/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
+RDIR=/home/sjs3495/$JOB_NAME-${BETA}beta-${KAPPA}k
+
+mkdir -p $WDIR
+if [ ! -d $WDIR ]
+then
+  echo $WDIR not created
+  exit
+fi
+cd $WDIR
+
+# Copy files
+cp -r $SIMDIR .
+cp /home/sjs3495/Omega_MutSel/cluster_scripts/run_gc.py .
+cp /home/sjs3495/Omega_MutSel/cluster_scripts/functions_simandinf.py .
+
+#Hyphy
+cp /home/sjs3495/bin/bin/HYPHYMP .
+cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
+
+# Run
+module load python
+python run_gc.py $SGE_TASK_ID $CPU $BETA $MU $KAPPA $BL $SEQLEN $GC
+
+# Cleanup
+mkdir -p $RDIR
+cp params* $RDIR
+cp codonFreqs* $RDIR
+rm -rf $WDIR
+
+
+
+
+
+
