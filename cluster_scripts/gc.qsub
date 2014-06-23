@@ -1,5 +1,5 @@
 #!/bin/bash
-#$ -N convergence
+#$ -N gc
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
