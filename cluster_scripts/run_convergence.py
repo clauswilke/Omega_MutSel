@@ -24,7 +24,7 @@ beta = float(sys.argv[3])
 mu = float(sys.argv[4])
 kappa = float(sys.argv[5])
 bl = sys.argv[6]
-seqlength = int(10**(uniform(2,7))) # random sequence length between 1e2 and 1e7 
+seqlength = int(uniform(500,1e7)) # random sequence length between 1e2 and 1e7 
 
 # Write tree given bl specifications
 treefile = "tree.tre"
