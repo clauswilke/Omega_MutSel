@@ -24,7 +24,7 @@ beta = float(sys.argv[3])
 mu = float(sys.argv[4])
 kappa = float(sys.argv[5])
 bl = sys.argv[6]
-seqlen = int(10**(uniform(2,7))) # random sequence length between 1e2 and 1e7 
+seqlength = int(10**(uniform(2,7))) # random sequence length between 1e2 and 1e7 
 
 # Write tree given bl specifications
 treefile = "tree.tre"
@@ -43,7 +43,7 @@ outf = open(outfile,'w')
 # Simulate
 print "simulating"
 f, num_pref_aa, gc_content = setFreqs(freqfile, beta, 0.0, 1.0) # last 2 args are gc min, gc max
-simulate(f, seqfile, treefile, mu, kappa, int(seqlength), None) # omega is last argument. when None, sim via mutsel
+simulate(f, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
 
 # Derive
 mu_dict = {'AT':mu, 'AC':mu, 'AG':mu, 'CG':mu, 'CT':mu, 'GT':mu}
