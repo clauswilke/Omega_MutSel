@@ -3,7 +3,7 @@
 # Parameters: fix kappa to 1.0 and beta to 2.5 in the qsub file.
 
 import sys
-from random import uniform
+from random import randint
 from functions_simandinf import *
 
 sys.path.append('src/')
@@ -15,8 +15,8 @@ from evolver import *
 
 
 # Input parameters and global stuff
-if (len(sys.argv) != 7):
-    print "\n\nUsage: python run_convergence.py <rep> <cpu> <beta> <mu> <kappa> <bl> \n."
+if (len(sys.argv) != 8):
+    print "\n\nUsage: python run_convergence.py <rep> <cpu> <beta> <mu> <kappa> <bl> <expon> \n."
     sys.exit()
 rep = sys.argv[1]
 cpu = sys.argv[2]
@@ -24,7 +24,14 @@ beta = float(sys.argv[3])
 mu = float(sys.argv[4])
 kappa = float(sys.argv[5])
 bl = sys.argv[6]
-seqlength = int(uniform(500,1e7)) # random sequence length between 1e2 and 1e7 
+expon = int(sys.argv[7])
+
+# Random sequence length between 5e2 and 1e6
+if expon == 2:
+    times = randint(5,10)
+else:
+    times = randint(1,10)
+seqlength = int( times * 10**expon )
 
 # Write tree given bl specifications
 treefile = "tree.tre"
@@ -33,9 +40,9 @@ treef.write("(t1:" + str(bl) + ", t2:" + str(bl) + ");")
 treef.close()
 
 # set up output sequence and parameter files
-freqfile = "codonFreqs" + str(rep)+".txt"
-seqfile = "seqs"+str(rep)+".fasta"
-outfile = "params"+str(rep)+".txt"
+freqfile = "codonFreqs" + str(rep) + "_" + str(seqlength) + ".txt"
+seqfile = "seqs" + str(rep) + "_" + str(seqlength) + ".fasta"
+outfile = "params" + str(rep) + "_" + str(seqlength) + ".txt"
 outf = open(outfile,'w')
 
 
