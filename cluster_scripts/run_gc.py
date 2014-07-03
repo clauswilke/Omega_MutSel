@@ -26,7 +26,7 @@ kappa = float(sys.argv[5])
 bl = sys.argv[6]
 seqlength = int(sys.argv[7])
 gc_start = float(sys.argv[8])*0.1
-gc_end = gc_start + 0.1
+gc_end = gc_start + 0.05
 
 # Write tree given bl specifications
 treefile = "tree.tre"
@@ -35,9 +35,9 @@ treef.write("(t1:" + str(bl) + ", t2:" + str(bl) + ");")
 treef.close()
 
 # set up output sequence and parameter files
-freqfile = "codonFreqs" + str(rep)+".txt"
-outfile = "params"+str(rep)+".txt"
-seqfile = "seqs"+str(rep)+".fasta"
+freqfile = "codonFreqs" + str(rep) + ".txt"
+outfile = "params" + str(rep) + ".txt"
+seqfile = "seqs" + str(rep) + ".fasta"
 
 
 # Simulate  
@@ -57,7 +57,7 @@ print "ML"
 gy94_w = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kappa)
     
 # Calculate relative error from derived omega. Not using abs() since plot nicer that way.
-err = abs( derived_w - gy94_w )/derived_w
+err = ( derived_w - gy94_w )/derived_w
 
 # Save
 outf = open(outfile, 'w')
