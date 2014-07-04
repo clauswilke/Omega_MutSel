@@ -53,10 +53,10 @@ def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
         model.params = params
         mat = mutSel_MatrixBuilder(model)
     model.Q = mat.buildQ()
-    partitions = [(length, model)]        
-    myEvolver = StaticEvolver(partitions = partitions, tree = my_tree, outfile = seqfile)
+    partitions = [(length, {"rootModel":model})]        
+    myEvolver = StaticEvolver(partitions, "rootModel" )
     myEvolver.sim_sub_tree(my_tree)
-    myEvolver.writeSequences()
+    myEvolver.writeSequences(outfile = seqfile)
 
 
 def setFreqs(freqfile, beta, gc_min = 0., gc_max = 1.):
