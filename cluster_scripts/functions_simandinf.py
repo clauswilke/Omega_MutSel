@@ -37,10 +37,10 @@ def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
         Symmetric mutation rates, with kappa.
     '''
     try:
-        my_tree = readTree(file = tree)
+        my_tree = readTree(file = tree, flags = False)
     except:
-        my_tree = readTree(tree = tree) 
-        
+        my_tree = readTree(tree = tree, flags = False) 
+          
     model = Model()
     if beta:
         params = {'alpha':1.0, 'beta':float(beta), 'mu': {'AC': mu, 'AG': mu*kappa, 'AT': mu, 'CG': mu, 'CT': mu*kappa, 'GT': mu}}
@@ -54,7 +54,7 @@ def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
         mat = mutSel_MatrixBuilder(model)
     model.Q = mat.buildQ()
     partitions = [(length, {"rootModel":model})]        
-    myEvolver = StaticEvolver(partitions, "rootModel" )
+    myEvolver = Evolver(partitions, "rootModel" )
     myEvolver.sim_sub_tree(my_tree)
     myEvolver.writeSequences(outfile = seqfile)
 
@@ -75,7 +75,6 @@ def setFreqs(freqfile, beta, gc_min = 0., gc_max = 1.):
         codonFreq = fobj.calcFreqs(type = 'codon', savefile = freqfile)
         nucFreq = fobj.calcFreqs(type = 'nuc')
         gc = nucFreq[1] + nucFreq[2]
-        print gc, (gc < gc_min or gc > gc_max), gc_min, gc_max
     return codonFreq, numaa, gc
 
 

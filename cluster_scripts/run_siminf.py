@@ -5,28 +5,27 @@
 
 
 import sys
-from functions_simandinf import *
-
-sys.path.append('src/')
+sys.path.append('../../MutSel/Simulator/src/')
+#sys.path.append('src/')
 from misc import *
 from newick import *
 from stateFreqs import *
 from matrixBuilder import *
 from evolver import *
+from functions_simandinf import *
 
 
 # Input parameters and global stuff
-if (len(sys.argv) != 9):
-    print "\n\nUsage: python run_siminf.py <rep> <cpu> <numaa> <beta> <mu> <kappa> <bl> <seqlength>\n."
+if (len(sys.argv) != 8):
+    print "\n\nUsage: python run_siminf.py <rep> <cpu> <beta> <mu> <kappa> <bl> <seqlength>\n."
     sys.exit()
 rep = sys.argv[1]
 cpu = sys.argv[2]
-numaa = int(sys.argv[3])
-beta = float(sys.argv[4])
-mu = float(sys.argv[5])
-kappa = float(sys.argv[6])
-bl = sys.argv[7]
-seqlength = int(sys.argv[8])
+beta = float(sys.argv[3])
+mu = float(sys.argv[4])
+kappa = float(sys.argv[5])
+bl = sys.argv[6]
+seqlength = int(sys.argv[7])
 
 
 # Write tree given bl specifications
@@ -51,7 +50,7 @@ mu_dict = {'AT':mu, 'AC':mu, 'AG':mu, 'CG':mu, 'CT':mu, 'GT':mu}
 mu_dict['AG'] = mu_dict['AG'] * kappa
 mu_dict['CT'] = mu_dict['CT'] * kappa
 derived_w = deriveOmega(f, mu_dict)
-
+print derived_w
 # HyPhy omega
 print "ML"
 gy94_w = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kappa)
