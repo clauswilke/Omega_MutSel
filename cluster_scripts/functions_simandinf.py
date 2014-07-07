@@ -55,7 +55,7 @@ def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
     model.Q = mat.buildQ()
     partitions = [(length, {"rootModel":model})]        
     myEvolver = Evolver(partitions, "rootModel" )
-    myEvolver.sim_sub_tree(my_tree)
+    myEvolver.simulate(my_tree)
     myEvolver.writeSequences(outfile = seqfile)
 
 
