@@ -54,9 +54,9 @@ derived_w = deriveOmega(f, mu_dict)
 
 # PAML omegas. Using paml since makes frequency specification a lot easier.
 print "ML"
-gy94_w_equal = runpaml(seqfile, codonFreq = "0", initw = 0.4)
-gy94_w_3x4   = runpaml(seqfile, codonFreq = "2", initw = 0.4)
-gy94_w_data  = runpaml(seqfile, codonFreq = "3", initw = 0.4)
+gy94_w_equal = float(runpaml(seqfile, codonFreq = "0", initw = 0.4))
+gy94_w_3x4   = float(runpaml(seqfile, codonFreq = "2", initw = 0.4))
+gy94_w_data  = float(runpaml(seqfile, codonFreq = "3", initw = 0.4))
 
 # Save
 outf = open(outfile,'w')
