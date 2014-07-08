@@ -43,14 +43,12 @@ def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
           
     model = Model()
     if beta:
-        params = {'alpha':1.0, 'beta':float(beta), 'mu': {'AC': mu, 'AG': mu*kappa, 'AT': mu, 'CG': mu, 'CT': mu*kappa, 'GT': mu}}
-        params['stateFreqs'] = f
-        model.substParams = params
+        params = {'stateFreqs':f, 'alpha':1.0, 'beta':float(beta), 'mu': {'AC': mu, 'AG': mu*kappa, 'AT': mu, 'CG': mu, 'CT': mu*kappa, 'GT': mu}}
+        model.params = params
         mat = mechCodon_MatrixBuilder(model)
     else:
-        params = {'alpha':1.0, 'beta':1.0, 'mu': {'AC': mu, 'CA':mu, 'AG': mu*kappa, 'GA':mu*kappa, 'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'CT': mu*kappa, 'TC':mu*kappa, 'GT': mu, 'TG':mu}}
-        params['stateFreqs'] = f
-        model.substParams = params
+        params = {'stateFreqs':f, 'alpha':1.0, 'beta':1.0, 'mu': {'AC': mu, 'CA':mu, 'AG': mu*kappa, 'GA':mu*kappa, 'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'CT': mu*kappa, 'TC':mu*kappa, 'GT': mu, 'TG':mu}}
+        model.params = params
         mat = mutSel_MatrixBuilder(model)
     model.Q = mat.buildQ()
     partitions = [(length, {"rootModel":model})]        
