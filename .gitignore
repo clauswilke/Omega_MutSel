@@ -3,5 +3,5 @@ Manuscript/*.aux
 Manuscript/*.bbl
 Manuscript/*.blg
 Manuscript/*.log
-Manuscript/*.synctex.qz
+Manuscript/*.synctex.gz
 
