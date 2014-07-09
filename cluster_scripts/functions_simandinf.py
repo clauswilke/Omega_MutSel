@@ -142,7 +142,7 @@ def generateAAlist(size):
 def calcCodonEntropy(f):
     sum = 0.
     for entry in f:
-        sum += f*np.log(f)
+        sum += entry*np.log(entry)
     return -1. * sum
 
 ################################################# HYPHY-RELATED FUNCTIONS ############################################################
