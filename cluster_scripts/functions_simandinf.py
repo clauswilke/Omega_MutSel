@@ -142,7 +142,8 @@ def generateAAlist(size):
 def calcCodonEntropy(f):
     sum = 0.
     for entry in f:
-        sum += entry*np.log(entry)
+        if entry > 1e-8:
+            sum += entry*np.log(entry)
     return -1. * sum
 
 ################################################# HYPHY-RELATED FUNCTIONS ############################################################
