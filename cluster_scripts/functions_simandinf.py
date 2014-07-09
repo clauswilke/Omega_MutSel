@@ -61,20 +61,36 @@ def setFreqs(freqfile, beta, gc_min = 0., gc_max = 1.):
     ''' Returns codon frequencies and gc content '''
     
     gc = -1.
-    while gc < gc_min or gc > gc_max:
+    count = 0
+    redo = True
+    while gc < gc_min or gc > gc_max or redo:
         # Frequencies based on boltzmann dist, such that amino acid frequencies distributed exponentially.
         rawfreqs = setBoltzFreqs(beta) # gets frequencies 
         numaa = sum(rawfreqs >= 0.05) # number of amino acids which have frequencies above random chance (favored). These amino acids should be intelligently chosen.
         aalist = generateAAlist(numaa)  # gets suitable list of amino acids
         uFreq = mergeAminoFreqs(aalist, rawfreqs) # merge aalist and rawfreqs into a dictionary, such that the preferred amino acids get assigned the Grantham group
-        
+    
         # Calculate codon state frequencies given amino acid frequencies, above.
         fobj = UserFreqs(by = 'amino', freqs = uFreq)
         codonFreq = fobj.calcFreqs(type = 'codon', savefile = freqfile)
+        
+        # Should I redo based on execssive codon freq stringency?
+        redo, bad = shouldIRedoFreqs(codonFreq) 
+        write = str(bad)+" "+str(count)+"\n" 
+        sys.stdout.write(write)
+        count+=1   
+        
+        # Get gc.
         nucFreq = fobj.calcFreqs(type = 'nuc')
         gc = nucFreq[1] + nucFreq[2]
     return codonFreq, numaa, gc
 
+def shouldIRedoFreqs(f):
+    ''' Need to be sure that frequencies generated weren't so stringent that effectively only 1 codon allowed!! This will break evolution/simulation. ''' 
+    for entry in f:
+        if entry >= 0.985: # kind of arbitrary but prob reasonable
+            return True, entry
+    return False, None
 
 def mergeAminoFreqs(aalist, f):
     amino = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
@@ -91,7 +107,7 @@ def mergeAminoFreqs(aalist, f):
         
 
 def setBoltzFreqs(beta):
-    ''' Use Boltzmann distribution to get amino acid frequencies for a certain number of amino acids'''
+    ''' Use Boltzmann distribution to get amino acid frequencies for a certain number of amino acids.'''
     ddg_values = np.random.normal(size = 20) 
     numer_list = np.zeros(20)
     denom = 0.
