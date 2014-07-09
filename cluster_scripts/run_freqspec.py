@@ -43,7 +43,11 @@ outfile = "params"+str(rep)+".txt"
 print "simulating"
 f, num_pref_aa, gc_content = setFreqs(freqfile, beta, 0.0, 1.0) # last 2 args are gc min, gc max
 simulate(f, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
-    
+
+# Sequence entropy based on codon frequencies
+entropy = calcCodonEntropy(f)
+
+
 # Derive omega
 print "deriving"
 mu_dict = {'AT':mu, 'AC':mu, 'AG':mu, 'CG':mu, 'CT':mu, 'GT':mu}
@@ -60,7 +64,7 @@ gy94_w_data  = float(runpaml(seqfile, codonFreq = "3", initw = 0.4))
 
 # Save
 outf = open(outfile,'w')
-outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(num_pref_aa) + '\t' + str(round(gc_content, 5)) + '\t' + str(round(derived_w, 5)) + '\t' + str(round(gy94_w_equal, 5)) + '\t' + str(round(gy94_w_3x4, 5)) + '\t' + str(round(gy94_w_data, 5)) + '\n')
+outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(num_pref_aa) + '\t' + str(entropy) + '\t' + str(gc_content) + '\t' + str(derived_w) + '\t' + str(gy94_w_equal) + '\t' + str(gy94_w_3x4) + '\t' + str(gy94_w_data) + '\n')
 outf.close()
 
 
