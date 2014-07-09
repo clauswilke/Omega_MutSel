@@ -14,7 +14,7 @@ source ~/.bash_profile
 MU=1e-6
 BL=0.005
 KAPPA=1.0
-SEQLEN=100
+SEQLEN=1000000
 
 # Set up directories
 SIMDIR=/home/sjs3495/MutSel/Simulator/src
