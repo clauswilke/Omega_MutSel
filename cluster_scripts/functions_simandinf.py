@@ -71,10 +71,20 @@ def setFreqs(freqfile, beta, gc_min = 0., gc_max = 1.):
         # Calculate codon state frequencies given amino acid frequencies, above.
         fobj = UserFreqs(by = 'amino', freqs = uFreq)
         codonFreq = fobj.calcFreqs(type = 'codon', savefile = freqfile)
+        redo = shouldIRedoFreqs(codonFreq)
+        while redo:
+            codonFreq = fobj.calcFreqs(type = 'codon', savefile = freqfile)
+            redo = shouldIRedoFreqs(codonFreq)      
         nucFreq = fobj.calcFreqs(type = 'nuc')
         gc = nucFreq[1] + nucFreq[2]
     return codonFreq, numaa, gc
 
+def shouldIRedoFreqs(f):
+    ''' Need to be sure that frequencies generated weren't so stringent that effectively only 1 codon allowed!! This will break evolution/simulation. ''' 
+    for entry in f:
+        if entry - 1. <= zero:
+            return True
+    return False
 
 def mergeAminoFreqs(aalist, f):
     amino = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
@@ -91,7 +101,7 @@ def mergeAminoFreqs(aalist, f):
         
 
 def setBoltzFreqs(beta):
-    ''' Use Boltzmann distribution to get amino acid frequencies for a certain number of amino acids'''
+    ''' Use Boltzmann distribution to get amino acid frequencies for a certain number of amino acids.'''
     ddg_values = np.random.normal(size = 20) 
     numer_list = np.zeros(20)
     denom = 0.
