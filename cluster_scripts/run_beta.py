@@ -48,18 +48,22 @@ print "deriving"
 mu_dict = {'AT':mu, 'AC':mu, 'AG':mu, 'CG':mu, 'CT':mu, 'GT':mu}
 mu_dict['AG'] = mu_dict['AG'] * kappa
 mu_dict['CT'] = mu_dict['CT'] * kappa
-derived_w = deriveOmega(f, mu_dict)
+derivedw = deriveOmega(f, mu_dict)
 
 # HyPhy omega
 print "ML"
-ml_w = float(runpaml(seqfile, codonFreq = "0", initw = 0.4))
-   
+mlw0 = float(runpaml(seqfile, codonFreq = "0", initw = 0.4))
+mlw2   = float(runpaml(seqfile, codonFreq = "2", initw = 0.4))
+mlw3  = float(runpaml(seqfile, codonFreq = "3", initw = 0.4))
+
 # Calculate relative error from derived omega.
-err = abs( derived_w - ml_w )/derived_w
+err0 = abs( derivedw - mlw0 )/derivedw
+err2 = abs( derivedw - mlw2 )/derivedw
+err3 = abs( derivedw - mlw3 )/derivedw
 
 # Save
 outf = open(outfile, 'w')
-outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(beta) + '\t' + str(entropy) + '\t' + str(gc_content) + '\t' + str(derived_w) + '\t' + str(ml_w) + '\t' + str(err) + '\n')
+outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(beta) + '\t' + str(entropy) + '\t' + str(gc_content) + '\t' + str(derivedw) + '\t' + str(mlw0) + '\t' + str(mlw2) + '\t' + str(mlw3) + '\t' + str(err0) + '\t' + str(err2) + '\t' + str(err3) + '\n')
 outf.close()
 
 
