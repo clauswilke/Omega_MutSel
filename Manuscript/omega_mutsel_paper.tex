@@ -37,7 +37,7 @@ In the framework of a MutSel model, we can write the steady-state frequency of c
  f_i=e^{s_i}\Big/\sum_k e^{s_k}\,,
 \end{equation}
 where the sum in the denominator runs over all 61 sense codons \cite{SellaHirsh2005}. Here, $s_i$ is the \emph{scaled selection coefficient} for codon $i$; larger $s_i$ correspond to higher frequencies of codon $i$. The fixation probability for a mutation from $i$ to $j$ is \cite{HalpernBruno1998,SellaHirsh2005}
-\begin{equation}
+\begin{equation}\label{eq:pi}
   \pi_{i\rightarrow j} = \frac{1-(f_i/f_j)^{1/N_e}}{1-f_i/f_j}
   \approx \frac{1}{N_e} \frac{\ln f_j - \ln f_i}{1-f_i/f_j}\,,
 \end{equation}
@@ -62,10 +62,11 @@ where ${\cal N}_i$ is the set of codons that are not synonymous to codon $i$ and
 Equations \eqref{eq:fi}--\eqref{eq:dN} establish a connection between the scaled selection coefficients $s_i$ (i.e., the primary parameters of a MutSel model) and the evolutionary rate ratio $dN/dS$. 
 
 
+
 \section*{Methods, INCREDIBLY ROUGH}
 
 \subsection*{Sequence simulation and omega inference}
-We simulated protein-coding sequences according as a continuous-time Markovprocess according to the MutSel model proposed by \cite{HalpernBruno1998}. This model's instantaneous rate matrix $Q = q_{ij}$, which describes the probability of substitution of from codon $i$ to codon $j$, is given by 
+We simulated protein-coding sequences as a continuous-time Markovprocess \cite{Yang2006} according to the MutSel model proposed by \cite{HalpernBruno1998}. This model's instantaneous rate matrix $Q = q_{ij}$, which describes the probability of substitution of from codon $i$ to codon $j$, is given by 
 
 \begin{equation}
 Q_{ij} = \left\{ \begin{array}{rl}
@@ -75,8 +76,9 @@ Q_{ij} = \left\{ \begin{array}{rl}
          \end{array} \right.,
 \end{equation} where $\mu_{ij}$ is the symmetric nucleotide mutation rate and $f_{ij}$ is the fixation probability from codon $i$ to $j$. The fixation probability is defined as \begin{equation}f_{ij} = ln\bigg{(}\frac{\pi_j\mu_{ij}}{\pi_i\mu_{ji}}\bigg{)}\bigg{/}\bigg{(}1 - \frac{\pi_i\mu_{ji}}{\pi_j\mu_{ij}}\bigg{)},\end{equation} where $\pi_i$ is the equilibrium frequency of codon $i$.
 
-For each simulation, we derived Boltzmann distributed values for the steady-state amino acid frequencies, where
-\begin{equation} F(a) = \frac{e^{s_a\beta}}{\sum_b e^{s_b\beta}} \end{equation}, and the denominator sums over all 20 amino acids. $s_a$ represents the scaled selection coefficient for amino acid $a$, analogous to the primary parameter given by a MutSel model. We sampled values for selection coefficients from a normal distribution. We fixed $\beta$ to 3(??). 
+For each simulation, we derived steady-state amino acid, and hence codon, frequencies according to the Boltzmann distribution,
+\begin{equation} F(a) = \frac{e^{s_a\beta}}{\sum_b e^{s_b\beta}} \end{equation}, where $F(a)$ is the equilibrium frequency of amino acid $a$, and the denominator sums over all 20 amino acids \cite{SellaHirsh2005, Ramseyetal2011}. In this framework, $s_a$ represents the scaled selection coefficient for amino acid $a$, analogous to the primary parameter given by a MutSel model. Unless otherwise stated, \texbf{$\beta$ was set to 2.0 for all simulations (I MADE THIS UP, COME BACK TO IT ?????)}. 
+  
   
 Once amino acid frequencies were determined, we assigned them to individual amino acids as follows. There was a certain number of values, out of 20, greater than 0.05 (the freq expected by random chance). For this number, we got a set of reasonably co-occurring amino acids based on mean pair-wise grantham scores. We selected a random group of aa's such that the mean distance was less than or equal to 100. The remaining frequencies were assigned randomly to the remaining amino acids.
 
@@ -129,28 +131,19 @@ This is because of where selection is represented. In mutsel models, selection i
 
 \subsection*{Mutation-selection-balance models are only valid for purifying selection}
 
-The proof that the free fitness function monotonically increases under the evolutionary dynamics is precisely analogous to the proof of Boltzmann’s H theorem (7). 
+\textbf{I really have no idea how to write up proofs, so I've virtually just latex'd the mathematica document. But at least the equations are there!}
 
-To show that mutation-selection models only corresponds to $dN/dS \leq 1$, we make use of that fact that ... 
+To show that mutation-selection models only corresponds to $dN/dS \leq 1$, we make use of that fact that each calculation of $dN/dS$, as described in equations \eqref{eq:fi}--\eqref{eq:dN}, entails summing the forward and backward fixation probabilities between codons, which are in turn divided by the codon frequency sums. We additionally assume that all mutation rates $\mu_{ij}$ are equal, and as all values for $N$ will ultimately cancel, we exclude them from the following proof. We will deal with the case of two nonsynonymous codons, $i$ and $j$, and we write their frequencies as $x$ and $y$, respectively.
 
-the free fitness function monotonically increases in the evolutionary dynamics, we simply show that its derivative according to time is non-negative. For that purpose, it is most convenient to use the formalism in continuous time. The derivative of the free fitness function according to time is
+As follows from \eqref{eq:pi}, the sum of the probabilities going from codon $i$ to codon $j$ and from codon $j$ to codon $i$ is \begin{equation} xP(x,y) + y(P(y,x) = \frac{2xy [\ln x - \ln y]}{x - y}\end{equation}, and we will demonstrate that this value is necessarily $\leq x + y$ for $x,y \geq 0$ and $x \leq y$.
 
-Using the relationship derived between $dN/dS$ and selection coefficients (equations \eqref{eq:fi}--\eqref{eq:dN}), we can show that recovered $dN/dS$ values will always be less than or equal to 1, corresponding to purifying selection. 
-First, we must recognize that the $dN/dS$ calculation always entails summing forward and backward fixation probabilities which is always divided by the frequency sums (I have no idea how to write this sentence.) Therefore, we can show that...
-
-
-
-
-
-
-
-
-
-
+To this end, we define the function \begin{equation} F(x,y) = x + y - \frac{2xy [\ln x - \ln y]}{x - y} \end{equation}. Thus, we show that $F(x,y) \geq 0$. For the condition $x=y$, this is straightforward to show, as $\lim_{x \to y}F(x,y) = 0$.
+We now show that the first derivative of $F(x, y)$ is negative throughout $x \in (0,y)$, thus proving that $F(x, y)$ has to be monotonically decreasing, and hence $\geq0$, in this interval.
 	
 \newpage
 	
-	
+
+
 	
  Several things emerge from this analysis - 
 1. If you fit a mutsel model and calculate dnds from it, it's just as good as if you had used a mech codon model. 
@@ -186,7 +179,7 @@ One such limitation is that the $dN/dS$ parameter ignores the influence of site-
 
 \begin{figure*}[H]
 \centerline{\includegraphics[width=6in]{figures/kappa_1beta.pdf}}
-\caption{\label{kappa} Value of kappa does not matter for agreement with derived and ML omegas. Relationship robust to differences in ()symmetric) mutational spectrum.}
+\caption{\label{kappa} Value of kappa does not matter for agreement with derived and ML omegas. Relationship robust to differences in (symmetric) mutational spectrum.}
 \end{figure*}
 
 \begin{figure*}[H]
@@ -201,7 +194,7 @@ One such limitation is that the $dN/dS$ parameter ignores the influence of site-
 
 
 \begin{figure*}[H]
-\centerline{\includegraphics[width=6in]{figures/convergence_2.5beta.pdf}}
+\centerline{\includegraphics[width=6in]{figures/convergence.pdf}}
 \caption{\label{conv} Convergence of derived $dN/dS$ and ML estimates of $dN/dS$. Each point represents results from a single simulation. The y-axis indicates relative error of the ML $dN/dS$ estimates, and the x-axis indicates sequence length on a log-scale. As the sequence length, or the data set size, increases, the two $dN/dS$ estimates converge to the same value. Note that this simulated data used a beta of 2.5.}
 \end{figure*}
 
