@@ -137,7 +137,13 @@ def generateAAlist(size):
             else:
                 list_is_ok = checkGrantham(aalist, size, 100.)  
     return aalist
+    
 
+def calcCodonEntropy(f):
+    sum = 0.
+    for entry in f:
+        sum += f*np.log(f)
+    return -1. * sum
 
 ################################################# HYPHY-RELATED FUNCTIONS ############################################################
 def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa):
