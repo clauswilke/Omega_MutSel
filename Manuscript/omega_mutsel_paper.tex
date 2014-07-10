@@ -77,12 +77,12 @@ Q_{ij} = \left\{ \begin{array}{rl}
 \end{equation} where $\mu_{ij}$ is the symmetric nucleotide mutation rate and $f_{ij}$ is the fixation probability from codon $i$ to $j$. The fixation probability is defined as \begin{equation}f_{ij} = ln\bigg{(}\frac{\pi_j\mu_{ij}}{\pi_i\mu_{ji}}\bigg{)}\bigg{/}\bigg{(}1 - \frac{\pi_i\mu_{ji}}{\pi_j\mu_{ij}}\bigg{)},\end{equation} where $\pi_i$ is the equilibrium frequency of codon $i$.
 
 For each simulation, we derived steady-state amino acid, and hence codon, frequencies according to the Boltzmann distribution,
-\begin{equation} F(a) = \frac{e^{s_a\beta}}{\sum_b e^{s_b\beta}} \end{equation}, where $F(a)$ is the equilibrium frequency of amino acid $a$, and the denominator sums over all 20 amino acids \cite{SellaHirsh2005, Ramseyetal2011}. In this framework, $s_a$ represents the scaled selection coefficient for amino acid $a$, analogous to the primary parameter given by a MutSel model. Unless otherwise stated, \texbf{$\beta$ was set to 2.0 for all simulations (I MADE THIS UP, COME BACK TO IT ?????)}. 
+\begin{equation} F(a) = \frac{e^{s_a\beta}}{\sum_b e^{s_b\beta}} \end{equation}, where $F(a)$ is the equilibrium frequency of amino acid $a$, and the denominator sums over all 20 amino acids \cite{SellaHirsh2005, Ramseyetal2011}. In this framework, $s_a$ represents the scaled selection coefficient for amino acid $a$, analogous to the primary parameter given by a MutSel model. Unless otherwise stated, \textbf{$\beta$ was set to 2.0 for all simulations (I MADE THIS UP, COME BACK TO IT ?????)}. 
   
-  
+ 
 Once amino acid frequencies were determined, we assigned them to individual amino acids as follows. There was a certain number of values, out of 20, greater than 0.05 (the freq expected by random chance). For this number, we got a set of reasonably co-occurring amino acids based on mean pair-wise grantham scores. We selected a random group of aa's such that the mean distance was less than or equal to 100. The remaining frequencies were assigned randomly to the remaining amino acids.
 
-Simulation parameters - 2 taxon tree with branch lengths fixed at 0.005. Mu, the symmetric base mutation rate was fixed at 1e-6, and we varied kappa from time to time. We evolved each position according to the same model; no site-wise variation.
+We simulated sequences along a 2-taxon tree with branch lengths fixed at 0.005 and $\mu = 10^{-6}$ and a sequence length of one-million positions, unless otherwise stated. A single codon frequency distribution was used for each simulation, meaning that we did not incorporate any site-wise variation into the evolutionary process.
 
 For each simulated sequence set, we inferred $dN/dS$ values using two approaches: the derivation presented in this paper (see Results) and using the standard maximum likelihood GY94 model \cite{GoldmanYang1994} within the HyPhy package \cite{KosakovskyPondetal2005}. This model includes two primary parameters, $\omega$ and $\kappa$. For each inference, we fixed $\kappa$ to the known simulated value, and we provided HyPhy with equal equilibrium codon frequencies, such that each codon had a frequency of $1/61$. This was necessary to achieve accurate $dN/dS$ estimates, and is discussed more in depth in Results. Using ML, we estimated a single average $\omega$ value for each alignment. 
 
@@ -92,21 +92,19 @@ For each simulated sequence set, we inferred $dN/dS$ values using two approaches
 
 \subsection*{$dN/dS$ values fully encapsulated by scaled selection coefficients}
 
-To validate our derived relationship between $dN/dS$ values and scaled selection coefficients, we simulated protein-coding sequences along a lineage according to the Halpern-Bruno mutation-selection model \cite{HalpernBruno1998}. For each simulation set, we fixed all mutation rates to $10^{-6}$, and we selected steady-state amino acid frequencies according to \begin{equation} F(a) = \frac{e^{s_a\beta}}{\sum_b e^{s_b\beta}} \end{equation}, where $F(a)$ corresponds to the frequency of amino acid $a$. These amino acid frequencies are analogous to the scaled selection coefficient parameters which a mutation-selection model would produce. Unless otherwise stated, we set $\beta = 2.5$. Higher values of $\beta$ indicate stronger constraint on the amino acid distributions; as $\beta$ approaches infinity, only a single amino acid will effectively have a non-zero frequency. 
+To validate our derived relationship between $dN/dS$ values and scaled selection coefficients, we simulated protein-coding sequences along a lineage according to the Halpern-Bruno mutation-selection model \cite{HalpernBruno1998}. For each simulation set, we fixed all mutation rates to $10^{-6}$, and we selected steady-state amino acid frequencies according to \begin{equation} F(a) = \frac{e^{s_a\beta}}{\sum_b e^{s_b\beta}} \end{equation}, where $F(a)$ corresponds to the frequency of amino acid $a$. These amino acid frequencies are analogous to the scaled selection coefficient parameters which a mutation-selection model would produce. \textbf{Again, this was made up so return to this later. - Unless otherwise stated, we set $\beta = 2.5$.} Higher values of $\beta$ indicate stronger constraint on the amino acid distributions; as $\beta$ approaches infinity, only a single amino acid will effectively have a non-zero frequency. 
 
-Following simulation, we calculated a $dN/dS$ value using both standard ML methods, according to the GY94 \cite{GoldmanYang1994} model, and our relationship. Figure~\ref 
-As shown in FigureX, the values nearly perfectly agree, demonstrating that all information about $dN/dS$ is fully encapsulated by the mutation-selection model parameters.
-
-
-We can additionally show that GC content does not influence this relationship. A linear model with error ~ gc yields p=0.487, meaning that this relationship is robust to nucleotide content.
-
-This relationship is also robust to mutational bias, specifically TI-TV bias, represented by the parameter kappa.
+Following simulation, we calculated a $dN/dS$ value using both standard ML methods, according to the GY94 \cite{GoldmanYang1994} model, and our relationship. As shown in Figure~\ref{simple}, $dN/dS$ values derived using selection coefficients agree nearly perfectly with those inferred using standard maximum likelihood methods. We additionally demonstrate convergence of these values with increasing amounts of data, represented by simulated alignment length (Figure~\ref{conv}).
+We confirmed, using simulations, that this relationship holds under different model parameterizations, including different specifications for $\kappa$ (Figure~\ref{kappa}) and GC content (Figure~\ref{gc}). 
 
 
 \subsection*{Maximum Likelihood inferences strongly biased by equilibrium frequency specifications}
 
-An emerging result from this study was that specs really matter. In 
+An emerging result from this study was that specs really matter. In order to get good agreement between our derived $dN/dS$ values and ML estimates, we had to set equilibrium codon frequencies equal to $1/61$ each. For instance, when you use other commonly used frequency specifications, there is tendency for ML methods to yield wildly inflated values for $dN/dS$ (Figure~\ref{freqspec_compare}); as frequency specifications become more and more tailored to the data set, ML estimates become more and more distant from the true value.
+
 This is because of where selection is represented. In mutsel models, selection is essentially manifested by the frequencies, whereas in dnds models, it is represented by omega. If you provide true frequencies, or ask for it to be calculated from data, then the frequencies hold the effects of selection, causing inflated estimates of dnds. However, if you set all codons to 1/61, this scenario effectively represents a neutral case with no effects of selection, which then allows the omega parameter to capture the effects.
+
+However, this effect depends heavily on the specifications given for $\beta$, which controls the level of selection pressure. Higher levels of $\beta$ naturally lead to more skewed codon frequency distributions, whereas lower values of $\beta$ will gradually approach a flattened distribution. Thus, we see that this error caused by frequency specification decreases when the real codon distribution is flatter (Figure~\ref{freq_s_error})
 
 
 
@@ -174,12 +172,12 @@ One such limitation is that the $dN/dS$ parameter ignores the influence of site-
 
 \begin{figure*}[H]
 \centerline{\includegraphics[width=6in]{figures/gc_2beta.pdf}}
-\caption{\label{kappa} GC content additionally does not influence the relationship.}
+\caption{\label{gc} GC content additionally does not influence the relationship. 400 simulations per panel.}
 \end{figure*}
 
 \begin{figure*}[H]
 \centerline{\includegraphics[width=6in]{figures/kappa_1beta.pdf}}
-\caption{\label{kappa} Value of kappa does not matter for agreement with derived and ML omegas. Relationship robust to differences in (symmetric) mutational spectrum.}
+\caption{\label{kappa} Value of kappa does not matter for agreement with derived and ML omegas. Relationship robust to differences in (symmetric) mutational spectrum. 100 simulations per panel.}
 \end{figure*}
 
 \begin{figure*}[H]
@@ -188,8 +186,8 @@ One such limitation is that the $dN/dS$ parameter ignores the influence of site-
 \end{figure*}
 
 \begin{figure*}[H]
-\centerline{\includegraphics[width=6in]{figures/freqspec_entropy_error.pdf}}
-\caption{\label{freqspec_compare} Issues with frequency specifications strongly related to the codon frequencies in the data set. Issue is more egregious when there are relatively few codons, based on entropy. As entropy increases (more permissive, and thus data set codon frequencies are flatter), the error decreases and ML more approximates the true omega value.}
+\centerline{\includegraphics[width=6in]{figures/freqspec_beta_s_error.pdf}}
+\caption{\label{freq_s_error} Issues with frequency specifications strongly related to the codon frequencies in the data set. Issue is more egregious when there are relatively few codons, based on entropy. As entropy increases (more permissive, and thus data set codon frequencies are flatter), the error decreases and ML more approximates the true omega value.}
 \end{figure*}
 
 
@@ -198,6 +196,10 @@ One such limitation is that the $dN/dS$ parameter ignores the influence of site-
 \caption{\label{conv} Convergence of derived $dN/dS$ and ML estimates of $dN/dS$. Each point represents results from a single simulation. The y-axis indicates relative error of the ML $dN/dS$ estimates, and the x-axis indicates sequence length on a log-scale. As the sequence length, or the data set size, increases, the two $dN/dS$ estimates converge to the same value. Note that this simulated data used a beta of 2.5.}
 \end{figure*}
 
+\begin{figure*}[H]
+\centerline{\includegraphics[width=6in]{figures/simpleregression.pdf}}
+\caption{\label{simple} Relationship works exceedingly well. There are 500 points in this plot, each of which corresponds to a single simulation. Beta values for each simulation were randomly chosen between 0.5-3.5, so this plot does contain varying levels of selective constraint on amino acid distributions. Note that beta is not significant in a regression (either additive or interaction model) so the extent of constraint doesn't appear to have any influence. Moreover, kappa=1.0 here.}
+\end{figure*}
 
 	
 	
