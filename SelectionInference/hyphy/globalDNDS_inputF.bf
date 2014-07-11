@@ -1,5 +1,5 @@
-global a;
-global b;
+//global a;
+//global b;
 global w;
 global k;
 global t;
@@ -16,8 +16,8 @@ DataSet	raw_data = ReadDataFile("temp.fasta");
 /* Filter the data to find and remove any stop codons*/
 DataSetFilter   filt_data = CreateFilter(raw_data,3,"", "","TAA,TAG,TGA");
 
-/* Set codon frequencies to KNOWN */
-codonFreq_data = MYFREQUENCIES;
+/* Set codon frequencies base on input specification */
+MYFREQUENCIES
 
 /* Define the model and tree */
 Model MyModel = (MYMATRIX, codonFreq_data, 1);
