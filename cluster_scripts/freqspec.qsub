@@ -47,7 +47,6 @@ python run_freqspec.py $SGE_TASK_ID $MU $BL $SEQLEN $CPU
 
 # Cleanup
 mkdir -p $RDIR
-cp * $RDIR
 cp params* $RDIR
 cp seqs* $RDIR
 cp codonFreqs* $RDIR
