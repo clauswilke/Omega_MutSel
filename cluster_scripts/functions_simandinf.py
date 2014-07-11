@@ -164,44 +164,6 @@ def calcCodonEntropy(f):
 
 
 
-############################ PAML-RELATED FUNCTIONS ###############################
-def runpaml(seqfile, codonFreq = "0"):
-    
-    # Set up sequence file
-    setuppaml1 = "cp "+seqfile+" temp.fasta"
-    setup1 = subprocess.call(setuppaml1, shell = True)
-    assert(setup1 == 0), "couldn't create temp.fasta"
-    
-    # Set up codon frequency specification NOTE: 0:1/61 each, 1:F1X4, 2:F3X4, 3:codon table
-    setuppaml2 = 'sed "s/MYCODONFREQ/'+str(codonFreq)+'/g" codeml_raw.txt > codeml.ctl' 
-    setup2 = subprocess.call(setuppaml2, shell = True)
-    assert(setup2 == 0), "couldn't set paml codon frequencies"
-    
-    # Run paml
-    runpaml = subprocess.call("./codeml", shell=True)
-    assert (runpaml == 0), "paml fail"
-
-    # Grab paml output
-    paml_w = parsePAML("pamloutfile")
-    return paml_w
-    
-def parsePAML(pamlfile):
-    ''' get the omega from a paml file. model run is single omega for an entire alignment. '''
-    paml = open(pamlfile, 'rU')
-    pamlines = paml.readlines()
-    paml.close()
-    omega = None
-    for line in pamlines:
-        findw = re.search("^omega \(dN\/dS\)\s*=\s*(.+)", line)
-        if findw:
-            omega = findw.group(1)
-            break
-    assert (omega is not None), "couldn't get omega from paml file"
-    return omega
-
-
-
-
 ####################################### OMEGA DERIVATION FUNCTIONS ######################################
 
 def deriveOmega(codonFreq, mu_dict = {'AT':1.0, 'AC':1.0, 'AG':1.0, 'CG':1.0, 'CT':1.0, 'GT':1.0}):
@@ -273,6 +235,132 @@ def calcNS(codon, codonFreq, i, list, mu_dict):
 
 
 
+################################################# HYPHY-RELATED FUNCTIONS ############################################################
+def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs, freqType):
+    ''' pretty specific function.'''
+    
+  
+    # Set up sequence file with tree
+    setuphyphy1 = "cp "+seqfile+" temp.fasta"
+    setup1 = subprocess.call(setuphyphy1, shell = True)
+    assert(setup1 == 0), "couldn't create temp.fasta"
+    setuphyphy2 = "cat "+treefile+" >> temp.fasta"
+    setup2 = subprocess.call(setuphyphy2, shell = True)
+    assert(setup2 == 0), "couldn't add tree to hyphy infile"
+    
+    # Set up frequencies. Either equal, data, or F3x4
+    if freqType == 'equal':
+        hyf_raw = np.zeros(61)
+        hyf_raw[hyf_raw == 0.] = 1./61.
+        hyf = freq2hyphy(hyf_raw)
+    
+    elif freqType == 'data':
+        hyf = freq2hyphy(codonFreqs)
+    
+    elif freqType == 'f3x4':
+        # yes super hack!
+        hyf_raw = calc_f3x4(codonFreqs)
+    
+    print freqType
+    setuphyphy3 = "sed 's/MYFREQUENCIES/"+hyf+"/g' "+batchfile+" > run.bf"
+    print setuphyphy3
+    setup3 = subprocess.call(setuphyphy3, shell = True)
+    assert(setup3 == 0), "couldn't properly add in frequencies"
+    
+    # Set up kappa
+    if kappa != 'free':
+        sedkappa = "sed 's/k/"+str(kappa)+"/g' matrices_raw.mdl > matrices.mdl"
+        runsedkappa = subprocess.call(sedkappa, shell=True)
+        assert(runsedkappa == 0), "couldn't set up kappa"
+    
+    # Set up matrix (GY94 or MG94), within run.bf
+    setuphyphy4 = "sed -i 's/MYMATRIX/"+matrix_name+"/g' run.bf"
+    setup4 = subprocess.call(setuphyphy4, shell = True)
+    assert(setup4 == 0), "couldn't properly define matrix" 
+
+    # Run hyphy
+    hyphy = "./HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
+    runhyphy = subprocess.call(hyphy, shell = True)
+    assert (runhyphy == 0), "hyphy fail"
+    
+    # grab hyphy output
+    if matrix_name == 'GY94':
+        return parseHyphyGY94('hyout.txt')
+    else:
+        return parseHyphyMG94('hyout.txt')
+
+
+def calc_f3x4(f):
+    ''' calculate this silly specification from codon frequencies.'''
+    
+    f3x4 = np.zeros(61)
+    nucindex = {'A':0, 'C':1, 'G':2, 'T':3}
+    
+    # Get positional nucleotide frequencies
+    pos_nuc = np.zeros([3, 4])
+    for i in range(3):
+        codon_count = 0
+        for codon in codons:
+            if codon[i] == 'A':
+                pos_nuc[i][0] += f[codon_count]
+            elif codon[i] == 'C':
+                pos_nuc[i][1] += f[codon_count]
+            elif codon[i] == 'G':
+                pos_nuc[i][2] += f[codon_count]
+            elif codon[i] == 'T':
+                pos_nuc[i][3] += f[codon_count]
+            codon_count += 1
+
+    # Compute f3x4 stuff
+    f_stop = (pos_nuc[0][nucindex['T']] * pos_nuc[1][nucindex['A']] * pos_nuc[2][nucindex['G']]) + (pos_nuc[0][nucindex['T']] * pos_nuc[1][nucindex['A']] * pos_nuc[2][nucindex['A']]) + (pos_nuc[0][nucindex['T']] * pos_nuc[1][nucindex['G']] * pos_nuc[2][nucindex['A']])  
+    for i in range(61):
+        codon = codons[i]
+        f3x4[i] = (pos_nuc[0][ nucindex[codon[0]] ] * pos_nuc[1][ nucindex[codon[1]] ] * pos_nuc[2][ nucindex[codon[2]] ]) / (1. - f_stop)
+    assert( np.sum(f3x4) - 1. < zero ), "f3x4 convert fail."
+    return f3x4
+        
+        
+
+
+
+def freq2hyphy(f):
+    ''' Convert codon frequencies to a form hyphy can use. '''
+    hyphy_f = "{"
+    for freq in f:
+        hyphy_f += "{"
+        hyphy_f += str(freq)
+        hyphy_f += "},"
+    hyphy_f = hyphy_f[:-1]
+    hyphy_f += "};"
+    return "codonFreq_data = " + hyphy_f
+    
+def parseHyphyGY94(file):
+    hyout = open(file, 'r')
+    hylines = hyout.readlines()
+    hyout.close()
+    for line in hylines:
+        findw = re.search("^w=(\d+\.*\d*)", line)
+        if findw:
+            hyphy_w = findw.group(1)
+    return float(hyphy_w)
+
+def parseHyphyMG94(file):
+    hyout = open(file, 'r')
+    hylines = hyout.readlines()
+    hyout.close()
+    for line in hylines:
+        finda = re.search("^a=(\d+\.*\d*)", line)
+        findb = re.search("^b=(\d+\.*\d*)", line)
+        if finda:
+             hyphy_alpha = finda.group(1)
+        if findb:
+            hyphy_beta = findb.group(1)
+    return float(hyphy_alpha), float(hyphy_beta)
+
+
+
+
+
 
 
 
@@ -300,110 +388,44 @@ def run_neigojo(seqfile):
     return dN/dS, np.mean(ns_mut), np.mean(s_mut)
 
 
-################################################# HYPHY-RELATED FUNCTIONS ############################################################
-def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa):
-    ''' pretty specific function.'''
+
+
+
+
+
+############################ PAML-RELATED FUNCTIONS ###############################
+def runpaml(seqfile, codonFreq = "0"):
     
-  
-    # Set up sequence file with tree
-    setuphyphy1 = "cp "+seqfile+" temp.fasta"
-    setup1 = subprocess.call(setuphyphy1, shell = True)
+    # Set up sequence file
+    setuppaml1 = "cp "+seqfile+" temp.fasta"
+    setup1 = subprocess.call(setuppaml1, shell = True)
     assert(setup1 == 0), "couldn't create temp.fasta"
-    setuphyphy2 = "cat "+treefile+" >> temp.fasta"
-    setup2 = subprocess.call(setuphyphy2, shell = True)
-    assert(setup2 == 0), "couldn't add tree to hyphy infile"
     
+    # Set up codon frequency specification NOTE: 0:1/61 each, 1:F1X4, 2:F3X4, 3:codon table
+    setuppaml2 = 'sed "s/MYCODONFREQ/'+str(codonFreq)+'/g" codeml_raw.txt > codeml.ctl' 
+    setup2 = subprocess.call(setuppaml2, shell = True)
+    assert(setup2 == 0), "couldn't set paml codon frequencies"
+    
+    # Run paml
+    runpaml = subprocess.call("./codeml", shell=True)
+    assert (runpaml == 0), "paml fail"
 
-    hyf = setFreqsForHyphy()
-    setuphyphy3 = "sed 's/MYFREQUENCIES/"+hyf+"/g' "+batchfile+" > run.bf"
-    setup3 = subprocess.call(setuphyphy3, shell = True)
-    assert(setup3 == 0), "couldn't properly add in frequencies"
+    # Grab paml output
+    paml_w = parsePAML("pamloutfile")
+    return paml_w
     
-    # Set up kappa
-    if kappa != 'free':
-        sedkappa = "sed -i 's/k/"+str(kappa)+"/g' matrices.mdl"
-        runsedkappa = subprocess.call(sedkappa, shell=True)
-        assert(runsedkappa == 0), "couldn't set up kappa"
-    
-    # Set up matrix, within run.bf
-    setuphyphy4 = "sed -i 's/MYMATRIX/"+matrix_name+"/g' run.bf"
-    setup4 = subprocess.call(setuphyphy4, shell = True)
-    assert(setup4 == 0), "couldn't properly define matrix"
-    
-
-    # Run hyphy
-    hyphy = "./HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
-    runhyphy = subprocess.call(hyphy, shell = True)
-    assert (runhyphy == 0), "hyphy fail"
-    
-    # grab hyphy output
-    if matrix_name == 'GY94':
-        return parseHyphyGY94('hyout.txt')
-    else:
-        return parseHyphyMG94('hyout.txt')
-
-
-def parseHyphyGY94(file):
-    hyout = open(file, 'r')
-    hylines = hyout.readlines()
-    hyout.close()
-    for line in hylines:
-        findw = re.search("^w=(\d+\.*\d*)", line)
+def parsePAML(pamlfile):
+    ''' get the omega from a paml file. model run is single omega for an entire alignment. '''
+    paml = open(pamlfile, 'rU')
+    pamlines = paml.readlines()
+    paml.close()
+    omega = None
+    for line in pamlines:
+        findw = re.search("^omega \(dN\/dS\)\s*=\s*(.+)", line)
         if findw:
-            hyphy_w = findw.group(1)
-    return float(hyphy_w)
+            omega = findw.group(1)
+            break
+    assert (omega is not None), "couldn't get omega from paml file"
+    return omega
 
-def parseHyphyMG94(file):
-    hyout = open(file, 'r')
-    hylines = hyout.readlines()
-    hyout.close()
-    for line in hylines:
-        finda = re.search("^a=(\d+\.*\d*)", line)
-        findb = re.search("^b=(\d+\.*\d*)", line)
-        if finda:
-             hyphy_alpha = finda.group(1)
-        if findb:
-            hyphy_beta = findb.group(1)
-    return float(hyphy_alpha), float(hyphy_beta)
-
-
-def setFreqsForHyphy():
-    ''' Build input hyphy frequencies. NOTE: bias code not used but commented out in case we want it again someday.
-    '''
-    eqf = np.zeros(61)
-    for i in range(61):
-        eqf[i] = 1./61.
-    return freq2hyphy(eqf)    
-#    if bias is not None:
-#        for amino in aminos_used:
-#            aa_ind = amino_acids.index(amino)
-#            syn_codons = genetic_code[aa_ind]
-#            cfreqs = []
-#            cinds=[]
-#            # If only 1 codon, no bias, so move on.
-#            if len(syn_codons) == 1:
-#                continue
-#            for syn in syn_codons:
-#                cinds.append(codons.index(syn))
-#                cfreqs.append(codonFreq[ codons.index(syn) ])
-#
-#            pref_factor = (1. + bias)
-#            unpref_factor = 1. - bias/(len(syn_codons)-1.)
-#            maxFreq = max(cfreqs)
-#            for c in range(len(syn_codons)):
-#                if cfreqs[c] < maxFreq:
-#                    eqf[cinds[c]] = 1./61. * unpref_factor
-#                elif cfreqs[c] == maxFreq:
-#                    eqf[cinds[c]] = 1./61. * pref_factor   
-    
-def freq2hyphy(f):
-    ''' Convert codon frequencies to a form hyphy can use. '''
-    hyphy_f = "{"
-    for freq in f:
-        hyphy_f += "{"
-        hyphy_f += str(freq)
-        hyphy_f += "},"
-    hyphy_f = hyphy_f[:-1]
-    hyphy_f += "}"
-    return hyphy_f
 
