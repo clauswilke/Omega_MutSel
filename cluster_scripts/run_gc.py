@@ -15,18 +15,19 @@ from evolver import *
 
 
 # Input parameters and global stuff
-if (len(sys.argv) != 9):
-    print "\n\nUsage: python run_convergence.py <rep> <cpu> <beta> <mu> <kappa> <bl> <seqlen> <gc_start> \n."
+if (len(sys.argv) != 7):
+    print "\n\nUsage: python run_gc.py <rep> <mu> <kappa> <bl> <seqlen> <gc_start> \n."
     sys.exit()
 rep = sys.argv[1]
-cpu = sys.argv[2]
-beta = float(sys.argv[3])
-mu = float(sys.argv[4])
-kappa = float(sys.argv[5])
-bl = sys.argv[6]
-seqlength = int(sys.argv[7])
-gc_start = float(sys.argv[8])*0.1
-gc_end = gc_start + 0.05
+mu = float(sys.argv[2])
+kappa = float(sys.argv[3])
+bl = sys.argv[4]
+seqlength = int(sys.argv[5])
+gc_start = float(sys.argv[6])*0.1
+gc_end = gc_start + 0.1
+
+# Set up beta for getting amino acid frequencies
+beta = rn.uniform(0.5,3.5)
 
 # Write tree given bl specifications
 treefile = "tree.tre"
@@ -54,14 +55,14 @@ derived_w = deriveOmega(f, mu_dict)
     
 # HyPhy omega
 print "ML"
-gy94_w = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kappa)
+gy94_w = float(runpaml(seqfile))
     
 # Calculate relative error from derived omega. Not using abs() since plot nicer that way.
 err = ( derived_w - gy94_w )/derived_w
 
 # Save
 outf = open(outfile, 'w')
-outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(num_pref_aa) + '\t' + str(round(gc_content, 6)) + '\t' + str(round(derived_w, 6)) + '\t' + str(round(gy94_w, 6)) + '\t' + str(round(err, 6)) + '\n')
+outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(beta) + '\t' + str(gc_content) + '\t' + str(derived_w) + '\t' + str(gy94_w) + '\t' + str(err) + '\n')
 outf.close()
 
 
