@@ -173,7 +173,7 @@ def runpaml(seqfile, codonFreq = "0"):
     assert(setup1 == 0), "couldn't create temp.fasta"
     
     # Set up codon frequency specification NOTE: 0:1/61 each, 1:F1X4, 2:F3X4, 3:codon table
-    setuppaml2 = 'sed "s/MYCODONFREQ/'+str(codonFreq)+'/g" codeml_raw.ctl > codeml.ctl' 
+    setuppaml2 = 'sed "s/MYCODONFREQ/'+str(codonFreq)+'/g" codeml_raw.txt > codeml.ctl' 
     setup2 = subprocess.call(setuppaml2, shell = True)
     assert(setup2 == 0), "couldn't set paml codon frequencies"
     
