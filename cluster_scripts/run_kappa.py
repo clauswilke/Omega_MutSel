@@ -9,18 +9,21 @@ from stateFreqs import *
 from matrixBuilder import *
 from evolver import *
 from functions_simandinf import *
-
+import random as rn
 
 # Input parameters and global stuff
-if (len(sys.argv) != 7):
-    print "\n\nUsage: python run_kappa.py <rep> beta> <mu> <kappa> <bl> <seqlength>\n."
+if (len(sys.argv) != 5):
+    print "\n\nUsage: python run_kappa.py <rep> <mu> <bl> <seqlength>\n."
     sys.exit()
 rep = sys.argv[1]
-beta = float(sys.argv[2])
-mu = float(sys.argv[3])
-kappa = float(sys.argv[4])
-bl = sys.argv[5]
-seqlength = int(sys.argv[6])
+mu = float(sys.argv[2])
+bl = sys.argv[3]
+seqlength = int(sys.argv[4])
+
+# get kappa, beta
+kappa = rn.uniform(1.0, 5.0)
+# Set up beta for getting amino acid frequencies
+beta = rn.uniform(0.5,3.5)
 
 
 # Write tree given bl specifications
@@ -47,12 +50,13 @@ mu_dict['CT'] = mu_dict['CT'] * kappa
 derived_w = deriveOmega(f, mu_dict)
 
 # ML omega
+gy94_w = float(runpaml(seqfile))
 
-gy94_w = float(runpaml(seqfile, codonFreq = "0", initw = 0.4))
+err = (derived_w - gy94_w) / derived_w
 
 # Save
 outf = open(outfile,'w')
-outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(beta) + '\t' + str(num_pref_aa) + '\t' + str(round(gc_content, 5)) + '\t' + str(round(derived_w, 5)) + '\t' + str(round(gy94_w, 5)) + '\n')
+outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(beta) + '\t' + str(derived_w) + '\t' + str(gy94_w) + '\t' + str(err) + '\n')
 outf.close()
 
 
