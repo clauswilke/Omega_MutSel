@@ -6,12 +6,12 @@
 #$ -q wilke
 #$ -m beas
 #$ -t 1-100:1
-#$ -pe serial 4
+#$ -pe serial 15
 
 source ~/.bash_profile
 
 # INPUT ARGS VARIABLES
-CPU=4
+CPU=15
 MU=1e-6
 BL=0.005
 SEQLEN=1000000
