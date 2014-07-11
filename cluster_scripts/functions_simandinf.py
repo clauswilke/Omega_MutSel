@@ -258,7 +258,7 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs, 
         hyf = freq2hyphy(codonFreqs)
     
     elif freqType == 'f3x4':
-        hyf = calc_f3x4(codonFreqs)
+        hyf = freq2hyphy( calc_f3x4(codonFreqs) )
     
     print freqType
     setuphyphy3 = "sed 's/MYFREQUENCIES/"+hyf+"/g' "+batchfile+" > run.bf"

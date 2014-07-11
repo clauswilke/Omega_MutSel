@@ -6,15 +6,14 @@
 #$ -q wilke
 #$ -m beas
 #$ -t 1-100:1
+#$ -pe serial 4
 
 source ~/.bash_profile
 
 # INPUT ARGS VARIABLES
-CPU=16
+CPU=4
 MU=1e-6
 BL=0.005
-KAPPA=1
-BETA=2.5
 SEQLEN=1000000
 
 
@@ -23,7 +22,7 @@ SEQLEN=1000000
 SIMDIR=/home/sjs3495/MutSel/Simulator/src
 SCRIPTDIR=/home/sjs3495/Omega_MutSel/cluster_scripts
 WDIR=/state/partition1/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
-RDIR=/home/sjs3495/$JOB_NAME-${BETA}beta-${KAPPA}k
+RDIR=/home/sjs3495/$JOB_NAME
 
 mkdir -p $WDIR
 if [ ! -d $WDIR ]
@@ -39,16 +38,18 @@ cp /home/sjs3495/Omega_MutSel/cluster_scripts/run_freqspec.py .
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/functions_simandinf.py .
 
 #Hyphy
-cp /home/sjs3495/bin/codeml .
-cp /home/sjs3495/Omega_MutSel/SelectionInference/paml/codeml_raw.txt .
+cp /home/sjs3495/bin/bin/HYPHYMP .
+cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
 
 # Run
 module load python
-python run_freqspec.py $SGE_TASK_ID $CPU $BETA $MU $KAPPA $BL $SEQLEN
+python run_freqspec.py $SGE_TASK_ID $MU $BL $SEQLEN $CPU
 
 # Cleanup
 mkdir -p $RDIR
+cp * $RDIR
 cp params* $RDIR
+cp seqs* $RDIR
 cp codonFreqs* $RDIR
 rm -rf $WDIR
 

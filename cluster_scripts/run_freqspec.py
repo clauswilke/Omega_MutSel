@@ -3,8 +3,6 @@
 # Be sure to cp src/ directory (simulator), **paml** files, and the functions_simandinf.py script into working directory
 
 
-
-
 import sys
 sys.path.append('src/')
 from misc import *
@@ -16,17 +14,18 @@ from functions_simandinf import *
 
 
 # Input parameters and global stuff
-if (len(sys.argv) != 8):
-    print "\n\nUsage: python run_siminf.py <rep> <cpu> <beta> <mu> <kappa> <bl> <seqlength>\n."
+if (len(sys.argv) != 6):
+    print "\n\nUsage: python run_freqspec.py <rep> <mu> <bl> <seqlength> <cpu>\n."
     sys.exit()
 rep = sys.argv[1]
-cpu = sys.argv[2]
-beta = float(sys.argv[3])
-mu = float(sys.argv[4])
-kappa = float(sys.argv[5])
-bl = sys.argv[6]
-seqlength = int(sys.argv[7])
+mu = float(sys.argv[2])
+bl = sys.argv[3]
+seqlength = int(sys.argv[4])
+cpu = sys.argv[5]
 
+
+beta = rn.uniform(0.5,3.5)
+kappa = rn.uniform(1.0, 5.0)
 
 # Write tree given bl specifications
 treefile = "tree.tre"
@@ -58,13 +57,17 @@ derived_w = deriveOmega(f, mu_dict)
 
 # PAML omegas. Using paml since makes frequency specification a lot easier.
 print "ML"
-gy94_w_equal = float(runpaml(seqfile, codonFreq = "0", initw = 0.4))
-gy94_w_3x4   = float(runpaml(seqfile, codonFreq = "2", initw = 0.4))
-gy94_w_data  = float(runpaml(seqfile, codonFreq = "3", initw = 0.4))
+gy94_w_equal = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kappa, f, "equal")
+gy94_w_3x4   = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kappa, f, "f3x4")
+gy94_w_data  = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kappa, f, "data")
+
+err_equal = (derived_w - gy94_w_equal) / derived_w
+err_3x4 = (derived_w - gy94_w_3x4) / derived_w
+err_data = (derived_w - gy94_w_data) / derived_w
 
 # Save
 outf = open(outfile,'w')
-outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(num_pref_aa) + '\t' + str(entropy) + '\t' + str(gc_content) + '\t' + str(derived_w) + '\t' + str(gy94_w_equal) + '\t' + str(gy94_w_3x4) + '\t' + str(gy94_w_data) + '\n')
+outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(entropy) + '\t' + str(gc_content) + '\t' + str(derived_w) + '\t' + str(gy94_w_equal) + '\t' + str(gy94_w_3x4) + '\t' + str(gy94_w_data) + '\t' + str(err_equal) + '\t' + str(err_3x4) + '\t' + str(err_data) + '\n')
 outf.close()
 
 
