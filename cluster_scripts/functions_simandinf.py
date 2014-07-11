@@ -162,6 +162,144 @@ def calcCodonEntropy(f):
             sum += entry*np.log(entry)
     return -1. * sum
 
+
+
+############################ PAML-RELATED FUNCTIONS ###############################
+def runpaml(seqfile, codonFreq = "3", initw = 0.4):
+    
+    # Set up sequence file
+    setuppaml1 = "cp "+seqfile+" temp.fasta"
+    setup1 = subprocess.call(setuppaml1, shell = True)
+    assert(setup1 == 0), "couldn't create temp.fasta"
+    
+    # Set up codon frequency specification NOTE: 0:1/61 each, 1:F1X4, 2:F3X4, 3:codon table
+    setuppaml2 = 'sed -i "s/MYCODONFREQ/'+str(codonFreq)+'/g" codeml.ctl' 
+    setup2 = subprocess.call(setuppaml2, shell = True)
+    assert(setup2 == 0), "couldn't set paml codon frequencies"
+    
+    # Run paml
+    runpaml = subprocess.call("./codeml", shell=True)
+    assert (runpaml == 0), "paml fail"
+
+    # Grab paml output
+    paml_w = parsePAML("pamloutfile")
+    return paml_w
+    
+def parsePAML(pamlfile):
+    ''' get the omega from a paml file. model run is single omega for an entire alignment. '''
+    paml = open(pamlfile, 'rU')
+    pamlines = paml.readlines()
+    paml.close()
+    omega = None
+    for line in pamlines:
+        findw = re.search("^omega \(dN\/dS\)\s*=\s*(\d+\.*\d*)", line)
+        if findw:
+            omega = findw.group(1)
+            break
+    assert (omega is not None), "couldn't get omega from paml file"
+    return omega
+
+
+
+
+####################################### OMEGA DERIVATION FUNCTIONS ######################################
+
+def deriveOmega(codonFreq, mu_dict = {'AT':1.0, 'AC':1.0, 'AG':1.0, 'CG':1.0, 'CT':1.0, 'GT':1.0}):
+    ''' Derive an omega using codon frequencies. Single calculation. Get numerator, get denominator, divide once at end.
+        Default mutational scheme is all mu's are equal.
+        Requires symmetric mutational scheme.
+    ''' 
+    
+    kN = 0.; nN = 0.; kS = 0.; nS = 0.
+    
+    # codon indices which do not have zero frequency
+    nonZero = getNonZeroFreqs(codonFreq)
+    
+    # Calculations
+    for i in nonZero:
+        codon = codons[i]
+        # Nonsynonymous calculation
+        num, den = calcNS(codon, codonFreq, i, nslist, mu_dict)
+        kN += num
+        nN += den
+        
+        # Synonymous calculation
+        num, den = calcNS(codon, codonFreq, i, slist, mu_dict)
+        kS += num
+        nS += den
+   
+    assert( nS != 0. and nN != 0.), "Omega derivation indicates no evolution, maybe?"
+    dN = kN/nN
+    dS = kS/nS
+    return dN/dS
+
+
+
+def getNonZeroFreqs(freq):
+    ''' Return indices whose frequencies are not 0.'''
+    nonZero = []
+    for i in range(len(freq)):
+        if freq[i] > zero:
+            nonZero.append(i)
+    return nonZero
+
+def getNucleotideDiff(source, target):
+    for i in range(3):
+        if source[i] != target[i]:    
+            return "".join(sorted(source[i]+target[i]))
+    
+def calcFix(fi, fj):
+    if fi == fj:
+        return 1.
+    elif fi == 0.  or fj == 0.:
+        return 0.
+    else:
+        return (np.log(fj) - np.log(fi)) / (1 - fi/fj)
+
+def calcNS(codon, codonFreq, i, list, mu_dict):
+    numer = 0.
+    denom = 0.
+    fix_sum=0.
+    freq = codonFreq[i]
+    for other_codon in list[i]:
+        if codon != other_codon:
+            diff = getNucleotideDiff(codon,other_codon)
+            tempfreq = codonFreq[codons.index(other_codon)]
+            fix_sum += calcFix( float(freq), float(tempfreq) ) * mu_dict[diff]                  
+            denom += codonFreq[i]
+    numer += fix_sum*codonFreq[i]
+    return numer, denom
+#########################################################################################
+
+
+
+
+
+
+
+
+
+ 
+
+############################# NEI-GOJOBORI FUNCTIONS ##################################
+def run_neigojo(seqfile):
+    ''' Get omega using counting method '''
+    import mutation_counter as mc
+    import site_counter as sc
+    
+    M = mc.MutationCounter()
+    S = sc.SiteCounter()
+    records = list(SeqIO.parse(seqfile, 'fasta'))
+    s1 = records[0].seq
+    s2 = records[1].seq
+    ( ns_mut, s_mut ) = M.countMutations( s1, s2 )
+    ( ns_sites1, s_sites1 ) = S.countSites( s1 )
+    ( ns_sites2, s_sites2 ) = S.countSites( s2 )
+    dS = 2*sum( s_mut )/(sum( s_sites1 ) + sum( s_sites2 ))
+    dN = 2*sum( ns_mut )/(sum( ns_sites2 ) + sum( ns_sites2 ))
+    return dN/dS, np.mean(ns_mut), np.mean(s_mut)
+
+
 ################################################# HYPHY-RELATED FUNCTIONS ############################################################
 def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa):
     ''' pretty specific function.'''
@@ -268,142 +406,4 @@ def freq2hyphy(f):
     hyphy_f = hyphy_f[:-1]
     hyphy_f += "}"
     return hyphy_f
-####################################### OMEGA DERIVATION FUNCTIONS ######################################
-
-def deriveOmega(codonFreq, mu_dict = {'AT':1.0, 'AC':1.0, 'AG':1.0, 'CG':1.0, 'CT':1.0, 'GT':1.0}):
-    ''' Derive an omega using codon frequencies. Single calculation. Get numerator, get denominator, divide once at end.
-        Default mutational scheme is all mu's are equal.
-        Requires symmetric mutational scheme.
-    ''' 
-    
-    kN = 0.; nN = 0.; kS = 0.; nS = 0.
-    
-    # codon indices which do not have zero frequency
-    nonZero = getNonZeroFreqs(codonFreq)
-    
-    # Calculations
-    for i in nonZero:
-        codon = codons[i]
-        # Nonsynonymous calculation
-        num, den = calcNS(codon, codonFreq, i, nslist, mu_dict)
-        kN += num
-        nN += den
-        
-        # Synonymous calculation
-        num, den = calcNS(codon, codonFreq, i, slist, mu_dict)
-        kS += num
-        nS += den
-   
-    assert( nS != 0. and nN != 0.), "Omega derivation indicates no evolution, maybe?"
-    dN = kN/nN
-    dS = kS/nS
-    return dN/dS
-
-
-
-def getNonZeroFreqs(freq):
-    ''' Return indices whose frequencies are not 0.'''
-    nonZero = []
-    for i in range(len(freq)):
-        if freq[i] > zero:
-            nonZero.append(i)
-    return nonZero
-
-def getNucleotideDiff(source, target):
-    for i in range(3):
-        if source[i] != target[i]:    
-            return "".join(sorted(source[i]+target[i]))
-    
-def calcFix(fi, fj):
-    if fi == fj:
-        return 1.
-    elif fi == 0.  or fj == 0.:
-        return 0.
-    else:
-        return (np.log(fj) - np.log(fi)) / (1 - fi/fj)
-
-def calcNS(codon, codonFreq, i, list, mu_dict):
-    numer = 0.
-    denom = 0.
-    fix_sum=0.
-    freq = codonFreq[i]
-    for other_codon in list[i]:
-        if codon != other_codon:
-            diff = getNucleotideDiff(codon,other_codon)
-            tempfreq = codonFreq[codons.index(other_codon)]
-            fix_sum += calcFix( float(freq), float(tempfreq) ) * mu_dict[diff]                  
-            denom += codonFreq[i]
-    numer += fix_sum*codonFreq[i]
-    return numer, denom
-#########################################################################################
-
-
-
-
-
-
-
-
-
- 
-
-############################# NEI-GOJOBORI FUNCTIONS ##################################
-def run_neigojo(seqfile):
-    ''' Get omega using counting method '''
-    import mutation_counter as mc
-    import site_counter as sc
-    
-    M = mc.MutationCounter()
-    S = sc.SiteCounter()
-    records = list(SeqIO.parse(seqfile, 'fasta'))
-    s1 = records[0].seq
-    s2 = records[1].seq
-    ( ns_mut, s_mut ) = M.countMutations( s1, s2 )
-    ( ns_sites1, s_sites1 ) = S.countSites( s1 )
-    ( ns_sites2, s_sites2 ) = S.countSites( s2 )
-    dS = 2*sum( s_mut )/(sum( s_sites1 ) + sum( s_sites2 ))
-    dN = 2*sum( ns_mut )/(sum( ns_sites2 ) + sum( ns_sites2 ))
-    return dN/dS, np.mean(ns_mut), np.mean(s_mut)
-
-
-
-############################ PAML-RELATED FUNCTIONS ###############################
-def runpaml(seqfile, codonFreq = "3", initw = 0.4):
-    
-    # Set up sequence file
-    setuppaml1 = "cp "+seqfile+" temp.fasta"
-    setup1 = subprocess.call(setuppaml1, shell = True)
-    assert(setup1 == 0), "couldn't create temp.fasta"
-    
-    # Set up initial omega
-    setuppaml2 = 'sed "s/MYINITIALW/'+str(initw)+'/g" codeml_raw.txt > codeml.ctl' 
-    setup2 = subprocess.call(setuppaml2, shell = True)
-    assert(setup2 == 0), "couldn't set paml initial w"
-    
-    # Set up codon frequency specification NOTE: 0:1/61 each, 1:F1X4, 2:F3X4, 3:codon table
-    setuppaml3 = 'sed -i "s/MYCODONFREQ/'+str(codonFreq)+'/g" codeml.ctl' 
-    setup3 = subprocess.call(setuppaml3, shell = True)
-    assert(setup3 == 0), "couldn't set paml codon frequencies"
-    
-    # Run paml
-    runpaml = subprocess.call("./codeml", shell=True)
-    assert (runpaml == 0), "paml fail"
-
-    # Grab paml output
-    paml_w = parsePAML("pamloutfile")
-    return paml_w
-    
-def parsePAML(pamlfile):
-    ''' get the omega from a paml file. model run is single omega for an entire alignment. '''
-    paml = open(pamlfile, 'rU')
-    pamlines = paml.readlines()
-    paml.close()
-    omega = None
-    for line in pamlines:
-        findw = re.search("^omega \(dN\/dS\)\s*=\s*(\d+\.*\d*)", line)
-        if findw:
-            omega = findw.group(1)
-            break
-    assert (omega is not None), "couldn't get omega from paml file"
-    return omega
 
