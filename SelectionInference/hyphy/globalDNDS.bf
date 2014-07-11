@@ -1,5 +1,5 @@
-//global a;
-//global b;
+global a;
+global b;
 global w;
 global k;
 global t;
@@ -17,7 +17,7 @@ DataSet	raw_data = ReadDataFile("temp.fasta");
 DataSetFilter   filt_data = CreateFilter(raw_data,3,"", "","TAA,TAG,TGA");
 
 /* Set codon frequencies base on input specification */
-MYFREQUENCIES
+codonFreq_data = MYFREQUENCIES;
 
 /* Define the model and tree */
 Model MyModel = (MYMATRIX, codonFreq_data, 1);
