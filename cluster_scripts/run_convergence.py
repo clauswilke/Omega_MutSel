@@ -67,7 +67,7 @@ err = ( derived_w - gy94_w )/derived_w
 
 # Save
 outf = open(outfile,'w')
-outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(beta) + '\t' + str(gc_content) + '\t' + str(derived_w) + '\t' + str(gy94_w) + '\t' + str(err) + '\n')
+outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(beta) + '\t' + str(derived_w) + '\t' + str(gy94_w) + '\t' + str(err) + '\n')
 outf.close()
 
 
