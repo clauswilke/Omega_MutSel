@@ -248,7 +248,7 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs, 
     setup2 = subprocess.call(setuphyphy2, shell = True)
     assert(setup2 == 0), "couldn't add tree to hyphy infile"
     
-    # Set up frequencies. Either equal, data, or F3x4
+    # Set up frequencies. Either equal, data, or f3x4
     if freqType == 'equal':
         hyf_raw = np.zeros(61)
         hyf_raw[hyf_raw == 0.] = 1./61.
@@ -258,7 +258,6 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs, 
         hyf = freq2hyphy(codonFreqs)
     
     elif freqType == 'f3x4':
-        # yes super hack!
         hyf_raw = calc_f3x4(codonFreqs)
     
     print freqType
@@ -332,7 +331,7 @@ def freq2hyphy(f):
         hyphy_f += "},"
     hyphy_f = hyphy_f[:-1]
     hyphy_f += "};"
-    return "codonFreq_data = " + hyphy_f
+    return hyphy_f
     
 def parseHyphyGY94(file):
     hyout = open(file, 'r')
