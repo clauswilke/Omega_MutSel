@@ -5,7 +5,7 @@
 
 import sys
 from functions_simandinf import *
-
+import random as rn
 sys.path.append('src/')
 from misc import *
 from newick import *
@@ -23,7 +23,9 @@ mu = float(sys.argv[2])
 kappa = float(sys.argv[3])
 bl = sys.argv[4]
 seqlength = int(sys.argv[5])
-gc_start = float(sys.argv[6])*0.1
+gc_raw = sys.argv[6]
+
+gc_start = float(gc_raw)*0.1
 gc_end = gc_start + 0.1
 
 # Set up beta for getting amino acid frequencies
@@ -37,14 +39,14 @@ treef.close()
 
 # set up output sequence and parameter files
 freqfile = "codonFreqs" + str(rep) + ".txt"
-outfile = "params" + str(rep) + ".txt"
+outfile = "params" + str(rep) + "_" + gc_raw + ".txt"
 seqfile = "seqs" + str(rep) + ".fasta"
 
 
 # Simulate  
 print "simulating"
 f, num_pref_aa, gc_content = setFreqs(freqfile, beta, gc_start, gc_end) # last 2 args are gc min, gc max
-simulate(f, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
+simulate(f, seqfile, treefile, mu, kappa, seqlength, None) # omega (well, beta, as in dN) is last argument. when None, sim via mutsel
     
 # Derive omega
 mu_dict = {'AT':mu, 'AC':mu, 'AG':mu, 'CG':mu, 'CT':mu, 'GT':mu}
@@ -64,8 +66,4 @@ err = ( derived_w - gy94_w )/derived_w
 outf = open(outfile, 'w')
 outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(beta) + '\t' + str(gc_content) + '\t' + str(derived_w) + '\t' + str(gy94_w) + '\t' + str(err) + '\n')
 outf.close()
-
-
-
-
 
