@@ -165,7 +165,7 @@ def calcCodonEntropy(f):
 
 
 ############################ PAML-RELATED FUNCTIONS ###############################
-def runpaml(seqfile, codonFreq = "3", initw = 0.4):
+def runpaml(seqfile, codonFreq = "0"):
     
     # Set up sequence file
     setuppaml1 = "cp "+seqfile+" temp.fasta"
