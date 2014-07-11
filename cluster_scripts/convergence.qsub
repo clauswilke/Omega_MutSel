@@ -5,15 +5,15 @@
 #$ -S /bin/bash
 #$ -q wilke
 #$ -m beas
-#$ -t 1-200:1
+#$ -t 1-100:1
 
 
 source ~/.bash_profile
 
 # INPUT ARGS VARIABLES
-CPU=16
 MU=1e-6
 BL=0.005
+KAPPA=1
 EXPON=2 # vary from 2-5
 
 
@@ -22,8 +22,8 @@ SIMDIR=/home/sjs3495/MutSel/Simulator/src
 SCRIPTDIR=/home/sjs3495/Omega_MutSel/cluster_scripts
 WDIR=/state/partition1/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
 RDIR=/home/sjs3495/$JOB_NAME
-
 mkdir -p $WDIR
+
 if [ ! -d $WDIR ]
 then
   echo $WDIR not created
