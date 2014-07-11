@@ -15,16 +15,17 @@ from evolver import *
 
 
 # Input parameters and global stuff
-if (len(sys.argv) != 8):
-    print "\n\nUsage: python run_convergence.py <rep> <cpu> <beta> <mu> <kappa> <bl> <expon> \n."
+if (len(sys.argv) != 6):
+    print "\n\nUsage: python run_convergence.py <rep> <mu> <kappa> <bl> <expon> \n."
     sys.exit()
 rep = sys.argv[1]
-cpu = sys.argv[2]
-beta = float(sys.argv[3])
-mu = float(sys.argv[4])
-kappa = float(sys.argv[5])
-bl = sys.argv[6]
-expon = int(sys.argv[7])
+mu = float(sys.argv[2])
+kappa = float(sys.argv[3])
+bl = sys.argv[4]
+expon = int(sys.argv[5])
+
+# Set up beta for getting amino acid frequencies
+beta = rn.uniform(0.5,3.5)
 
 # Random sequence length between 5e2 and 1e6
 if expon == 2:
@@ -43,7 +44,6 @@ treef.close()
 freqfile = "codonFreqs" + str(rep) + "_" + str(seqlength) + ".txt"
 seqfile = "seqs" + str(rep) + "_" + str(seqlength) + ".fasta"
 outfile = "params" + str(rep) + "_" + str(seqlength) + ".txt"
-outf = open(outfile,'w')
 
 
 # Now, simulate sequences and infer ML omegas
@@ -60,13 +60,14 @@ derived_w = deriveOmega(f, mu_dict)
 
 # HyPhy omega
 print "ML"
-gy94_w = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kappa)
+gy94_w = float(runpaml(seqfile))
 
 # Calculate relative error from derived omega. Not using abs() since plot nicer that way.
 err = ( derived_w - gy94_w )/derived_w
 
 # Save
-outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(num_pref_aa) + '\t' + str(round(gc_content, 6)) + '\t' + str(round(derived_w, 6)) + '\t' + str(round(gy94_w, 6)) + '\t' + str(round(err, 6)) + '\n')
+outf = open(outfile,'w')
+outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(beta) + '\t' + str(gc_content) + '\t' + str(derived_w) + '\t' + str(gy94_w) + '\t' + str(err) + '\n')
 outf.close()
 
 
