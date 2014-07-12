@@ -4,6 +4,7 @@
 import os
 import re
 import sys
+import shutil
 import subprocess
 import numpy as np
 from random import randint
