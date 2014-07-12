@@ -10,7 +10,7 @@ from random import randint
 
 
 # Simulation code
-sys.path.append('src/')
+#sys.path.append('src/')
 from misc import *
 from newick import *
 from stateFreqs import *
@@ -237,7 +237,9 @@ def calcNS(codon, codonFreq, i, list, mu_dict):
 
 ################################################# HYPHY-RELATED FUNCTIONS ############################################################
 def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs, freqType):
-    ''' pretty specific function.'''
+    ''' pretty specific function.
+        codonFreqs = what was simulated. note that empirical are not signif different from true, so this is fine.
+    '''
     
   
     # Set up sequence file with tree
@@ -260,9 +262,10 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs, 
     elif freqType == 'f3x4':
         hyf = freq2hyphy( calc_f3x4(codonFreqs) )
     
-    print freqType
+    #print freqType
+    #print hyf
     setuphyphy3 = "sed 's/MYFREQUENCIES/"+hyf+"/g' "+batchfile+" > run.bf"
-    print setuphyphy3
+    #print setuphyphy3
     setup3 = subprocess.call(setuphyphy3, shell = True)
     assert(setup3 == 0), "couldn't properly add in frequencies"
     
@@ -271,6 +274,8 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs, 
         sedkappa = "sed 's/k/"+str(kappa)+"/g' matrices_raw.mdl > matrices.mdl"
         runsedkappa = subprocess.call(sedkappa, shell=True)
         assert(runsedkappa == 0), "couldn't set up kappa"
+    else:
+        shutil.copy('matrices_raw.mdl', 'matrices.mdl')
     
     # Set up matrix (GY94 or MG94), within run.bf
     setuphyphy4 = "sed -i 's/MYMATRIX/"+matrix_name+"/g' run.bf"
