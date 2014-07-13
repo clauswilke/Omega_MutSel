@@ -49,44 +49,22 @@ print "ML"
 ml_estimates = np.zeros(9)
 kappas = np.zeros(3)
 count = 0
+fspecs = ['equal', 'f3x4', 'data']
+kspecs = {1.:'one', kappa:'true', 'free':'free'}
 
-# kappa constrained to 1
-ml_estimates[0], noneK = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, 1., f, "equal")
-ml_estimates[1], noneK  = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, 1., f, "f3x4")
-ml_estimates[2], noneK  = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, 1., f, "data")
+common_out_string = rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(gc_content) + '\t' + str(beta) + '\t' + str(entropy) + '\t' + str(derivedw)
 
-
-# kappa fixed as true value
-ml_estimates[3], noneK = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kappa , f, "equal")
-ml_estimates[4], noneK  = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kappa , f, "f3x4")
-ml_estimates[5], noneK  = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kappa , f, "f3x4")
-
-# kappa as a free parameter
-ml_estimates[6], kappas[0]  = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, 'free' , f, "equal")
-ml_estimates[7], kappas[1]  = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, 'free' , f, "f3x4")
-ml_estimates[8], kappas[2]  = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, 'free', f, "data")
-
-
-
-out_string = rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(gc_content) + '\t' + str(beta) + '\t' + str(entropy) + '\t' + str(derivedw)
-
-#mlw and error
-for mlw in ml_estimates:
-    err = (derivedw - mlw) / derivedw
-    temp = '\t' + str(mlw) + '\t' + str(err)
-    out_string += temp
-
-#kappaw and error
-for kap in kappas:
-    err = (kappa - kap) / kappa
-    temp = '\t' + str(kap) + '\t' + str(err)
-    out_string += temp
-    
-out_string += '\n'
-
-# Save
-outf = open(outfile,'w')
-outf.write(out_string)
+outf = open(outfile, 'w')
+for kapspec in kspecs:
+    for freqspec in fspecs:
+        mlw, mlk = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kapspec, f, freqspec)
+        w_err = (derivedw - mlw) / derivedw
+        if mlk is not None:
+            k_err = (kappa - mlk) / kappa
+        else:
+            mlk = "None"
+            k_err = "None"   
+        outf.write(common_out_string + '\t' + str(freqspec) + '\t' + str(kspecs[kapspec]) + '\t' + str(mlw) + '\t' + str(w_err) + '\t' + str(mlk) + '\t' + str(k_err) + '\n')
 outf.close()
 
 
