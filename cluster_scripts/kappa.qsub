@@ -6,7 +6,7 @@
 #$ -q wilke
 #$ -m beas
 #$ -t 1-200:1
-#$ -pe serial 2
+#$ -pe serial 2 # since might overload compute node, apparently.
 
 source ~/.bash_profile
 
