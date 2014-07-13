@@ -25,11 +25,41 @@ More recently, a second class of models, known as mutation-selection-balance (Mu
 
 Some have argued that MutSel models are more robust than $dN/dS$ and can better describe the evo process owing to their treatment of amino acid identities. More fine-grained modeling results than a $dN/dS$ analysis would yield. However, it is virtually unknown how these models really relate, so it remains unclear whether one model should be preferred over another. We don't know how parameter estimates even relate.
 
-Although both $dN/dS$ and MutSel models describe the same fundamental process of protein evolution along a phylogeny, the relationship between these models is largely unknown. These two classes of models have largely been developed independently, and as a consequence we do not know whether parameters estimated from a $dN/dS$ model are similar, distinct, or even contradictory to those estimated from from a MutSel model of coding sequence evolution. Here, we aim to formalize the relationship between $dN/dS$ and MutSel models by examining the extent to which their focal parameters, $dN/dS$ and scaled amino acid selection coefficients, yield overlapping information about the evolutionary process. To this end, we derive a mathematical relationship between these two parameter classes, and we demonstrate that MutSel models fully embody the $dN/dS$ values. Using a simulation approach, we show that we can accurately estimate $dN/dS$ values using MutSel model parameter estimates, and these estimates correspond precisely to those inferred using a traditional $dN/dS$ maximum likelihood inference approach.  Importantly, we additionally show that this relationship holds only under regimes of purifying selection or neutral evolution ($dN/dS \leq 1$). Therefore, MutSel models are inherently unable to describe protein evolution under a regime of positive selection, in which $dN/dS > 1$. This result has important implications for circumstances under which MutSel model use is justified.
+Although both $dN/dS$ and MutSel models describe the same fundamental process of protein evolution along a phylogeny, the relationship between these models is largely unknown. These two classes of models have largely been developed independently, and as a consequence we do not know whether parameters estimated from a $dN/dS$ model are similar, distinct, or even contradictory to those estimated from from a MutSel model of coding sequence evolution. Here, we aim to formalize the relationship between $dN/dS$ and MutSel models by examining the extent to which their focal parameters, $dN/dS$ and scaled amino acid selection coefficients, yield overlapping information about the evolutionary process. To this end, we derive a mathematical relationship between these two parameter classes, and we demonstrate that MutSel models fully embody the $dN/dS$ values. Using a simulation approach, we verify this relationship show that we can accurately estimate $dN/dS$ values using MutSel model parameter estimates, and these estimates correspond precisely to those inferred using a traditional $dN/dS$ maximum likelihood inference approach.  Importantly, we additionally show that this relationship holds only under regimes of purifying selection or neutral evolution ($dN/dS \leq 1$). Therefore, MutSel models are inherently unable to describe protein evolution under a regime of positive selection, in which $dN/dS > 1$. This result has important implications for circumstances under which MutSel model use is justified.
 
  
+
+
+\section*{Methods}
+
+\subsection*{Sequence simulation and omega inference}
+We simulated protein-coding sequences as a continuous-time Markovprocess \cite{Yang2006} according to the MutSel model proposed by \cite{HalpernBruno1998}. This model's instantaneous rate matrix $Q = q_{ij}$, which describes the probability of substitution from codon $i$ to codon $j$, is given by 
+
+\begin{equation}
+Q_{ij} = \left\{ \begin{array}{rl}
+              0                                           &\mbox{multiple nucleotide changes} \\
+              \mu_{ij}f_{ij}                          &\mbox{single nucleotide transversion} \\
+              \kappa\mu_{ij}f_{ij}               &\mbox{single nucleotide transition} \\
+         \end{array} \right.,
+\end{equation} where $\mu_{ij}$ is the symmetric nucleotide mutation rate and $f_{ij}$ is the fixation probability from codon $i$ to $j$. The fixation probability is defined as \begin{equation}f_{ij} = ln\bigg{(}\frac{\pi_j\mu_{ij}}{\pi_i\mu_{ji}}\bigg{)}\bigg{/}\bigg{(}1 - \frac{\pi_i\mu_{ji}}{\pi_j\mu_{ij}}\bigg{)},\end{equation} where $\pi_i$ is the equilibrium frequency of codon $i$.
+
+For each simulation, we simulated selection coefficients $s_a$ for each amino acid $a$ by drawing from a normal distribution $\mathcal{N} \sim (0, 1)$. Using these selection coefficients, we derived steady-state amino acid frequencies $F(a)$ according to the Boltzmann distribution, \begin{equation} F(a) = \frac{e^{s_a\beta}}{\sum_b e^{s_b\beta}} \end{equation}, whose denominator sums over all 20 amino acids \cite{SellaHirsh2005, Ramseyetal2011}. We selected the coefficient $\beta$, which imposes the level of constraint on amino acid frequencies, from $\mathcal{U} \sim (1.0, 3.0)$. Higher levels of $\beta$ indicate increased constraint; as this value approaches infinity, only a single amino acid will effectively have a non-zero frequency.
+
+Once a set of 20 frequencies were derived, we assigned them to amino acids as follows. For each set of frequencies, we determined the number of preferred amino acids, defined as the number of frequency values greater than 0.05, or the frequency one would expect under neutral evolution.  We then selected a set of preferred amino acids such that the mean pair-wise Grantham scores among these amino acids was $\leq 100$. These amino acids were then randomly assigned to have the frequencies above 0.05, and the remaining amino acids were assigned randomly to all frequencies below 0.05. The resulting amino acid frequencies were then converted to codon frequencies such that all synonymous codons shared the same frequency (i.e., there was no codon bias).
+
+All simulations were conducted along 2-taxon tress with branch lengths and all $\mu_{ij}$ values fixed at 0.005 and $10^{-6}$, respectively. This 2-taxon framework effectively represents a single evolutionary trajectory of protein evolution, which is the evolutionary scenario used by Sella and Hirsh \cite{SellaHirsh2005}. Unless otherwise stated, we simulated alignments of one-million positions. Moreover, a single evolutionary model was applied to all positions in the simulated sequences, meaning that we did not incorporate any site-wise variation into the evolutionary process. 
+
+For each simulated alignment, we inferred $dN/dS$ values in two ways; first, we derived a $dN/dS$ value using the mathematical relationships described in \eqref{eq:fi}--\eqref{eq:dN}, and second, we used the standard maximum likelihood M0 model, which uses the GY94 evolutionary model \cite{GoldmanYang1994}, as implemented in HyPhy \cite{KosakovskyPondetal2005}. The GY94 model includes two primary parameters, $\omega=dN/dS$ and $\kappa$. \textbf{Not true, but still need explanation for why we aren't doing it:For each inference, we fixed $\kappa$ to the known simulated value}. Unless otherwise stated, we specified that HyPhy use equal equilibrium codon frequencies, such that each codon had a frequency of $1/61$. This frequency specification was necessary to achieve accurate $dN/dS$ maximum likelihood estimates, and is discussed more in depth in Results. 
+
+To investigate the influence of codon frequency specifications, we specified three types of codon frequency specifications to HyPhy inferences: equal codon frequencies, F3x4 codon frequencies, and true codon frequencies.
+
+\section*{Results}
+
+
 \section*{Mathematical relationship between selection coefficients and omega}
-\textbf{At this time, this section is largely copied from the NIH proposal, except with unequal mu's. We can always replace this with the mu's that cancel out again, given that that's the proof.}
+
+\textbf{At this time, this section is largely copied from the NIH proposal, except with unequal mu's. We can always replace this with the mu's that cancel out again, given that that's what corresponds to the proof.}
+
 We describe here how to calculate $dN/dS$ from the parameters of a MutSel model. We assume the following: (i) the mutational process is symmetric, such that $\mu_{xy}=\mu_{yx}$ for all nucleotide pairs $xy$; (ii) all synonymous codons for a given amino acid have the same fitness; there is no synonymous rate variation or codon bias.
 
 In the framework of a MutSel model, we can write the steady-state frequency of codon $i$ as
@@ -62,39 +92,37 @@ where ${\cal N}_i$ is the set of codons that are not synonymous to codon $i$ and
 Equations \eqref{eq:fi}--\eqref{eq:dN} establish a connection between the scaled selection coefficients $s_i$ (i.e., the primary parameters of a MutSel model) and the evolutionary rate ratio $dN/dS$. 
 
 
-
-\section*{Methods}
-
-\subsection*{Sequence simulation and omega inference}
-We simulated protein-coding sequences as a continuous-time Markovprocess \cite{Yang2006} according to the MutSel model proposed by \cite{HalpernBruno1998}. This model's instantaneous rate matrix $Q = q_{ij}$, which describes the probability of substitution from codon $i$ to codon $j$, is given by 
-
-\begin{equation}
-Q_{ij} = \left\{ \begin{array}{rl}
-              0                                           &\mbox{multiple nucleotide changes} \\
-              \mu_{ij}f_{ij}                          &\mbox{single nucleotide transversion} \\
-              \kappa\mu_{ij}f_{ij}               &\mbox{single nucleotide transition} \\
-         \end{array} \right.,
-\end{equation} where $\mu_{ij}$ is the symmetric nucleotide mutation rate and $f_{ij}$ is the fixation probability from codon $i$ to $j$. The fixation probability is defined as \begin{equation}f_{ij} = ln\bigg{(}\frac{\pi_j\mu_{ij}}{\pi_i\mu_{ji}}\bigg{)}\bigg{/}\bigg{(}1 - \frac{\pi_i\mu_{ji}}{\pi_j\mu_{ij}}\bigg{)},\end{equation} where $\pi_i$ is the equilibrium frequency of codon $i$.
-
-For each simulation, we derived steady-state amino acid frequencies according to the Boltzmann distribution,
-\begin{equation} F(a) = \frac{e^{s_a\beta}}{\sum_b e^{s_b\beta}} \end{equation}, where $F(a)$ is the equilibrium frequency of amino acid $a$, and the denominator sums over all 20 amino acids \cite{SellaHirsh2005, Ramseyetal2011}. In this framework, $s_a$ represents the scaled selection coefficient for amino acid $a$, analogous to the primary parameter given by a MutSel model. Unless otherwise stated, \textbf{$\beta$ was set to 2.0 for all simulations (I MADE THIS UP, COME BACK TO IT ?????)}. 
-We assigned these frequency values to amino acids as follows. For each set of frequencies, we determined the number of preferred amino acids as the number of frequency values greater than 0.05. We then selected a set of preferred amino acids such that the mean pair-wise Grantham scores among these amino acids was $\leq 100$. These amino acids were then randomly assigned to have the frequencies above 0.05, and the remaining amino acids were assigned randomly to all frequencies below 0.05. The resulting amino acid frequencies were then converted to codon frequencies such that all synonymous codons shared the same frequency (i.e., there was no codon bias).
-
-All simulations were conducted along 2-taxon tress with branch lengths and $\mu$ values fixed at 0.005 and $10^{-6}$, respectively. Unless otherwise stated, we simulated alignments of one-million positions, and amino acid frequencies were derived using a $\beta = 2.0$. Moreover, a single evolutionary model was applied to all positions in the simulated sequences, meaning that we did not incorporate any site-wise variation into the evolutionary process.
-
-For each simulated alignment, we inferred $dN/dS$ values in two ways; first, we used selection coefficients to derive the $dN/dS$ value, and second we used the standard maximum likelihood M0 model, which uses the GY94 evolutionary model \cite{GoldmanYang1994}, as implemented in PAML\cite{PAML2007}. The GY94 model includes two primary parameters, $\omega=dN/dS$ and $\kappa$. For each inference, we fixed $\kappa$ to the known simulated value, and we provided HyPhy with equal equilibrium codon frequencies, such that each codon had a frequency of $1/61$. This codon frequency was necessary to achieve accurate $dN/dS$ maximum likelihood estimates, and is discussed more in depth in Results. 
-
-
-\section*{Results}
-
 \subsection*{$dN/dS$ values fully encapsulated by scaled selection coefficients}
 
-To validate our derived relationship between $dN/dS$ values and scaled selection coefficients, we simulated protein-coding sequences along a lineage according to the Halpern-Bruno mutation-selection model \cite{HalpernBruno1998}. For each simulation set, we selected steady-state amino acid frequencies, which we then converted to codon frequencies, according to \begin{equation} F(a) = \frac{e^{s_a\beta}}{\sum_b e^{s_b\beta}} \end{equation}, where $F(a)$ corresponds to the frequency of amino acid $a$. These amino acid frequencies are analogous to the scaled selection coefficient parameters which a mutation-selection model would produce. \textbf{Again, this was made up so return to this later. - Unless otherwise stated, we set $\beta = 2.0$.} Higher values of $\beta$ indicate stronger constraint on the amino acid distributions; as $\beta$ approaches infinity, effectively only a single amino acid will be allowed. 
+To validate our derived relationship between $dN/dS$ values and scaled selection coefficients, we simulated protein-coding sequences along a lineage according to the Halpern-Bruno mutation-selection model \cite{HalpernBruno1998}. For each simulation set, we selected steady-state amino acid frequencies, which we then converted to codon frequencies, according to \begin{equation} F(a) = \frac{e^{s_a\beta}}{\sum_b e^{s_b\beta}} \end{equation}, where $F(a)$ corresponds to the frequency of amino acid $a$ and $s_a$ corresponds to the scaled selection coefficient for this amino acid. These $s_a$ values are analogous to the selection coefficient parameters which a MutSel model would infer from a given data set. For each simulation, we drew selection coefficients $s_a$ for each amino acid from $\mathcal{N} \sim (0, 1)$, and we selected the coefficient $\beta$ from \textbf{check this - $\mathcal{U} \sim (1.0, 3.0)$}. Note that higher values of $\beta$ indicate stronger constraint on the amino acid distributions; as $\beta$ approaches infinity, effectively only a single amino acid will be allowed. 
 
-Following simulation, we calculated a $dN/dS$ value using both standard ML methods, according to the GY94 \cite{GoldmanYang1994} model, and our relationship. As shown in Figure~\ref{simple}, $dN/dS$ values derived using selection coefficients agree nearly perfectly with those inferred using standard maximum likelihood methods. We additionally demonstrate convergence of these values with increasing amounts of data, represented by simulated alignment length (Figure~\ref{conv}).
-We confirmed, using simulations, that this relationship holds under different model parameterizations, including different specifications for $\kappa$ (Figure~\ref{kappa}) and GC content (Figure~\ref{gc}). 
+Following simulation, we calculated a $dN/dS$ value using both standard ML methods, according to the GY94 \cite{GoldmanYang1994} model, and our relationship. As shown in Figure~\ref{simple}, $dN/dS$ values derived using selection coefficients agree nearly perfectly with those inferred using standard maximum likelihood methods. We additionally demonstrate convergence of these values with increasing amounts of data, represented by simulated alignment length (Figure~\ref{conv}). We confirmed, using simulations, that this relationship holds under different model parameterizations, including different specifications for $\kappa$ (Figure~\ref{kappa}) and GC content (Figure~\ref{gc}). These results clearly show that MutSel model parameters fully encapsulate information regarding the evolutionary rate ratio, $dN/dS$, and that the results from MutSel and $dN/dS$ models are largely in agreement.
 
 
+
+\subsection*{Maximum Likelihood inferences strongly biased by equilibrium frequency specifications}
+
+In verifying the derived relationship between selection coefficients and $dN/dS$, we encountered some biases in ML inference methods. In particular, the specific codon frequency specification that the ML inference used had a substantial effect on its accuracy. Only when specifying equal codon frequencies (an equilibrium frequency of $1/61$ for each codon, regardless of that codon's actual frequency in the given data set) were we able to achieve agreement between our derived and ML $dN/dS$ estimates (Figure~\ref{freqspec_compare}) . On the other hand, when more commonly used codon frequency specifications, included the popular F3x4 estimator and simply using frequencies as measured from the data, ML yielded strongly inflated $dN/dS$ estimates. Indeed, as the model's codon frequency parameters were more and more tailored to the given data set, error between derived and ML $dN/dS$ values increased.
+
+Importantly, however, our simulated data sets contained relatively constrained amino acid, and thus codon, frequencies, as a single MutSel  parameterization was applied to all positions in the simulated alignment. Therefore, we examined the extent to which codon constraints influenced this tendency for frequency specifications to yield spurious results. For each simulated alignment $i$, we calculated the Shannon entropy, \begin{equation} H(i) = - \sum_j P_j \ln P_j \end{equation}, where $P_j$ is the frequency of codon $j$ and the sum runs over all sense codons. Note that, for sense codons, the maximum $H(i) = 4.11$ value is reached when all codons have a frequency of $1/61$. We then examined the relationship between error in $dN/dS$ estimates caused by different codon frequency specifications and alignment codon entropy, as shown in Figure~\ref{freq_s_error}. Clearly, as entropy increases, thus approaching a flatter distribution of codon frequencies, error in ML estimates does indeed decrease. Even so, specifying a equal codon frequencies will nearly always minimize the error.
+
+We contend that these results reflect a broad misinterpretation of codon frequency parameterization in mechanistic codon models. These frequencies must represent the codon frequencies which would exist \textit{in the absence of natural selection}. Selection, alternatively, acts to tune this frequencies to increase protein fitness. If one specifies equilibrium frequencies which exist after natural selection has acted on the protein sequence (i.e., frequencies measured directly from the data), then the influence of selection pressure is incorporated into these values. The desirable outcome, however, is that the $dN/dS$ parameter measures the selective strength. If other parameters in this model contain selection information, estimates for $dN/dS$ will not accurately capture selective effects.
+
+
+
+
+
+\subsection*{Discussion}
+
+Here, we have derived a formal mathematical relationship between the parameter estimates of MutSel and mechanistic codon models. Through a simulation approach, we validated this relationship and demonstrated that these models yield nearly identical results. However, we additionally found that MutSel models necessarily cannot describe scenarios in which positive or diversifying selection occurs, or when $dN/dS > 1$. Although it is generally acknowledged that MutSel models carry the assumption of purifying selection, we formalize and prove this result. These findings have important implications for how and when these models should be applied. In cases of purifying selection or neutral evolution, these two competing models are virtually no different from one another, and thus use of either model is fully justified. Alternatively, if positive selection is occurring, MutSel models cannot be used as they mathematically cannot capture the actual evolutionary process.
+
+This study highlights the importance of examining the similarities and differences among different evolutionary model classes. While some may prefer one model over another, it is important to have a full understanding of why one model might be applied over another. Our results demonstrate that, for circumstances of purifying selection or neutral, the models are robust and in agreement. However, be careful, because sometimes they don't agree, and this is equally important.
+
+Now, for the frequency specification: does this really matter? Typically, when one measures codon frequencies from the data set, codon frequencies are treated as global parameters rather than site-specific. This calculation will naturally lead to a flatter distribution of codon frequencies. 
+
+
+Caveat about how our math relies on symmetric mutation rates and/or equal mutation rates, depending on which one ends up happening.
+	
 
 \subsection*{Mutation-selection-balance models are only valid for purifying selection}
 
@@ -106,35 +134,6 @@ As follows from \eqref{eq:pi}, the sum of the probabilities going from codon $i$
 
 To this end, we define the function \begin{equation} F(x,y) = x + y - \frac{2xy [\ln x - \ln y]}{x - y} \end{equation}. Thus, we show that $F(x,y) \geq 0$. For the condition $x=y$, this is straightforward to show, as $\lim_{x \to y}F(x,y) = 0$.
 We now show that the first derivative of $F(x, y)$ is negative throughout $x \in (0,y)$, thus proving that $F(x, y)$ has to be monotonically decreasing, and hence $\geq0$, in this interval.
-
-
-\subsection*{Maximum Likelihood inferences strongly biased by equilibrium frequency specifications}
-
-An emerging result from this study was that specs really matter. In order to get good agreement between our derived $dN/dS$ values and ML estimates, we had to set equilibrium codon frequencies equal to $1/61$ each. For instance, when you use other commonly used frequency specifications, there is tendency for ML methods to yield wildly inflated values for $dN/dS$ (Figure~\ref{freqspec_compare}); as frequency specifications become more and more tailored to the data set, ML estimates become more and more distant from the true value.
-
-This is because of where selection is represented. In mutsel models, selection is essentially manifested by the frequencies, whereas in dnds models, it is represented by omega. If you provide true frequencies, or ask for it to be calculated from data, then the frequencies hold the effects of selection, causing inflated estimates of dnds. However, if you set all codons to 1/61, this scenario effectively represents a neutral case with no effects of selection, which then allows the omega parameter to capture the effects.
-
-However, this effect depends heavily on the specifications given for $\beta$, which controls the level of selection pressure. Higher levels of $\beta$ naturally lead to more skewed codon frequency distributions, whereas lower values of $\beta$ will gradually approach a flattened distribution. Thus, we see that this error caused by frequency specification decreases when the real codon distribution is flatter (Figure~\ref{freq_s_error})
-
-
-
-
-
-
-\subsection*{Discussion}
-	
- Several things emerge from this analysis - 
-1. If you fit a mutsel model and calculate dnds from it, it's just as good as if you had used a mech codon model. 
-2. we prove that dnds, when calc'd from mutsel, must be less than 1. although generally acknowledged that purifying selection is a feature, we demonstrate it precisely and reveal that, in cases of positive selection, mutsel models are likely not appropriate.
-3. we also have a more realistic way to assess performance of dnds models. bias is introduced by codon frequencies used by the model. otherwise, freqs will likely capture selective pressure, rendering omega estimates bonkers. typically highly elevated. More work should be done in this field, for instance, in dnds analyses featuring high levels of codon bias may result in artifactually high dnds, although unclear the extent to which this will actually influence.
-
-Discussion points:
-- Important insight is that dN/dS>1 inherently cannot be described by mutation-selection models, and thus at those sites its results may be misleading. In particular, possibly a confounding factor in the Rodrigue implementation, as positively selected sites in the alignment could introduce bias.
-- Importance of examining intersections between models. Must understand how estimates from one relate to another. Helps to ensure robust results; model agreement is key, so we must formulate explicit relationships among them to systematically assess agreement.
-- 
-
-	
-	
 
 %dNdS limitations:
 %One such limitation is that the $dN/dS$ parameter ignores the influence of site-specific amino acid propensities.  It is universally recognized that a particular position in a protein will only tolerate certain amino acids, due either to functional or structural constraints. However, $dN/dS$ ignores this key aspect of protein evolution and considers all nonsynonymous changes, regardless of which amino acid was substituted, as having equal weight on protein fitness, a biologically implausible assumption. An additional limitation is that codon-substitution models merely describe the result of the evolutionary process, rather than the explicit underlying mechanism producing those results. More precisely, substitutions in protein-coding sequences result from an ongoing mutation-selection balance. When a mutation occurs in a DNA sequence, natural selection must act on this mutation, either by disfavoring it, resulting in the mutation's removal from the population, or favoring it, ultimately yielding an amino acid replacement or substitution. By overlooking this underlying mechanism and focusing only on whether substitutions have occurred, codon substitution models are unable to capture the full extent of the evolutionary process. 
