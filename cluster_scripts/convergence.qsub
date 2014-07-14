@@ -1,11 +1,11 @@
 #!/bin/bash
-#$ -N siminf
+#$ -N conv
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
 #$ -q wilke
 #$ -m beas
-#$ -t 1-500:1
+#$ -t 1-5:1
 #$ -pe serial 15
 
 
