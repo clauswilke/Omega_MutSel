@@ -54,7 +54,9 @@ derived_w = deriveOmega(f, mu_dict)
 
 # HyPhy omega
 print "ML"
-gy94_w, ml_k_is_none = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, 1., f)
+f_equal = np.zeros(61)
+f_equal[f_equal == 0.] = 1./61.
+gy94_w, ml_k_is_none = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, 1., f_equal)
 
 # Calculate relative error from derived omega. Not using abs() since plot nicer that way.
 err = ( derived_w - gy94_w )/derived_w
