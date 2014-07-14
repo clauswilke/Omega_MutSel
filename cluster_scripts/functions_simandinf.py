@@ -382,7 +382,7 @@ def run_neigojo(seqfile):
     ( ns_sites2, s_sites2 ) = S.countSites( s2 )
     dS = 2*sum( s_mut )/(sum( s_sites1 ) + sum( s_sites2 ))
     dN = 2*sum( ns_mut )/(sum( ns_sites2 ) + sum( ns_sites2 ))
-    return dN/dS, np.mean(ns_mut), np.mean(s_mut)
+    return dN/dS #, np.mean(ns_mut), np.mean(s_mut)
 
 
 
