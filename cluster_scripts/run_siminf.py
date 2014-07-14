@@ -17,7 +17,7 @@ simdir = sys.argv[6]
 sys.path.append(simdir)
 from functions_simandinf import *
 kappa = rn.uniform(1.0, 5.0)
-beta = 1.0 #rn.uniform(0.5, 3.0)
+lambda_ = rn.uniform(0.5, 2.0)
 
 
 
@@ -34,7 +34,7 @@ outfile = "params"+str(rep)+".txt"
 
 # Simulate
 print "simulating"
-f_data, num_pref_aa, gc_content = setFreqs(freqfile, beta, 0.0, 1.0) # last 2 args are gc min, gc max
+f_data, num_pref_aa, gc_content = setFreqs(freqfile, lambda_, 0.0, 1.0) # last 2 args are gc min, gc max
 simulate(f_data, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
 
 # entropies and other frequencies
@@ -59,15 +59,13 @@ count = 0
 fspecs = ['equal', 'f3x4', 'data']
 kspecs = {1.:'one', kappa:'true', 'free':'free'}
 
-common_out_string = rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(gc_content) + '\t' + str(derivedw)
-
+common_out_string = rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(gc_content) + '\t' + str(lambda_) + '\t' + str(entropy_data) + '\t' + str(entropy_f3x4) + '\t' + str(derivedw) 
 
 
 
 outf = open(outfile, 'w')
 for freqspec in fspecs:
     freq = eval('f_'+freqspec)
-    entropy = eval('entropy_'+freqspec)
     for kapspec in kspecs:
         mlw, mlk = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kapspec, freq)
         w_err = (derivedw - mlw) / derivedw
@@ -76,9 +74,8 @@ for freqspec in fspecs:
         else:
             mlk = "None"
             k_err = "None"   
-        outf.write(common_out_string + '\t' + str(entropy) + '\t' + str(freqspec) + '\t' + str(kspecs[kapspec]) + '\t' + str(mlw) + '\t' + str(w_err) + '\t' + str(mlk) + '\t' + str(k_err) + '\n')
+        outf.write(common_out_string + '\t' + str(freqspec) + '\t' + str(kspecs[kapspec]) + '\t' + str(mlw) + '\t' + str(w_err) + '\t' + str(mlk) + '\t' + str(k_err) + '\n')
 outf.close()
-
 
 
 

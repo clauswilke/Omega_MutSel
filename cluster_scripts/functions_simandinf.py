@@ -34,7 +34,7 @@ grantham = {'AA':0, 'AC':195, 'AD':126, 'AE':107, 'AF':113, 'AG':60, 'AH':86, 'A
 ################################################ SIMULATION FUNCTIONS #####################################################
 
 def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
-    ''' Simulate single partition according to either codon or mutsel model (check beta value for which model).
+    ''' Simulate single partition according to either codon or mutsel model (check beta (dN) value for which model).
         Symmetric mutation rates, with kappa.
     '''
     try:
@@ -58,7 +58,7 @@ def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
     myEvolver.writeSequences(outfile = seqfile)
 
 
-def setFreqs(freqfile, beta, gc_min = 0., gc_max = 1.):
+def setFreqs(freqfile, lambda_, gc_min = 0., gc_max = 1.):
     ''' Returns codon frequencies and gc content '''
     
     gc = -1.
@@ -66,7 +66,7 @@ def setFreqs(freqfile, beta, gc_min = 0., gc_max = 1.):
     redo = True
     while gc < gc_min or gc > gc_max or redo:
         # Frequencies based on boltzmann dist, such that amino acid frequencies distributed exponentially.
-        rawfreqs = setBoltzFreqs(beta) # gets frequencies 
+        rawfreqs = setBoltzFreqs(lambda_) # gets frequencies 
         numaa = sum(rawfreqs >= 0.05) # number of amino acids which have frequencies above random chance (favored). These amino acids should be intelligently chosen.
         aalist = generateAAlist(numaa)  # gets suitable list of amino acids
         uFreq = mergeAminoFreqs(aalist, rawfreqs) # merge aalist and rawfreqs into a dictionary, such that the preferred amino acids get assigned the Grantham group
@@ -107,13 +107,13 @@ def mergeAminoFreqs(aalist, f):
     return fdict
         
 
-def setBoltzFreqs(beta):
+def setBoltzFreqs(lambda_):
     ''' Use Boltzmann distribution to get amino acid frequencies for a certain number of amino acids.'''
     ddg_values = np.random.normal(size = 20) 
     numer_list = np.zeros(20)
     denom = 0.
     for d in range(20):
-        val = np.exp(-1. * beta * ddg_values[d])
+        val = np.exp(-1. * lambda_ * ddg_values[d])
         denom += val
         numer_list[d] = val
     return numer_list/(np.sum(numer_list))     
@@ -351,7 +351,7 @@ def parseHyphyMG94(file):
         if finda:
              hyphy_alpha = finda.group(1)
         if findb:
-            hyphy_beta = findb.group(1)
+            hyphy_beta= findb.group(1)
     return float(hyphy_alpha), float(hyphy_beta)
 
 
