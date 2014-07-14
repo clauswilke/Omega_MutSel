@@ -72,8 +72,9 @@ for freqspec in fspecs:
         if mlk is not None:
             k_err = (kappa - mlk) / kappa
         else:
-            mlk = "None"
-            k_err = "None"   
+            # set these as numbers so R won't read those columns in as character.
+            mlk = -10000
+            k_err = -10000   
         outf.write(common_out_string + '\t' + str(freqspec) + '\t' + str(kspecs[kapspec]) + '\t' + str(mlw) + '\t' + str(w_err) + '\t' + str(mlk) + '\t' + str(k_err) + '\n')
 outf.close()
 
