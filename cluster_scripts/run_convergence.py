@@ -1,33 +1,27 @@
-# SJS.
-# Code specifically for generating data to demonstrate omega convergence.
-# Parameters: fix kappa to 1.0 and beta to 2.5 in the qsub file.
+# SJS. Code specifically for generating data to demonstrate omega convergence.
+
+
+
 
 import sys
-from random import randint
-from functions_simandinf import *
-
-sys.path.append('src/')
-from misc import *
-from newick import *
-from stateFreqs import *
-from matrixBuilder import *
-from evolver import *
-
-
 # Input parameters and global stuff
 if (len(sys.argv) != 6):
-    print "\n\nUsage: python run_convergence.py <rep> <mu> <kappa> <bl> <expon> \n."
+    print "\n\nUsage: python run_convergence.py <rep> <cpu> <mu> <bl> <simdir> \n."
     sys.exit()
 rep = sys.argv[1]
-mu = float(sys.argv[2])
-kappa = float(sys.argv[3])
+cpu = sys.argv[2]
+mu = float(sys.argv[3])
 bl = sys.argv[4]
-expon = int(sys.argv[5])
+simdir = sys.argv[5]
+sys.path.append(simdir)
+from functions_simandinf import *
+from random import randint
 
-# Set up beta for getting amino acid frequencies
-beta = rn.uniform(0.5,3.5)
+kappa = rn.uniform(1.0, 5.0)
+lambda_ = rn.uniform(0.5, 2.0)
 
 # Random sequence length between 5e2 and 1e6
+expon = randint(2,5)
 if expon == 2:
     times = randint(5,10)
 else:
@@ -49,7 +43,7 @@ outfile = "params" + str(rep) + "_" + str(seqlength) + ".txt"
 # Now, simulate sequences and infer ML omegas
 # Simulate
 print "simulating"
-f, num_pref_aa, gc_content = setFreqs(freqfile, beta, 0.0, 1.0) # last 2 args are gc min, gc max
+f, num_pref_aa, gc_content = setFreqs(freqfile, lambda_, 0.0, 1.0) # last 2 args are gc min, gc max
 simulate(f, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
 
 # Derive
@@ -60,14 +54,14 @@ derived_w = deriveOmega(f, mu_dict)
 
 # HyPhy omega
 print "ML"
-gy94_w = float(runpaml(seqfile))
+gy94_w, ml_k_is_none = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, 1., f)
 
 # Calculate relative error from derived omega. Not using abs() since plot nicer that way.
 err = ( derived_w - gy94_w )/derived_w
 
 # Save
 outf = open(outfile,'w')
-outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(beta) + '\t' + str(derived_w) + '\t' + str(gy94_w) + '\t' + str(err) + '\n')
+outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(lambda_) + '\t' + str(derived_w) + '\t' + str(gy94_w) + '\t' + str(err) + '\n')
 outf.close()
 
 
