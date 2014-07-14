@@ -1,5 +1,5 @@
 #!/bin/bash
-#$ -N siminf
+#$ -N siminf_1beta
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash

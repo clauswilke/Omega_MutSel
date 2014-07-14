@@ -237,7 +237,7 @@ def calcNS(codon, codonFreq, i, list, mu_dict):
 
 
 ################################################# HYPHY-RELATED FUNCTIONS ############################################################
-def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs, freqType):
+def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs):
     ''' pretty specific function.
         codonFreqs = what was simulated. note that empirical are not signif different from true, so this is fine.
     '''
@@ -251,22 +251,9 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs, 
     setup2 = subprocess.call(setuphyphy2, shell = True)
     assert(setup2 == 0), "couldn't add tree to hyphy infile"
     
-    # Set up frequencies. Either equal, data, or f3x4
-    if freqType == 'equal':
-        hyf_raw = np.zeros(61)
-        hyf_raw[hyf_raw == 0.] = 1./61.
-        hyf = freq2hyphy(hyf_raw)
-    
-    elif freqType == 'data':
-        hyf = freq2hyphy(codonFreqs)
-    
-    elif freqType == 'f3x4':
-        hyf = freq2hyphy( calc_f3x4(codonFreqs) )
-    
-    #print freqType
-    #print hyf
+    # Set up frequencies.
+    hyf = freq2hyphy(codonFreqs)
     setuphyphy3 = "sed 's/MYFREQUENCIES/"+hyf+"/g' "+batchfile+" > run.bf"
-    #print setuphyphy3
     setup3 = subprocess.call(setuphyphy3, shell = True)
     assert(setup3 == 0), "couldn't properly add in frequencies"
     
