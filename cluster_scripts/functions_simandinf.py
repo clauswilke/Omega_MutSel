@@ -239,6 +239,9 @@ def calcNS(codon, codonFreq, i, list, mu_dict):
 
 
 
+def run_ng86(
+
+
 ################################################# HYPHY-RELATED FUNCTIONS ############################################################
 def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs):
     ''' pretty specific function.
@@ -394,7 +397,41 @@ def run_neigojo(seqfile):
 
 
 ############################ PAML-RELATED FUNCTIONS ###############################
-def runpaml(seqfile, codonFreq = "0"):
+def runpaml_yn00(seqfile):
+    # Set up sequence file
+    setuppaml1 = "cp "+seqfile+" temp.fasta"
+    setup1 = subprocess.call(setuppaml1, shell = True)
+    assert(setup1 == 0), "couldn't create temp.fasta"
+
+    # Run paml
+    runpaml = subprocess.call("./yn00", shell=True)
+    assert (runpaml == 0), "paml fail"
+
+    # Grab paml output
+    paml_w = parsepaml_ng86("pamloutfile")
+    return paml_w
+
+def parsepaml_yn00(pamlfile):
+    ''' parsing paml outfiles is completely the worst.'''
+    paml = open(pamlfile, 'rU')
+    lines = paml.readlines()
+    paml.close()
+    count = 0
+    for line in lines:
+        find = re.search("^Nei \& Gojobori 1986\. dN/dS \(dN, dS\)", line)
+        if find:
+            break
+        else:
+            count += 1
+    omega_line = lines[count+5]
+    find_omega = re.search('\s+(\d\.\d+)\s+\(', omega_line)
+    assert(find_omega.group(1)) is not None, "couldn't get yn00 dnds from paml file"
+    return float(find_omega.group(1))
+    
+def runpaml_codeml(seqfile, codonFreq, estimateKappa, kappa=1.0):
+    ''' estimateKappa: 0 to estimate, 1 to fix
+        kappa: the value for fixed kappa to take on. default is 1.0
+    '''
     
     # Set up sequence file
     setuppaml1 = "cp "+seqfile+" temp.fasta"
@@ -406,6 +443,15 @@ def runpaml(seqfile, codonFreq = "0"):
     setup2 = subprocess.call(setuppaml2, shell = True)
     assert(setup2 == 0), "couldn't set paml codon frequencies"
     
+    # Set up kappa specification
+    setuppaml3 = 'sed "s/ESTKAPPA/'+str(estimateKappa)+'/g" codeml.ctl'
+    setup3 = subprocess.call(setuppaml3, shell=True)
+    assert(setup3 == 0), "couldn't set up whether kappa should be fixed or estimated
+    
+    setuppaml4 = 'sed "s/INITKAPPA/'+str(kappa)+'/g" codeml.ctl'
+    setup4 = subprocess.call(setuppaml4, shell=True)
+    assert(setup4 == 0), "couldn't set up initial/fixed kappa value
+    
     # Run paml
     runpaml = subprocess.call("./codeml", shell=True)
     assert (runpaml == 0), "paml fail"
@@ -414,7 +460,7 @@ def runpaml(seqfile, codonFreq = "0"):
     paml_w = parsePAML("pamloutfile")
     return paml_w
     
-def parsePAML(pamlfile):
+def parsepaml_codeml(pamlfile):
     ''' get the omega from a paml file. model run is single omega for an entire alignment. '''
     paml = open(pamlfile, 'rU')
     pamlines = paml.readlines()
@@ -426,6 +472,6 @@ def parsePAML(pamlfile):
             omega = findw.group(1)
             break
     assert (omega is not None), "couldn't get omega from paml file"
-    return omega
+    return float(omega)
 
 
