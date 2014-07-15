@@ -110,12 +110,13 @@ def mergeAminoFreqs(aalist, f):
 
 def setBoltzFreqs(lambda_):
     ''' Use Boltzmann distribution to get amino acid frequencies for a certain number of amino acids.'''
-    ssc_values = np.random.normal(size = 20) #ssc = scaled selection coefficient.
+    # lambda_ basically determines the strength of selection. We are now using it as the stddev of the normal distribution from which ssc's are drawn.
+    ssc_values = np.random.normal(loc=0., scale=lambda_, size = 20) #ssc = scaled selection coefficient.
     ssc_values[0] = 0. # set one value to zero to make these values *scaled* selection coeffs 
     numer_list = np.zeros(20)
     denom = 0.
     for ssc in range(20):
-        val = np.exp(-1. * lambda_ * ssc_values[ssc])
+        val = np.exp(-1. * ssc_values[ssc])
         denom += val
         numer_list[ssc] = val
     return numer_list/(np.sum(numer_list))     
