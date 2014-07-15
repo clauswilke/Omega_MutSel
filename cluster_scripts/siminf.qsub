@@ -1,11 +1,11 @@
 #!/bin/bash
-#$ -N siminf
+#$ -N siminf_withnei2
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
 #$ -q wilke
 #$ -m beas
-#$ -t 1-500:1
+#$ -t 1-1:1
 #$ -pe serial 15
 
 
@@ -14,8 +14,8 @@ source ~/.bash_profile
 # INPUT ARGS VARIABLES
 CPU=15
 MU=1e-5
-BL=0.005
-SEQLEN=1000000
+BL=0.001
+SEQLEN=500000
 
 
 # Set up directories
@@ -33,6 +33,7 @@ fi
 cd $WDIR
 
 # Copy files
+cp /home/sjs3495/Omega_MutSel/scripts/*.py .
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/run_siminf.py .
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/functions_simandinf.py .
 

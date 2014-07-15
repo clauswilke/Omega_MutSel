@@ -51,6 +51,9 @@ mu_dict = {'AT':mu, 'AC':mu, 'AG':mu*kappa, 'CG':mu, 'CT':mu*kappa, 'GT':mu}
 derivedw = deriveOmega(f_data, mu_dict)
 
 
+# counting method omega
+neiw = run_neigojo(seqfile)
+
 # HyPhy omega and kappa, forever and ever
 print "ML"
 ml_estimates = np.zeros(9)
@@ -59,7 +62,7 @@ count = 0
 fspecs = ['equal', 'f3x4', 'data']
 kspecs = {1.:'one', kappa:'true', 'free':'free'}
 
-common_out_string = rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(gc_content) + '\t' + str(lambda_) + '\t' + str(entropy_data) + '\t' + str(entropy_f3x4) + '\t' + str(derivedw) 
+common_out_string = rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(gc_content) + '\t' + str(lambda_) + '\t' + str(entropy_data) + '\t' + str(entropy_f3x4) + '\t' + str(derivedw) + '\t' + str(neiw)
 
 
 
