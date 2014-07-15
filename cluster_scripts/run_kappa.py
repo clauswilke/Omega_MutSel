@@ -31,7 +31,7 @@ freqfile = "codonFreqs" + str(rep)+".txt"
 outfile = "params"+str(rep)+".txt"
 
 ############ Set up state frequencies and also frequencies for hyphy #############
-lambda_ = rn.uniform(0.5, 2.0)
+lambda_ = rn.uniform(1.0, 3.0)
 f_data, num_pref_aa, gc_content = setFreqs(freqfile, lambda_, 0.0, 1.0) # last 2 args are gc min, gc max
 f_equal = np.zeros(61)
 f_equal[f_equal == 0.] = 1./61.
@@ -40,12 +40,10 @@ f_equal[f_equal == 0.] = 1./61.
 ################ FIRST WITH TRUE KAPPA = 1.0 ##################
 
 ########## Simulate
-kappa = 1.0
-simulate(f_data, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
+simulate(f_data, seqfile, treefile, mu, 1.0, seqlength, None) # omega is last argument. when None, sim via mutsel
 
 ######### Derive omega with math
-mu_dict = {'AT':mu, 'AC':mu, 'AG':mu*kappa, 'CG':mu, 'CT':mu*kappa, 'GT':mu}
-derivedw = deriveOmega(f_data, mu_dict)
+derivedw_1 = deriveOmega(f_data, {'AT':mu, 'AC':mu, 'AG':mu, 'CG':mu, 'CT':mu, 'GT':mu})
 
 ######### Infer omega with nei-gojobori
 neiw_1 = run_neigojo(seqfile)
@@ -54,27 +52,26 @@ neiw_1 = run_neigojo(seqfile)
 mlw_1, mlk = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, 1., f_equal)
 
 
-################### NOW WITH TRUE KAPPA AS [1,5] #####################
+################### NOW WITH TRUE KAPPA AS [2,5] #####################
 
 
 ########## Simulate
-kappa = rn.uniform(1.0, 5.0)
+kappa = rn.uniform(2.0, 5.0)
 simulate(f_data, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
 
 ######### Derive omega with math
-mu_dict = {'AT':mu, 'AC':mu, 'AG':mu*kappa, 'CG':mu, 'CT':mu*kappa, 'GT':mu}
-derivedw_2 = deriveOmega(f_data, mu_dict)
+derivedw_2 = deriveOmega(f_data, {'AT':mu, 'AC':mu, 'AG':mu*kappa, 'CG':mu, 'CT':mu*kappa, 'GT':mu})
 
 ######### Infer omega with nei-gojobori
 neiw_2 = run_neigojo(seqfile)
 
 ######### Infer hyphy
 mlw_2_k1, mlk = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, 1., f_equal)
-mlw_2_kfree, mlk = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, 'free', f_equal)
+mlw_2_ktrue, mlk = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, 'true', f_equal)
 
 
 outf = open(outfile, 'w')
-outf.write(rep + '\t' + str(kappa) + '\t' + str(derivedw_1) + '\t' + str(neiw_1) + '\t' + str(mlw_1) + '\t' + str(derivedw_2) + '\t' + str(neiw_2) + '\t' + str(mlw_2_k1) + '\t' + str(mlw_2_kfree) + '\t' + str(mlk) + '\n')
+outf.write(rep + '\t' + str(kappa) + '\t' + str(derivedw_1) + '\t' + str(derivedw_2) + '\t' + str(neiw_1) + '\t' + str(neiw_2) + '\t' + str(mlw_1) + '\t' + str(mlw_2_k1) + '\t' + str(mlw_2_ktrue) + '\n')
 outf.close()
 
 
