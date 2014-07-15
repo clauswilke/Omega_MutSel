@@ -5,7 +5,7 @@
 
 ######## Input parameters ########
 import sys
-if (len(sys.argv) != 7):
+if (len(sys.argv) != 4):
     print "\n\nUsage: python run_siminf.py <rep> <cpu> <simdir> \n."
     sys.exit()
 rep = sys.argv[1]
@@ -13,7 +13,7 @@ cpu = sys.argv[2]
 simdir = sys.argv[3]
 sys.path.append(simdir)
 from functions_simandinf import *
-seqlength = 10000
+seqlength = 100000
 kappa = rn.uniform(1.0, 5.0)
 lambda_ = rn.uniform(0.5, 2.0)
 omega = rn.uniform(0.01, 0.99)
@@ -21,6 +21,7 @@ omega = rn.uniform(0.01, 0.99)
 
 
 # Write tree given bl specifications
+bl=0.05
 treefile = "tree.tre"
 treef = open(treefile, 'w')
 treef.write("(t1:" + str(bl) + ", t2:" + str(bl) + ");")
@@ -34,7 +35,7 @@ outfile = "params"+str(rep)+".txt"
 # Simulate
 print "simulating"
 f_data, num_pref_aa, gc_content = setFreqs(freqfile, lambda_, 0.0, 1.0) # last 2 args are gc min, gc max
-simulate(f_data, seqfile, treefile, mu, kappa, seqlength, omega) # omega is last argument. when None, sim via mutsel
+simulate(f_data, seqfile, treefile, 1., kappa, seqlength, omega) # omega is last argument. when None, sim via mutsel
 
 f_equal = np.zeros(61)
 f_equal[f_equal == 0.] = 1./61.
