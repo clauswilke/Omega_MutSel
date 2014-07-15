@@ -44,7 +44,8 @@ def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
           
     model = Model()
     if beta:
-        params = {'stateFreqs':f, 'alpha':1.0, 'beta':float(beta), 'mu': {'AC': mu, 'AG': mu*kappa, 'AT': mu, 'CG': mu, 'CT': mu*kappa, 'GT': mu}}
+        print "mech codon!!"
+	params = {'stateFreqs':f, 'alpha':1.0, 'beta':float(beta), 'mu': {'AC': mu, 'AG': mu*kappa, 'AT': mu, 'CG': mu, 'CT': mu*kappa, 'GT': mu}}
         model.params = params
         mat = mechCodon_MatrixBuilder(model)
     else:
