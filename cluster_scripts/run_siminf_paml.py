@@ -61,14 +61,14 @@ print "ML"
 ml_estimates = np.zeros(9)
 kappas = np.zeros(3)
 count = 0
-fspecs = ['0', '2', '3'] # 1/61, f3x4, data
-kspec = ['0':'free', '1':'fixed'] #free, fixed
+fspecs = {'0':"equal", '2':"f3x4", '3':"data"} # 1/61, f3x4, data
+kspecs = {'0':'free', '1':'fixed'} #free, fixed
 outf = open(outfile, 'w')
 for freqspec in fspecs:
     for kapspec in kspecs:
         mlw = runpaml_codeml(seqfile, freqspec, kapspec, kappa)
         w_err = (derivedw - mlw) / derivedw
-        outf.write(common_out_string + '\t' + str(freqspec) + '\t' + str(kspecs[kapspec]) + '\t' + str(mlw) + '\t' + str(w_err) + '\n')
+        outf.write(common_out_string + '\t' + str(fspecs[freqspec]) + '\t' + str(kspecs[kapspec]) + '\t' + str(mlw) + '\t' + str(w_err) + '\n')
 outf.close()
 
 

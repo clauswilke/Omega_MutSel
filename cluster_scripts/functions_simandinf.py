@@ -239,8 +239,6 @@ def calcNS(codon, codonFreq, i, list, mu_dict):
 
 
 
-def run_ng86(
-
 
 ################################################# HYPHY-RELATED FUNCTIONS ############################################################
 def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs):
@@ -408,8 +406,7 @@ def runpaml_yn00(seqfile):
     assert (runpaml == 0), "paml fail"
 
     # Grab paml output
-    paml_w = parsepaml_ng86("pamloutfile")
-    return paml_w
+    return parsepaml_yn00("pamloutfile")
 
 def parsepaml_yn00(pamlfile):
     ''' parsing paml outfiles is completely the worst.'''
@@ -446,19 +443,18 @@ def runpaml_codeml(seqfile, codonFreq, estimateKappa, kappa=1.0):
     # Set up kappa specification
     setuppaml3 = 'sed "s/ESTKAPPA/'+str(estimateKappa)+'/g" codeml.ctl'
     setup3 = subprocess.call(setuppaml3, shell=True)
-    assert(setup3 == 0), "couldn't set up whether kappa should be fixed or estimated
+    assert(setup3 == 0), "couldn't set up whether kappa should be fixed or estimated"
     
     setuppaml4 = 'sed "s/INITKAPPA/'+str(kappa)+'/g" codeml.ctl'
     setup4 = subprocess.call(setuppaml4, shell=True)
-    assert(setup4 == 0), "couldn't set up initial/fixed kappa value
+    assert(setup4 == 0), "couldn't set up initial/fixed kappa value"
     
     # Run paml
     runpaml = subprocess.call("./codeml", shell=True)
     assert (runpaml == 0), "paml fail"
 
     # Grab paml output
-    paml_w = parsePAML("pamloutfile")
-    return paml_w
+    return parsepaml_codeml("pamloutfile")
     
 def parsepaml_codeml(pamlfile):
     ''' get the omega from a paml file. model run is single omega for an entire alignment. '''

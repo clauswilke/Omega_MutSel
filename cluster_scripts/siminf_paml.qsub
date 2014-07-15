@@ -5,21 +5,20 @@
 #$ -S /bin/bash
 #$ -q wilke
 #$ -m beas
-#$ -t 1-1:1
-
+#$ -t 1-1000:1
 
 source ~/.bash_profile
 
 # INPUT ARGS VARIABLES
 MU=1e-5
 BL=0.01
-SEQLEN=5000
+SEQLEN=1000000
 
 
 # Set up directories
 SIMDIR=/home/sjs3495/MutSel/Simulator/src
 SCRIPTDIR=/home/sjs3495/Omega_MutSel/cluster_scripts
-WDIR=/state/partition1/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
+WDIR=/share/WilkeLab/work/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
 RDIR=/home/sjs3495/$JOB_NAME
 
 mkdir -p $WDIR
@@ -43,7 +42,7 @@ cp /home/sjs3495/Omega_MutSel/SelectionInference/paml/yn00.ctl .
 
 # Run
 module load python
-python run_siminf_paml.py $SGE_TASK_ID MU $BL $SEQLEN $SIMDIR
+python run_siminf_paml.py $SGE_TASK_ID $MU $BL $SEQLEN $SIMDIR
 
 # Cleanup
 mkdir -p $RDIR
