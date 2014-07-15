@@ -5,14 +5,13 @@
 
 import sys
 # Input parameters and global stuff
-if (len(sys.argv) != 6):
-    print "\n\nUsage: python run_convergence.py <rep> <cpu> <mu> <bl> <simdir> \n."
+if (len(sys.argv) != 5):
+    print "\n\nUsage: python run_convergence.py <rep> <mu> <bl> <simdir> \n."
     sys.exit()
 rep = sys.argv[1]
-cpu = sys.argv[2]
-mu = float(sys.argv[3])
-bl = sys.argv[4]
-simdir = sys.argv[5]
+mu = float(sys.argv[2])
+bl = sys.argv[3]
+simdir = sys.argv[4]
 sys.path.append(simdir)
 from functions_simandinf import *
 from random import randint
@@ -50,20 +49,17 @@ simulate(f, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argum
 mu_dict = {'AT':mu, 'AC':mu, 'AG':mu, 'CG':mu, 'CT':mu, 'GT':mu}
 mu_dict['AG'] = mu_dict['AG'] * kappa
 mu_dict['CT'] = mu_dict['CT'] * kappa
-derived_w = deriveOmega(f, mu_dict)
+derivedw = deriveOmega(f, mu_dict)
 
-# HyPhy omega
-print "ML"
-f_equal = np.zeros(61)
-f_equal[f_equal == 0.] = 1./61.
-gy94_w, ml_k_is_none = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, 1., f_equal)
+# ng86 omega
+neiw = runpaml_yn00(seqfile)
 
 # Calculate relative error from derived omega. Not using abs() since plot nicer that way.
-err = ( derived_w - gy94_w )/derived_w
+err = ( derived_w - neiw )/derived_w
 
 # Save
 outf = open(outfile,'w')
-outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(lambda_) + '\t' + str(derived_w) + '\t' + str(gy94_w) + '\t' + str(err) + '\n')
+outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(lambda_) + '\t' + str(derived_w) + '\t' + str(neiw) + '\t' + str(err) + '\n')
 outf.close()
 
 
