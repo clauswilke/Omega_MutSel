@@ -55,11 +55,11 @@ derivedw = deriveOmega(f, mu_dict)
 neiw = runpaml_yn00(seqfile)
 
 # Calculate relative error from derived omega. Not using abs() since plot nicer that way.
-err = ( derived_w - neiw )/derived_w
+err = ( derivedw - neiw )/derivedw
 
 # Save
 outf = open(outfile,'w')
-outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(lambda_) + '\t' + str(derived_w) + '\t' + str(neiw) + '\t' + str(err) + '\n')
+outf.write(rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(lambda_) + '\t' + str(derivedw) + '\t' + str(neiw) + '\t' + str(err) + '\n')
 outf.close()
 
 

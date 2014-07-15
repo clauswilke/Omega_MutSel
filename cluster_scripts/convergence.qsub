@@ -1,11 +1,11 @@
 #!/bin/bash
-#$ -N conv
+#$ -N conv_nei
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
 #$ -q wilke
 #$ -m beas
-#$ -t 1-1:1
+#$ -t 1-100:1
 
 
 source ~/.bash_profile
