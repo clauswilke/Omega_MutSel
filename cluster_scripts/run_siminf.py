@@ -5,20 +5,19 @@
 
 ######## Input parameters ########
 import sys
-if (len(sys.argv) != 7):
-    print "\n\nUsage: python run_siminf.py <rep> <cpu> <mu> <bl> <seqlength> <simdir> \n."
+if (len(sys.argv) != 6):
+    print "\n\nUsage: python run_siminf.py <rep> <mu> <bl> <seqlength> <simdir> \n."
     sys.exit()
 rep = sys.argv[1]
-cpu = sys.argv[2]
-mu = float(sys.argv[3])
-bl = sys.argv[4]
-seqlength = int(sys.argv[5])
-simdir = sys.argv[6]
+mu = float(sys.argv[2])
+bl = sys.argv[3]
+seqlength = int(sys.argv[4])
+simdir = sys.argv[5]
 sys.path.append(simdir)
 from functions_simandinf import *
 
 # So that half of simulations will have kappa~u(1,5) and half will have kappa=1.0
-if rep%2 == 1:
+if int(rep)%2 == 1:
     kappa = rn.uniform(1.0, 5.0)
 else:
     kappa = 1.0
