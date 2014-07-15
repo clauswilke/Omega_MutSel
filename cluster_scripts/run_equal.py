@@ -33,7 +33,7 @@ simulate(f_equal, seqfile, treefile, 1., 1., 100000, omega) # omega is last argu
 neiw = run_neigojo(seqfile)
 
 # HyPhy omega and kappa, forever and ever
-mlw, mlk = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, "1", 'free', f_data)
+mlw, mlk = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, "1", 'free', f_equal)
 
 outf = open(outfile, 'w')
 outf.write(str(rep) + '\t' + str(omega) + '\t' + str(neiw) + '\t' + str(mlk) + '\n')
