@@ -16,8 +16,15 @@ seqlength = int(sys.argv[5])
 simdir = sys.argv[6]
 sys.path.append(simdir)
 from functions_simandinf import *
-kappa = rn.uniform(1.0, 5.0)
-lambda_ = rn.uniform(0.5, 2.0)
+
+# So that half of simulations will have kappa~u(1,5) and half will have kappa=1.0
+if rep%2 == 1:
+    kappa = rn.uniform(1.0, 5.0)
+else:
+    kappa = 1.0
+
+# parameter which affects the strength of selection pressure.
+lambda_ = rn.uniform(0.5, 3.5)
 
 
 
@@ -63,7 +70,6 @@ fspecs = ['equal', 'f3x4', 'data']
 kspecs = {1.:'one', kappa:'true', 'free':'free'}
 
 common_out_string = rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(gc_content) + '\t' + str(lambda_) + '\t' + str(entropy_data) + '\t' + str(entropy_f3x4) + '\t' + str(derivedw) + '\t' + str(neiw)
-
 
 
 outf = open(outfile, 'w')
