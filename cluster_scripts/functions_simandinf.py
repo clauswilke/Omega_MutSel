@@ -426,7 +426,10 @@ def parsepaml_yn00(pamlfile):
     assert(find_omega.group(1)) is not None, "couldn't get yn00 dnds from paml file"
     return float(find_omega.group(1))
     
-def runpaml_codeml(seqfile, codonFreq = "0"):
+def runpaml_codeml(seqfile, codonFreq, estimateKappa, kappa=1.0):
+    ''' estimateKappa: 0 to estimate, 1 to fix
+        kappa: the value for fixed kappa to take on. default is 1.0
+    '''
     
     # Set up sequence file
     setuppaml1 = "cp "+seqfile+" temp.fasta"
@@ -437,6 +440,15 @@ def runpaml_codeml(seqfile, codonFreq = "0"):
     setuppaml2 = 'sed "s/MYCODONFREQ/'+str(codonFreq)+'/g" codeml_raw.txt > codeml.ctl' 
     setup2 = subprocess.call(setuppaml2, shell = True)
     assert(setup2 == 0), "couldn't set paml codon frequencies"
+    
+    # Set up kappa specification
+    setuppaml3 = 'sed "s/ESTKAPPA/'+str(estimateKappa)+'/g" codeml.ctl'
+    setup3 = subprocess.call(setuppaml3, shell=True)
+    assert(setup3 == 0), "couldn't set up whether kappa should be fixed or estimated
+    
+    setuppaml4 = 'sed "s/INITKAPPA/'+str(kappa)+'/g" codeml.ctl'
+    setup4 = subprocess.call(setuppaml4, shell=True)
+    assert(setup4 == 0), "couldn't set up initial/fixed kappa value
     
     # Run paml
     runpaml = subprocess.call("./codeml", shell=True)
