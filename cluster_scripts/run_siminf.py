@@ -75,7 +75,7 @@ outf = open(outfile, 'w')
 for freqspec in fspecs:
     freq = eval('f_'+freqspec)
     for kapspec in kspecs:
-        mlw, mlk = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, 1., kapspec, freq)
+        mlw, mlk = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, "1.", kapspec, freq)
         w_err = (derivedw - mlw) / derivedw
         if mlk is not None:
             k_err = (kappa - mlk) / kappa
