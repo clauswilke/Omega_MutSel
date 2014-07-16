@@ -395,11 +395,25 @@ def run_neigojo(seqfile):
 
 
 ############################ PAML-RELATED FUNCTIONS ###############################
-def runpaml_yn00(seqfile):
+def runpaml_yn00(seqfile, weight, commonf3x4):
+    ''' weight: * weighting pathways between codons (0/1)?
+        commonf3x4: * use one set of codon freqs for all pairs (0/1)? 
+    '''
+    
     # Set up sequence file
     setuppaml1 = "cp "+seqfile+" temp.fasta"
     setup1 = subprocess.call(setuppaml1, shell = True)
     assert(setup1 == 0), "couldn't create temp.fasta"
+    
+    # Set up weighting preference.
+    setuppaml2 = "sed 's/MYWEIGHTING/"+str(weight)+"/g' yn00_raw.txt > yn00.ctl"
+    setup2 = subprocess.call(setuppaml2, shell = True)
+    assert(setup2 == 0), "couldn't specify paml weighting"
+    
+    # Set up frequencies.
+    setuppaml3 = "sed -i 's/MYFREQUENCIES/"+str(commonf3x4)+"/g' yn00.ctl"
+    setup3 = subprocess.call(setuppaml3, shell = True)
+    assert(setup3 == 0), "couldn't properly add in frequencies"
 
     # Run paml
     runpaml = subprocess.call("./yn00", shell=True)
@@ -409,21 +423,67 @@ def runpaml_yn00(seqfile):
     return parsepaml_yn00("pamloutfile")
 
 def parsepaml_yn00(pamlfile):
-    ''' parsing paml outfiles is completely the worst.'''
+    ''' parsing paml outfiles is completely the worst. IMPORTANT: CODE HERE WILL WORK ONLY WHEN INPUT DATA HAS 2 SEQUENCES ONLY!!! 
+        There are 5 omega values to retrieve:
+            1. ng86
+            2. yn00
+            3. lwl85
+            4. lwl85m
+            5. lpb93
+    '''
+
     paml = open(pamlfile, 'rU')
     lines = paml.readlines()
     paml.close()
     count = 0
     for line in lines:
-        find = re.search("^Nei \& Gojobori 1986\. dN/dS \(dN, dS\)", line)
-        if find:
-            break
+        find_ng86 = re.search("^Nei \& Gojobori 1986\. dN/dS \(dN, dS\)", line)
+        if find_ng86:
+            ng86_line = count + 5
+        
+        find_yn00 = re.search("Yang \& Nielsen \(2000\) method", line)
+        if find_yn00:
+            yn00_line = count + 8
+        
+        find_lpb93 = re.search('LPB93\:\s+dS =\s+\d+\.\d+\s+dN =\s+\d+\.\d+\s+w =\s+(\d+\.\d+)', line)
+        if find_lpb93:
+            assert(find_lpb93.group(1) is not None)
+            w_lpb93 = find_lpb93.group(1)
+        
+        find_lwl85 = re.search('LWL85\:\s+dS =\s+\d+\.\d+\s+dN =\s+\d+\.\d+\s+w =\s+(\d+\.\d+)', line)
+        if find_lwl85:
+            assert(find_lwl85.group(1) is not None)
+            w_lwl85 = find_lwl85.group(1)
+        
+        find_lwl85m = re.search('LWL85m\:\s+dS =  \d+\.\d+\s+dN =\s+\d+\.\d+\s+w =\s+(\d+\.\d+)', line)
+        if find_lwl85m:
+            assert(find_lwl85m.group(1) is not None)
+            w_lwl85m = find_lwl85m.group(1)
+            
         else:
             count += 1
-    omega_line = lines[count+5]
-    find_omega = re.search('\s+(\d\.\d+)\s+\(', omega_line)
-    assert(find_omega.group(1)) is not None, "couldn't get yn00 dnds from paml file"
-    return float(find_omega.group(1))
+    
+    find_ng86 = re.search('\s+(\d\.\d+)\s+\(', lines[ng86_line])
+    assert(find_ng86.group(1) is not None)
+    w_ng86 = find_ng86.group(1)
+    
+    find_yn00 = re.search('^\s+\w+\s+\w+\s+\d+\.\d+\s+\d+\.\d+\s+\d+\.\d+\s+\d+\.\d+\s+(\d+\.\d+)', lines[yn00_line])
+    assert(find_yn00.group(1) is not None)
+    w_yn00 = find_yn00.group(1)
+    
+    w_list = [w_ng86, w_yn00, w_lwl85, w_lwl85m, w_lpb93]
+    return(w_list)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
 def runpaml_codeml(seqfile, codonFreq, estimateKappa, kappa=1.0):
     ''' estimateKappa: 0 to estimate, 1 to fix
