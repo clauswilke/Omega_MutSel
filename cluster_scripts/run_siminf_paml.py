@@ -50,10 +50,10 @@ mu_dict = {'AT':mu, 'AC':mu, 'AG':mu*kappa, 'CG':mu, 'CT':mu*kappa, 'GT':mu}
 derivedw = deriveOmega(f_data, mu_dict)
 
 # NG86 omega
-neiw = runpaml_yn00(seqfile)
+write_yn00 = '\t'.join( runpaml_yn00(seqfile) )
 
 
-common_out_string = rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(gc_content) + '\t' + str(lambda_) + '\t' + str(entropy_data) + '\t' + str(entropy_f3x4) + '\t' + str(derivedw) + '\t' + str(neiw)
+common_out_string = rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(gc_content) + '\t' + str(lambda_) + '\t' + str(entropy_data) + '\t' + str(entropy_f3x4) + '\t' + str(derivedw) + '\t' + write_yn00
 
 
 # ML omegas
