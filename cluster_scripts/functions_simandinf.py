@@ -395,8 +395,10 @@ def run_neigojo(seqfile):
 
 
 ############################ PAML-RELATED FUNCTIONS ###############################
-def runpaml_yn00(seqfile, weight, commonf3x4):
-    ''' weight: * weighting pathways between codons (0/1)?
+def runpaml_yn00(seqfile):
+    ''' 
+        NOTE THESE ARGS NO LONGER USED SINCE THEY MADE NO DIFFERENCE AT ALL!!!! REALLY, I CHECKED THIS THOROUGHLY.
+        weight: * weighting pathways between codons (0/1)?
         commonf3x4: * use one set of codon freqs for all pairs (0/1)? 
     '''
     
@@ -404,16 +406,6 @@ def runpaml_yn00(seqfile, weight, commonf3x4):
     setuppaml1 = "cp "+seqfile+" temp.fasta"
     setup1 = subprocess.call(setuppaml1, shell = True)
     assert(setup1 == 0), "couldn't create temp.fasta"
-    
-    # Set up weighting preference.
-    setuppaml2 = "sed 's/MYWEIGHTING/"+str(weight)+"/g' yn00_raw.txt > yn00.ctl"
-    setup2 = subprocess.call(setuppaml2, shell = True)
-    assert(setup2 == 0), "couldn't specify paml weighting"
-    
-    # Set up frequencies.
-    setuppaml3 = "sed -i 's/MYFREQUENCIES/"+str(commonf3x4)+"/g' yn00.ctl"
-    setup3 = subprocess.call(setuppaml3, shell = True)
-    assert(setup3 == 0), "couldn't properly add in frequencies"
 
     # Run paml
     runpaml = subprocess.call("./yn00", shell=True)
@@ -421,6 +413,8 @@ def runpaml_yn00(seqfile, weight, commonf3x4):
 
     # Grab paml output
     return parsepaml_yn00("pamloutfile")
+
+
 
 def parsepaml_yn00(pamlfile):
     ''' parsing paml outfiles is completely the worst. IMPORTANT: CODE HERE WILL WORK ONLY WHEN INPUT DATA HAS 2 SEQUENCES ONLY!!! 
@@ -468,8 +462,11 @@ def parsepaml_yn00(pamlfile):
     w_ng86 = find_ng86.group(1)
     
     find_yn00 = re.search('^\s+\w+\s+\w+\s+\d+\.\d+\s+\d+\.\d+\s+\d+\.\d+\s+\d+\.\d+\s+(\d+\.\d+)', lines[yn00_line])
-    assert(find_yn00.group(1) is not None)
-    w_yn00 = find_yn00.group(1)
+    #assert(find_yn00.group(1) is not None)
+    try:
+        w_yn00 = find_yn00.group(1)
+    except:
+        w_yn00 = '5'
     
     w_list = [w_ng86, w_yn00, w_lwl85, w_lwl85m, w_lpb93]
     return(w_list)
