@@ -174,10 +174,8 @@ def calcCodonEntropy(f):
     
 def deriveOmega(codonFreq, mu_dict, type='mos'):
     ''' Derive an omega using codon frequencies. Single calculation. Get numerator, get denominator, divide once at end.
-        Default mutational scheme is all mu's are equal.
         Requires symmetric mutational scheme.
         type is mos (mutational opportunity sites) vs ps (physical sites).
-
     ''' 
     
     kN = 0.; nN = 0.; kS = 0.; nS = 0.
@@ -189,12 +187,12 @@ def deriveOmega(codonFreq, mu_dict, type='mos'):
     for i in nonZero:
         codon = codons[i]
         # Nonsynonymous calculation
-        num, den = calcNS_PS(codon, codonFreq, i, nslist, mu_dict, type)
+        num, den = calcNS(codon, codonFreq, i, nslist, mu_dict, type)
         kN += num
         nN += den
         
         # Synonymous calculation
-        num, den = calcNS_PS(codon, codonFreq, i, slist, mu_dict, type)
+        num, den = calcNS(codon, codonFreq, i, slist, mu_dict, type)
         kS += num
         nS += den
    
