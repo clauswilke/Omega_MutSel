@@ -169,7 +169,7 @@ def calcCodonEntropy(f):
 ####################################### OMEGA DERIVATION FUNCTIONS ######################################
 ########################### NOTE: ASSUMES NO CODON BIAS SO dS IS SET AT 1 ###############################
 
-def deriveOmega(codonFreq, mu_dict, type):
+def deriveOmega(codonFreq, mu_dict):
     num = 0.; denom = 0.;rate_sum = 0.
     
     # codon indices which do not have zero frequency
