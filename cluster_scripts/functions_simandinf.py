@@ -78,8 +78,6 @@ def setFreqs(freqfile, lambda_, gc_min = 0., gc_max = 1.):
         
         # Should I redo based on execssive codon freq stringency?
         redo, bad = shouldIRedoFreqs(codonFreq) 
-        write = str(bad)+" "+str(count)+"\n" 
-        sys.stdout.write(write)
         count+=1   
         
         # Get gc.
@@ -169,16 +167,10 @@ def calcCodonEntropy(f):
 
 
 ####################################### OMEGA DERIVATION FUNCTIONS ######################################
+########################### NOTE: ASSUMES NO CODON BIAS SO dS IS SET AT 1 ###############################
 
-
-    
-def deriveOmega(codonFreq, mu_dict, type='mos'):
-    ''' Derive an omega using codon frequencies. Single calculation. Get numerator, get denominator, divide once at end.
-        Requires symmetric mutational scheme.
-        type is mos (mutational opportunity sites) vs ps (physical sites).
-    ''' 
-    
-    kN = 0.; nN = 0.; kS = 0.; nS = 0.
+def deriveOmega(codonFreq, mu_dict, type):
+    num = 0.; denom = 0.;rate_sum = 0.
     
     # codon indices which do not have zero frequency
     nonZero = getNonZeroFreqs(codonFreq)
@@ -187,19 +179,30 @@ def deriveOmega(codonFreq, mu_dict, type='mos'):
     for i in nonZero:
         codon = codons[i]
         # Nonsynonymous calculation
-        num, den = calcNS(codon, codonFreq, i, nslist, mu_dict, type)
-        kN += num
-        nN += den
-        
-        # Synonymous calculation
-        num, den = calcNS(codon, codonFreq, i, slist, mu_dict, type)
-        kS += num
-        nS += den
+        rate, sites, sourceFreq = calcPaths(codon, codonFreq, i, nslist, mu_dict)
+        assert( sites != 0.), "No sites?"
+        num += sourceFreq * rate
+        denom += sourceFreq * sites
+        rate_sum += (sourceFreq * rate/sites)
    
-    assert( nS != 0. and nN != 0.), "Omega derivation indicates no evolution, maybe?"
-    dN = kN/nN
-    dS = kS/nS
-    return dN/dS
+    assert( denom != 0.), "Omega derivation indicates no evolution, maybe?"
+    return num/denom, rate_sum
+
+   
+    
+ 
+def calcPaths(source, codonFreq, i, list, mu_dict):
+    rate = 0.
+    sites = 0.
+    sourceFreq = codonFreq[codons.index(source)]
+    for target in list[i]:
+        if source != target :
+            diff = getNucleotideDiff(source, target)
+            targetFreq = codonFreq[codons.index(target)]
+            rate += calcFix( sourceFreq, targetFreq) * mu_dict[diff]
+            sites += mu_dict[diff]
+    return rate, sites, sourceFreq
+
 
 
 
@@ -222,27 +225,7 @@ def calcFix(fi, fj):
     elif fi == 0.  or fj == 0.:
         return 0.
     else:
-        return (np.log(fj) - np.log(fi)) / (1 - fi/fj)
-
-def calcNS(codon, codonFreq, i, list, mu_dict, type='mos'):
-    ''' type is mos (mutational opportunity sites) vs ps (physical sites)'''
-    numer = 0.
-    denom = 0.
-    fix_sum=0.
-    freq = codonFreq[i]
-    for other_codon in list[i]:
-        if codon != other_codon:
-            diff = getNucleotideDiff(codon,other_codon)
-            tempfreq = codonFreq[codons.index(other_codon)]
-            fix_sum += calcFix( float(freq), float(tempfreq) ) * mu_dict[diff]                  
-            temp_denom = codonFreq[i]
-            if type == 'mos': # default. mutational opportunity definition of sites.
-                temp_denom *= mu_dict[diff]
-            denom += temp_denom     
-    numer += fix_sum*codonFreq[i]
-    return numer, denom
-  
-    
+        return (np.log(fj) - np.log(fi)) / (1 - fi/fj)    
 #########################################################################################
 
 
@@ -276,14 +259,15 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs):
         assert(runsedkappa == 0), "couldn't set up kappa"
     else:
         shutil.copy('matrices_raw.mdl', 'matrices.mdl')
-    
-    # Set up matrix (GY94 or MG94), within run.bf
-    setuphyphy4 = "sed -i 's/MYMATRIX/"+matrix_name+"/g' run.bf"
-    setup4 = subprocess.call(setuphyphy4, shell = True)
-    assert(setup4 == 0), "couldn't properly define matrix" 
+
+#    # Set up matrix (GY94 or MG94), within run.bf
+#    setuphyphy4 = "sed -i 's/MYMATRIX/"+matrix_name+"/g' run.bf"
+#    setup4 = subprocess.call(setuphyphy4, shell = True)
+#    assert(setup4 == 0), "couldn't properly define matrix" 
 
     # Run hyphy
-    hyphy = "./HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
+    #hyphy = "./HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
+    hyphy = "HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
     runhyphy = subprocess.call(hyphy, shell = True)
     assert (runhyphy == 0), "hyphy fail"
     
@@ -416,7 +400,8 @@ def runpaml_yn00(seqfile):
     assert(setup1 == 0), "couldn't create temp.fasta"
 
     # Run paml
-    runpaml = subprocess.call("./yn00", shell=True)
+    #runpaml = subprocess.call("./yn00", shell=True)
+    runpaml = subprocess.call("yn00", shell=True)
     assert (runpaml == 0), "paml fail"
 
     # Grab paml output
