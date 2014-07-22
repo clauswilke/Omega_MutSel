@@ -170,7 +170,8 @@ def calcCodonEntropy(f):
 ########################### NOTE: ASSUMES NO CODON BIAS SO dS IS SET AT 1 ###############################
 
 def deriveOmega(codonFreq, mu_dict):
-    num = 0.; denom = 0.;rate_sum = 0.
+    num = 0.; denom = 0.;
+    #rate_sum = 0.
     
     # codon indices which do not have zero frequency
     nonZero = getNonZeroFreqs(codonFreq)
@@ -180,13 +181,12 @@ def deriveOmega(codonFreq, mu_dict):
         codon = codons[i]
         # Nonsynonymous calculation
         rate, sites, sourceFreq = calcPaths(codon, codonFreq, i, nslist, mu_dict)
-        assert( sites != 0.), "No sites?"
         num += sourceFreq * rate
         denom += sourceFreq * sites
-        rate_sum += (sourceFreq * rate/sites)
+        #rate_sum += (sourceFreq * rate/sites)
    
     assert( denom != 0.), "Omega derivation indicates no evolution, maybe?"
-    return num/denom, rate_sum
+    return num/denom #, rate_sum
 
    
     
@@ -362,28 +362,6 @@ def parseHyphyMG94(file):
 
  
 
-############################# NEI-GOJOBORI FUNCTIONS ##################################
-def run_neigojo(seqfile):
-    ''' Get omega using counting method '''
-    import mutation_counter as mc
-    import site_counter as sc
-    
-    M = mc.MutationCounter()
-    S = sc.SiteCounter()
-    records = list(SeqIO.parse(seqfile, 'fasta'))
-    s1 = records[0].seq
-    s2 = records[1].seq
-    ( ns_mut, s_mut ) = M.countMutations( s1, s2 )
-    ( ns_sites1, s_sites1 ) = S.countSites( s1 )
-    ( ns_sites2, s_sites2 ) = S.countSites( s2 )
-    dS = 2*sum( s_mut )/(sum( s_sites1 ) + sum( s_sites2 ))
-    dN = 2*sum( ns_mut )/(sum( ns_sites2 ) + sum( ns_sites2 ))
-    return dN/dS #, np.mean(ns_mut), np.mean(s_mut)
-
-
-
-
-
 
 
 ############################ PAML-RELATED FUNCTIONS ###############################
@@ -519,5 +497,30 @@ def parsepaml_codeml(pamlfile):
             break
     assert (omega is not None), "couldn't get omega from paml file"
     return float(omega)
+
+
+
+
+
+
+
+
+
+def run_neigojo(seqfile):
+    ''' Get omega using counting method '''
+    import mutation_counter as mc
+    import site_counter as sc
+    
+    M = mc.MutationCounter()
+    S = sc.SiteCounter()
+    records = list(SeqIO.parse(seqfile, 'fasta'))
+    s1 = records[0].seq
+    s2 = records[1].seq
+    ( ns_mut, s_mut ) = M.countMutations( s1, s2 )
+    ( ns_sites1, s_sites1 ) = S.countSites( s1 )
+    ( ns_sites2, s_sites2 ) = S.countSites( s2 )
+    dS = 2*sum( s_mut )/(sum( s_sites1 ) + sum( s_sites2 ))
+    dN = 2*sum( ns_mut )/(sum( ns_sites2 ) + sum( ns_sites2 ))
+    return dN/dS #, np.mean(ns_mut), np.mean(s_mut)
 
 
