@@ -1,18 +1,18 @@
 #!/bin/bash
-#$ -N siminf
+#$ -N siminf_10tree_shorter
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
 #$ -q wilke
 #$ -m beas
-#$ -t 1-1:1
-#$ -pe serial 3
+#$ -t 1-50:1
+#$ -pe serial 15
 
 
 source ~/.bash_profile
 
 # INPUT ARGS VARIABLES
-CPU=3
+CPU=15
 MU=1e-5
 SEQLEN=10000
 
@@ -20,7 +20,7 @@ SEQLEN=10000
 # Set up directories
 SIMDIR=/home/sjs3495/MutSel/Simulator/src
 SCRIPTDIR=/home/sjs3495/Omega_MutSel/cluster_scripts
-WDIR=/state/partition1/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
+WDIR=/share/WilkeLab/work/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
 RDIR=/home/sjs3495/$JOB_NAME
 
 mkdir -p $WDIR
@@ -32,7 +32,7 @@ fi
 cd $WDIR
 
 # Copy files
-cp /home/sjs3495/Omega_MutSel/trees/16.tre tree.tre
+cp /home/sjs3495/Omega_MutSel/trees/10.tre tree.tre
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/run_siminf.py .
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/functions_simandinf.py .
 

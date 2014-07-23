@@ -1,18 +1,16 @@
 #!/bin/bash
-#$ -N conv_nei
+#$ -N conv
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
 #$ -q wilke
 #$ -m beas
 #$ -t 1-100:1
+#$ -pe serial 15
 
+CPU=15
 
 source ~/.bash_profile
-
-# INPUT ARGS VARIABLES
-MU=1e-5
-BL=0.01
 
 
 # Set up directories
@@ -30,16 +28,18 @@ fi
 cd $WDIR
 
 # Copy files
+cp /home/sjs3495/Omega_MutSel/trees/10.tre tree.tre
+
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/run_convergence.py .
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/functions_simandinf.py .
 
-# paml
-cp /home/sjs3495/bin/yn00 .
-cp /home/sjs3495/Omega_MutSel/SelectionInference/paml/yn00.ctl .
+# hyphy
+cp /home/sjs3495/bin/bin/HYPHYMP .
+cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
 
 # Run
 module load python
-python run_convergence.py $SGE_TASK_ID $MU $BL $SIMDIR
+python run_convergence.py $SGE_TASK_ID tree.tre $SIMDIR $CPU
 
 # Cleanup
 mkdir -p $RDIR

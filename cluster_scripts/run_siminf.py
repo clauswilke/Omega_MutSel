@@ -19,6 +19,7 @@ from functions_simandinf import *
 
 
 
+
 # set up output sequence and parameter files
 seqfile = "seqs"+str(rep)+".fasta"
 freqfile = "codonFreqs" + str(rep)+".txt"
