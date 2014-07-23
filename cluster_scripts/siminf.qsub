@@ -1,21 +1,20 @@
 #!/bin/bash
-#$ -N siminf_withnei2
+#$ -N siminf
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
 #$ -q wilke
 #$ -m beas
 #$ -t 1-1:1
-#$ -pe serial 15
+#$ -pe serial 3
 
 
 source ~/.bash_profile
 
 # INPUT ARGS VARIABLES
-CPU=15
+CPU=3
 MU=1e-5
-BL=0.001
-SEQLEN=500000
+SEQLEN=10000
 
 
 # Set up directories
@@ -33,7 +32,7 @@ fi
 cd $WDIR
 
 # Copy files
-cp /home/sjs3495/Omega_MutSel/scripts/*.py .
+cp /home/sjs3495/Omega_MutSel/trees/16.tre tree.tre
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/run_siminf.py .
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/functions_simandinf.py .
 
@@ -43,7 +42,7 @@ cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
 
 # Run
 module load python
-python run_siminf.py $SGE_TASK_ID $CPU $MU $BL $SEQLEN $SIMDIR
+python run_siminf.py $SGE_TASK_ID $MU tree.tre $SEQLEN $SIMDIR $CPU
 
 # Cleanup
 mkdir -p $RDIR
