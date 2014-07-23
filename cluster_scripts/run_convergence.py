@@ -23,14 +23,16 @@ lambda_ = rn.uniform(0.5, 2.0)
 expon = rn.randint(2,5)
 if expon == 2:
     times = rn.randint(5,10)
+elif expon == 5:
+	times = rn.randint(1,5)
 else:
     times = randint(1,10)
 seqlength = int( times * 10**expon )
 
 # set up output sequence and parameter files
-freqfile = "codonFreqs" + str(rep) + "_" + str(seqlength) + ".txt"
-seqfile = "seqs" + str(rep) + "_" + str(seqlength) + ".fasta"
-outfile = "params" + str(rep) + "_" + str(seqlength) + ".txt"
+freqfile = "codonFreqs" + str(rep) + ".txt"
+seqfile = "seqs" + str(rep) + ".fasta"
+outfile = "params" + str(rep) + ".txt"
 
 
 # Now, simulate sequences and infer ML omegas
