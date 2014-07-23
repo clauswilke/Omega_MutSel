@@ -227,7 +227,7 @@ def calcFix(fi, fj):
 
 
 ################################################# HYPHY-RELATED FUNCTIONS ############################################################
-def runhyphy(batchfile, matrix_name, seqfile, treefile, kappa, codonFreqs):
+def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs):
     ''' pretty specific function.
         codonFreqs = what was simulated. note that empirical are not signif different from true, so this is fine.
     '''
@@ -255,14 +255,13 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, kappa, codonFreqs):
     else:
         shutil.copy('matrices_raw.mdl', 'matrices.mdl')
 
-#    # Set up matrix (GY94 or MG94), within run.bf
-#    setuphyphy4 = "sed -i 's/MYMATRIX/"+matrix_name+"/g' run.bf"
-#    setup4 = subprocess.call(setuphyphy4, shell = True)
-#    assert(setup4 == 0), "couldn't properly define matrix" 
+    # Set up matrix (GY94 or MG94), within run.bf
+    setuphyphy4 = "sed -i 's/MYMATRIX/"+matrix_name+"/g' run.bf"
+    setup4 = subprocess.call(setuphyphy4, shell = True)
+    assert(setup4 == 0), "couldn't properly define matrix" 
 
     # Run hyphy
-    #hyphy = "./HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
-    hyphy = "HYPHYMP run.bf > hyout.txt"
+    hyphy = "./HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
     runhyphy = subprocess.call(hyphy, shell = True)
     assert (runhyphy == 0), "hyphy fail"
     
