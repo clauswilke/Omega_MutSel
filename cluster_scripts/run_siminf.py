@@ -53,7 +53,7 @@ print "ML"
 fspecs = {'equal':'equal_freqs', 'f3x4':'f3x4_freqs', 'data':'data_freqs'}
 kspecs = {kappa:'kappa_true', 'free':'kappa_free'}
 
-common_out_string = rep + '\t' + str(seqlength) + '\t' + str(bl) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(lambda_) + '\t' + str(gc_content) + '\t' + str(entropy_data) + '\t' + str(entropy_f3x4) + '\t' + str(derivedw)
+common_out_string = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(lambda_) + '\t' + str(gc_content) + '\t' + str(entropy_data) + '\t' + str(entropy_f3x4) + '\t' + str(derivedw)
 
 
 outf = open(outfile, 'w')
