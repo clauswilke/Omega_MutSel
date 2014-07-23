@@ -192,18 +192,7 @@ def calcNonSyn(source, cfreqs, mu_dict):
     rate  *= sourceFreq
     sites *= sourceFreq
     return rate, sites
-
-
-
-
-def getNonZeroFreqs(freq):
-    ''' Return indices whose frequencies are not 0.'''
-    nonZero = []
-    for i in range(len(freq)):
-        if freq[i] > zero:
-            nonZero.append(i)
-    return nonZero
-
+    
 
 def getNucleotideDiff(source, target):
     diff = ''
@@ -212,12 +201,11 @@ def getNucleotideDiff(source, target):
             diff += "".join(sorted(source[i]+target[i]))
     return diff
 
-
     
 def calcFix(fi, fj):
     if fi == fj:
         return 1.
-    elif fi == 0.  or fj == 0.:
+    elif fi == 0. or fj == 0.:
         return 0.
     else:
         return (np.log(fj) - np.log(fi)) / (1 - fi/fj)    
