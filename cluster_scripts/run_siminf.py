@@ -5,15 +5,13 @@
 
 ######## Input parameters ########
 import sys
-if (len(sys.argv) != 7):
-    print "\n\nUsage: python run_siminf.py <rep> <mu> <treefile> <seqlength> <simdir> <cpu> \n."
+if (len(sys.argv) != 5):
+    print "\n\nUsage: python run_siminf.py <rep> <treefile> <simdir> <cpu> \n."
     sys.exit()
 rep = sys.argv[1]
-mu = float(sys.argv[2])
-treefile = sys.argv[3]
-seqlength = int(sys.argv[4])
-simdir = sys.argv[5]
-cpu = sys.argv[6]
+treefile = sys.argv[2]
+simdir = sys.argv[3]
+cpu = sys.argv[4]
 sys.path.append(simdir)
 from functions_simandinf import *
 
@@ -26,6 +24,8 @@ freqfile = "codonFreqs" + str(rep)+".txt"
 outfile = "params"+str(rep)+".txt"
 
 # More important parameters
+mu = 1e-5
+seqlength = 500000
 kappa = rn.uniform(1.0, 5.0) # kappa
 lambda_ = rn.uniform(0.5, 3.5) # sets strength of selection, effectively. This parameter will be the stddev for the normal distribution from which we draw scaled selection coefficients. Larger stddev = larger fitness differences among amino acids.
 
