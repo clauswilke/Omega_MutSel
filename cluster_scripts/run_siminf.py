@@ -25,7 +25,7 @@ outfile = "params"+str(rep)+".txt"
 
 # More important parameters
 mu = 1e-5
-seqlength = 500
+seqlength = 500000
 kappa = rn.uniform(1.0, 5.0) # kappa
 lambda_ = rn.uniform(0.5, 3.5) # sets strength of selection, effectively. This parameter will be the stddev for the normal distribution from which we draw scaled selection coefficients. Larger stddev = larger fitness differences among amino acids.
 
