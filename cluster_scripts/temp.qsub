@@ -1,0 +1,46 @@
+#!/bin/bash
+#$ -N tempsiminf
+#$ -e e_$JOB_NAME
+#$ -o o_$JOB_NAME
+#$ -S /bin/bash
+#$ -q wilke
+#$ -m beas
+#$ -t 1-1:1
+#$ -pe serial 15
+
+
+source ~/.bash_profile
+
+# Set up directories
+SIMDIR=/home/sjs3495/MutSel/Simulator/src
+SCRIPTDIR=/home/sjs3495/Omega_MutSel/cluster_scripts
+WDIR=/share/WilkeLab/work/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
+RDIR=/home/sjs3495/$JOB_NAME
+
+mkdir -p $WDIR
+if [ ! -d $WDIR ]
+then
+  echo $WDIR not created
+  exit
+fi
+cd $WDIR
+
+# Copy files
+cp /home/sjs3495/Omega_MutSel/trees/10.tre tree.tre
+cp /home/sjs3495/Omega_MutSel/cluster_scripts/temp_siminf.py .
+cp /home/sjs3495/Omega_MutSel/cluster_scripts/functions_simandinf.py .
+
+#Hyphy
+cp /home/sjs3495/bin/bin/HYPHYMP .
+cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
+
+# Run
+module load python
+python temp_siminf.py $SGE_TASK_ID tree.tre $SIMDIR 15
+
+# Cleanup
+mkdir -p $RDIR
+cp params* $RDIR
+cp seqs* $RDIR
+cp codonFreqs* $RDIR
+rm -rf $WDIR
