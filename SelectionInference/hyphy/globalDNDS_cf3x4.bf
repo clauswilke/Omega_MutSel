@@ -16,8 +16,6 @@ DataSet	raw_data = ReadDataFile("temp.fasta");
 /* Filter the data to find and remove any stop codons*/
 DataSetFilter   filt_data = CreateFilter(raw_data,3,"", "","TAA,TAG,TGA");
 
-/* Set codon frequencies base on input specification */
-DataSetFilter   filt_data = CreateFilter (raw_data,3,"", "","TAA,TAG,TGA");
 
 HarvestFrequencies(posFreqs_raw,filt_data,3,1,1);
 posFreqs_cf3x4 = CF3x4(posFreqs_raw, "TAA,TAG,TGA");
