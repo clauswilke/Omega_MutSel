@@ -56,6 +56,36 @@ def simulate(f, seqfile, tree, mu, kappa, length, beta=None):
     myEvolver.writeSequences(outfile = seqfile)
 
 
+def setFreqs2(lambda_):
+    redo = True
+    while redo:
+    
+        # Derive selection coefficients and assign randomly to amino acids
+        aa_coeffs_raw = getAminoCoeffs(lambda_)
+        aa_coeffs = dict(zip(amino_acids, aa_coeffs_raw))
+
+ 
+        # METHOD 1: calculate amino acid frequencies and then convert to codon
+        aa_freqlist = boltzFreqs(aa_coeffs, 20, amino_acids)
+        fobj = UserFreqs(by = 'amino', freqs = dict(zip(amino_acids, aa_freqlist)) )
+        codonFreq1 = fobj.calcFreqs(type = 'codon')
+        assert(np.sum(codonFreq1) - 1.0 < self.zero), "codonFreq1 fail"
+       
+        # METHOD 2: calculate codon frequencies right off the bat by applying the selection coefficients to codons
+        codon_coeffs = {}
+        for aa_index in range(20):
+            amino = amino_acids[aa_index]
+            tempcodons = genetic_code[aa_index]
+            for codon in tempcodons:
+                codon_coeffs[codon] = aa_coeffs[amino]
+        codonFreq2 = boltzFreqs(codon_coeffs, 61, codons)
+        assert(np.sum(codonFreq2) - 1.0 < self.zero), "codonFreq2 fail"
+
+        # Should I redo based on execssive codon freq stringency?
+        redo = codonFreq1.any() >= 0.985 or codonFreq2.any() >= 0.985  
+    return codonFreq1, codonFreq2
+
+
 def setFreqs(freqfile, lambda_, gc_min = 0., gc_max = 1.):
     ''' Returns codon frequencies and gc content '''
     
@@ -260,13 +290,7 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs):
         return parseHyphyMG94('hyout.txt')
 
 
-def calc_f3x4(f):
-    ''' calculate this silly specification from codon frequencies.'''
-    
-    f3x4 = np.zeros(61)
-    nucindex = {'A':0, 'C':1, 'G':2, 'T':3}
-    
-    # Get positional nucleotide frequencies
+def getPosNuc(f):
     pos_nuc = np.zeros([3, 4])
     for i in range(3):
         codon_count = 0
@@ -280,6 +304,14 @@ def calc_f3x4(f):
             elif codon[i] == 'T':
                 pos_nuc[i][3] += f[codon_count]
             codon_count += 1
+    return pos_nuc
+
+def calc_f3x4(f):
+    ''' calculate this silly specification from codon frequencies.'''
+    
+    f3x4 = np.zeros(61)
+    nucindex = {'A':0, 'C':1, 'G':2, 'T':3}
+    pos_nuc = getPosNuc(f)
 
     # Compute f3x4 stuff
     f_stop = (pos_nuc[0][nucindex['T']] * pos_nuc[1][nucindex['A']] * pos_nuc[2][nucindex['G']]) + (pos_nuc[0][nucindex['T']] * pos_nuc[1][nucindex['A']] * pos_nuc[2][nucindex['A']]) + (pos_nuc[0][nucindex['T']] * pos_nuc[1][nucindex['G']] * pos_nuc[2][nucindex['A']])  
@@ -289,9 +321,6 @@ def calc_f3x4(f):
     assert( np.sum(f3x4) - 1. < zero ), "f3x4 convert fail."
     return f3x4
         
-        
-
-
 
 def freq2hyphy(f):
     ''' Convert codon frequencies to a form hyphy can use. '''
