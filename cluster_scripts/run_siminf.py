@@ -59,7 +59,7 @@ print "ML"
 fspecs = {'equal':'globalDNDS_inputf.bf', 'data': 'globalDNDS_inputf.bf', 'f3x4':'globalDNDS_f3x4.bf', 'cf3x4':'globalDNDS_cf3x4.bf'}
 kspecs = {1.0: 'kappa_one', kappa:'kappa_true', 'free':'kappa_free'}
 
-common_out_string = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(lambda_) + '\t' + str(gc_content) + '\t' + str(entropy_data) + '\t' + str(derivedw) 
+common_out_string = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(bias) + '\t' + str(lambda_) + '\t' + str(gc_content) + '\t' + str(entropy_data) + '\t' + str(derivedw) 
 
 
 outf = open(outfile, 'w')
