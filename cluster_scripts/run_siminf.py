@@ -5,7 +5,7 @@
 
 ######## Input parameters ########
 import sys
-if (len(sys.argv) != 5):
+if (len(sys.argv) != 6):
     print "\n\nUsage: python run_siminf.py <rep> <treefile> <simdir> <cpu> <gcbias>\n."
     sys.exit()
 rep = sys.argv[1]
@@ -25,7 +25,7 @@ freqfile = "codonFreqs" + str(rep)+".txt"
 outfile = "params"+str(rep)+".txt"
 
 # Parameters
-seqlength = 500
+seqlength = 500000
 lambda_ = rn.uniform(0.5, 3.5) # sets strength of selection, effectively. This parameter will be the stddev for the normal distribution from which we draw scaled selection coefficients. Larger stddev = larger fitness differences among amino acids.
 mu = 1e-5
 kappa = rn.uniform(1.0, 5.0)
@@ -33,7 +33,7 @@ if gc_bias:
     bias = rn.uniform(1., 5.)
 else:
     bias = 1.0
-mu_dict = {'AC': mu*bias, 'CA':mu, 'AG': mu*kappa*bias, 'GA':mu*kappa, 'AT': mu, 'TA':mu, 'CG': mu*bias, 'GC':mu*bias, 'CT': mu*kappa, 'TC':mu*kappa*bias, 'GT': mu, 'TG':mu*bias}}
+mu_dict = {'AC': mu*bias, 'CA':mu, 'AG': mu*kappa*bias, 'GA':mu*kappa, 'AT': mu, 'TA':mu, 'CG': mu*bias, 'GC':mu*bias, 'CT': mu*kappa, 'TC':mu*kappa*bias, 'GT': mu, 'TG':mu*bias}
 
 
 

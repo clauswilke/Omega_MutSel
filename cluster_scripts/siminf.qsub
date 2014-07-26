@@ -1,17 +1,17 @@
 #!/bin/bash
-#$ -N siminf
+#$ -N siminf_gcbias
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
 #$ -q wilke
 #$ -m beas
-#$ -t 1-100:1
+#$ -t 1-10:1
 #$ -pe serial 15
 
 
 source ~/.bash_profile
 
-GCBIAS = 1
+GCBIAS=1
 # Set up directories
 SIMDIR=/home/sjs3495/MutSel/Simulator/src
 SCRIPTDIR=/home/sjs3495/Omega_MutSel/cluster_scripts
@@ -42,6 +42,6 @@ python run_siminf.py $SGE_TASK_ID tree.tre $SIMDIR 15 $GCBIAS
 # Cleanup
 mkdir -p $RDIR
 cp params* $RDIR
-cp seqs* $RDIR
-cp codonFreqs* $RDIR
+#cp seqs* $RDIR
+#cp codonFreqs* $RDIR
 rm -rf $WDIR
