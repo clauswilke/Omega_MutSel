@@ -112,7 +112,7 @@ def setBoltzFreqs(lambda_):
 
 ####################################### OMEGA DERIVATION FUNCTIONS ######################################
 
-def deriveOmega(codonFreqs, mu_dict):
+def deriveOmega(codonFreqs, mu_dict, sym=False):
     ''' NOTE: assumes dS = 1. If codon bias is introduced, this will be violated. '''
     
     numer = 0.; denom = 0.;
@@ -120,7 +120,7 @@ def deriveOmega(codonFreqs, mu_dict):
 
     for codon in cfreqs:
         if cfreqs[codon] > zero:  
-            rate, sites = calcNonSyn(codon, cfreqs, mu_dict)
+            rate, sites = calcNonSyn(codon, cfreqs, mu_dict, sym)
             numer += rate
             denom += sites
     assert( denom != 0. ), "Omega derivation indicates no evolution, maybe?"
@@ -128,12 +128,12 @@ def deriveOmega(codonFreqs, mu_dict):
 
 
      
-def calcNonSyn(source, cfreqs, mu_dict):
+def calcNonSyn(source, cfreqs, mu_dict, sym):
     rate = 0.
     sites = 0.
     sourceFreq = cfreqs[source]
     for target in codons:
-        diff = getNucleotideDiff(source, target) # only consider single nucleotide differences since are calculating instantaneous.
+        diff = getNucleotideDiff(source, target, sym) # only consider single nucleotide differences since are calculating instantaneous.
         if codon_dict[source] != codon_dict[target] and cfreqs[target] > zero and len(diff) == 2:
             rate  += calcFix( sourceFreq, cfreqs[target] ) * mu_dict[diff]
             sites += mu_dict[diff]
@@ -142,11 +142,14 @@ def calcNonSyn(source, cfreqs, mu_dict):
     return rate, sites
     
 
-def getNucleotideDiff(source, target):
+def getNucleotideDiff(source, target, sort):
     diff = ''
     for i in range(3):
-        if source[i] != target[i]:    
-            diff += "".join( source[i]+target[i] )
+        if source[i] != target[i]: 
+            if sort:   
+                diff += "".join(sorted(source[i]+target[i]))
+            else:
+                diff += "".join( source[i]+target[i] )
     return diff
 
     
