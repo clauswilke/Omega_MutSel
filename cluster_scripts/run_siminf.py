@@ -30,36 +30,42 @@ lambda_ = rn.uniform(0.5, 3.5) # sets strength of selection, effectively. This p
 mu = 1e-5
 kappa = rn.uniform(1.0, 5.0)
 if gc_bias:
-    bias = rn.uniform(1., 5.)
+    bias = rn.uniform(2., 5.)
 else:
     bias = 1.0
 mu_dict = {'AC': mu*bias, 'CA':mu, 'AG': mu*kappa*bias, 'GA':mu*kappa, 'AT': mu, 'TA':mu, 'CG': mu*bias, 'GC':mu*bias, 'CT': mu*kappa, 'TC':mu*kappa*bias, 'GT': mu, 'TG':mu*bias}
+sym_mu_dict = {'AC': mu, 'AG': mu*kappa, 'AT': mu, 'CG': mu, 'CT': mu*kappa,  'GT': mu}
 
 
 
 
 # Simulate
 print "simulating"
-f_data, gc_content = setFreqs(freqfile, lambda_, 0., 1.) # last 2 args are gc min, gc max
-simulate(f_data, seqfile, treefile, mu_dict, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
+f_true, gc_content = setFreqs(freqfile, lambda_, 0., 1.) # last 2 args are gc min, gc max
+simulate(f_true, seqfile, treefile, mu_dict, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
 
+f_data_obj = ReadFreqs(file = seqfile, by = 'codon')
+f_data = f_data_obj.calcFreqs(type = 'codon')
 
 # Derive omega
 print "deriving"
-# can incorporate asymmetric if wish
-derivedw = deriveOmega(f_data, mu_dict)
+derivedw_true = deriveOmega(f_true, mu_dict, False) #false = not symmetric
+derivedw_true_sym = deriveOmega(f_true, sym_mu_dict, True)
+derivedw_data  = deriveOmega(f_data, mu_dict, False) #false = not symmetric
+derivedw_data_sym = deriveOmega(f_data, sym_mu_dict, True)
 
 # Calculate entropy and setup the f_equal variable
 f_equal = np.zeros(61)
 f_equal[f_equal == 0.] = 1./61.
+entropy_true = calcCodonEntropy(f_true)
 entropy_data = calcCodonEntropy(f_data)
 
 # ML
 print "ML"
-fspecs = {'equal':'globalDNDS_inputf.bf', 'data': 'globalDNDS_inputf.bf', 'f3x4':'globalDNDS_f3x4.bf', 'cf3x4':'globalDNDS_cf3x4.bf'}
+fspecs = {'equal':'globalDNDS_inputf.bf', 'true':'globalDNDS_inputf.bf',  'data': 'globalDNDS_inputf.bf', 'f3x4':'globalDNDS_f3x4.bf', 'cf3x4':'globalDNDS_cf3x4.bf'}
 kspecs = {1.0: 'kappa_one', kappa:'kappa_true', 'free':'kappa_free'}
 
-common_out_string = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(bias) + '\t' + str(lambda_) + '\t' + str(gc_content) + '\t' + str(entropy_data) + '\t' + str(derivedw) 
+common_out_string = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(bias) + '\t' + str(lambda_) + '\t' + str(gc_content) + '\t' + str(entropy_data) + '\t' + str(entropy_true) + '\t' + str(derivedw_true) + '\t' + str(derivedw_true_sym) + '\t' + str(derivedw_data) + '\t' + str(derivedw_data_sym)
 
 
 outf = open(outfile, 'w')
@@ -70,8 +76,8 @@ for freqspec in fspecs:
         hyfreq = None
     for kapspec in kspecs:
         mlw, mlk = runhyphy(fspecs[freqspec], "GY94", seqfile, treefile, cpu, kapspec, hyfreq)
-        w_err = (derivedw - mlw) / derivedw 
-        outf.write(common_out_string + '\t' + 'freq_'+str(freqspec) + '\t' + str(kspecs[kapspec]) + '\t' + str(mlw) + '\t' + str(w_err) + '\t' + str(mlk) + '\n')
+        #w_err = (derivedw - mlw) / derivedw 
+        outf.write(common_out_string + '\t' + 'freq_'+str(freqspec) + '\t' + str(kspecs[kapspec]) + '\t' + str(mlw) + '\n' ) #+ '\t' + str(w_err) + '\t' + str(mlk) + '\n')
 outf.close()
 
 
