@@ -147,7 +147,7 @@ def getNucleotideDiff(source, target):
     diff = ''
     for i in range(3):
         if source[i] != target[i]:    
-            diff += "".join(sorted(source[i]+target[i]))
+            diff += "".join( source[i]+target[i] )
     return diff
 
     
