@@ -6,12 +6,13 @@
 ######## Input parameters ########
 import sys
 if (len(sys.argv) != 5):
-    print "\n\nUsage: python run_siminf.py <rep> <treefile> <simdir> <cpu> \n."
+    print "\n\nUsage: python run_siminf.py <rep> <treefile> <simdir> <cpu> <gcbias>\n."
     sys.exit()
 rep = sys.argv[1]
 treefile = sys.argv[2]
 simdir = sys.argv[3]
 cpu = sys.argv[4]
+gc_bias = bool(int(sys.argv[5])) # 0 or 1
 sys.path.append(simdir)
 from functions_simandinf import *
 
@@ -23,22 +24,29 @@ seqfile = "seqs"+str(rep)+".fasta"
 freqfile = "codonFreqs" + str(rep)+".txt"
 outfile = "params"+str(rep)+".txt"
 
-# More important parameters
-mu = 1e-5
+# Parameters
 seqlength = 500000
-kappa = rn.uniform(1.0, 5.0) # kappa
 lambda_ = rn.uniform(0.5, 3.5) # sets strength of selection, effectively. This parameter will be the stddev for the normal distribution from which we draw scaled selection coefficients. Larger stddev = larger fitness differences among amino acids.
+mu = 1e-5
+kappa = rn.uniform(1.0, 5.0)
+if gc_bias:
+    bias = rn.uniform(0.001, 5.)
+else:
+    bias = 1.0
+mu_dict = {'AC': mu*bias, 'CA':mu, 'AG': mu*kappa*bias, 'GA':mu*kappa, 'AT': mu, 'TA':mu, 'CG': mu*bias, 'GC':mu*bias, 'CT': mu*kappa, 'TC':mu*kappa*bias, 'GT': mu, 'TG':mu*bias}}
+
+
 
 
 # Simulate
 print "simulating"
 f_data, gc_content = setFreqs(freqfile, lambda_, 0., 1.) # last 2 args are gc min, gc max
-simulate(f_data, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
+simulate(f_data, seqfile, treefile, mu_dict, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
 
 
 # Derive omega
 print "deriving"
-mu_dict = {'AT':mu, 'AC':mu, 'AG':mu*kappa, 'CG':mu, 'CT':mu*kappa, 'GT':mu}
+# can incorporate asymmetric if wish
 derivedw = deriveOmega(f_data, mu_dict)
 
 # Calculate entropy and setup the f_equal variable

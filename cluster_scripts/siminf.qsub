@@ -11,6 +11,7 @@
 
 source ~/.bash_profile
 
+GCBIAS = 1
 # Set up directories
 SIMDIR=/home/sjs3495/MutSel/Simulator/src
 SCRIPTDIR=/home/sjs3495/Omega_MutSel/cluster_scripts
@@ -36,7 +37,7 @@ cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
 
 # Run
 module load python
-python run_siminf.py $SGE_TASK_ID tree.tre $SIMDIR 15
+python run_siminf.py $SGE_TASK_ID tree.tre $SIMDIR 15 $GCBIAS
 
 # Cleanup
 mkdir -p $RDIR
