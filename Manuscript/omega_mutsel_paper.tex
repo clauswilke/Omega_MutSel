@@ -25,11 +25,9 @@ More recently, a second class of models, known as mutation-selection-balance (Mu
 
 Although both $\omega$ and MutSel models describe the same fundamental process of protein-coding sequence evolution along a phylogeny, it is largely unknown how these two classes of models relate to one another. In particular, as these inference methods have been developed independently, it remains an open question whether or not parameter estimates from one model are comparable to those of the other model. Therefore, while certain rhetorical arguments may be made in favor of using one method over another, there is currently no formalized, concrete rationale to guide researchers in their methodological choices. 
 
-Here, we aim to formalize the relationship between $\omega$ and MutSel models by examining the extent to which their focal parameters, $\omega$ and scaled amino acid selection coefficients, yield overlapping information about the evolutionary process. To this end, we derive a mathematical relationship these models' primary parameters from which one can infer $\omega$ values from selection coefficients alone. Using a simulation approach, we verify that $\omega$ values estimated using selection coefficients alone correspond precisely to those inferred using the standard maximum likelihood $\omega$ inference approach. Further, we prove that this relationship holds only under regimes of purifying selection or neutral evolution ($dN/dS \leq 1$). This proof reveals that MutSel models are inherently unable to describe accurately protein evolution under a regime of positive diversifying selection, or when $dN/dS > 1$. This result has important implications for circumstances under which MutSel model use is justified.
+Here, we aim to formalize the relationship between $\omega$ and MutSel models by examining the extent to which their focal parameters, $\omega$ and scaled amino acid selection coefficients, yield overlapping information about the evolutionary process. To this end, we derive a mathematical relationship these models' primary parameters from which one can infer $\omega$ values from selection coefficients alone. Using a simulation approach, we verify that $\omega$ values estimated using selection coefficients alone correspond precisely to those inferred using the standard maximum likelihood $\omega$ inference approach. Further, we prove that, under conditions of symmetric mutation rates, this relationship holds only under regimes of purifying selection or neutral evolution ($dN/dS \leq 1$). This proof reveals that MutSel models are inherently unable to describe accurately protein evolution under a regime of positive diversifying selection, or when $dN/dS > 1$. This result has important implications for circumstances under which MutSel model use is justified.
 
-Moreover, using this relationship as a benchmark, we have uncovered some potential biases inherent in $\omega$ inference methods. Typically, inference framework performance is assessed through simulating datasets which adhere to the underlying model's assumptions. However, this strategy can only confirm that inference methods are behaving as expected; it cannot confirm that the underlying model accurately represents the evolutionary process. Instead, we suggest an alternate approach to benchmark inference methods, and indeed evolutionary models: assessing the extent to which distinct models agree serves as a robust strategy to determine the accuracy of different modeling frameworks. 
-Many frameworks for dnds inference have been proposed, and it is well-known that these inferences differ from one another (yang2006, that other 2006 paper). However, the only argument for preferring one model's results over another is some sort of statistical argument for ``this model seems a lot better," but there is no way to truly know. 
-Our approach presents a promising alternative. Here, it seems that we really know what this parameter's value is. 
+Moreover, using this relationship as a benchmark, we have uncovered some potential biases inherent in $\omega$ inference methods. Typically, inference framework performance is assessed through simulating datasets which adhere to the underlying model's assumptions. However, this strategy can only confirm that inference methods are behaving as expected; it cannot confirm that the underlying model accurately represents the evolutionary process. Instead, we suggest an alternate approach to benchmark inference methods, and indeed evolutionary models: assessing the extent to which distinct models agree may serve as a novel, robust strategy to determine the accuracy of different modeling frameworks. 
 
 
 \section*{Methods}
@@ -46,7 +44,7 @@ Q_{ij} = \left\{ \begin{array}{rl}
 \end{equation} where $\mu_{ij}$ is the symmetric nucleotide mutation rate and $f_{ij}$ is the fixation probability from codon $i$ to $j$. The fixation probability is defined as \begin{equation}f_{ij} = ln\bigg{(}\frac{\pi_j\mu_{ij}}{\pi_i\mu_{ji}}\bigg{)}\bigg{/}\bigg{(}1 - \frac{\pi_i\mu_{ji}}{\pi_j\mu_{ij}}\bigg{)},\end{equation} where $\pi_i$ is the equilibrium frequency of codon $i$.
 
 For each simulation, we generated scaled amino acid selection coefficients, $s_a$, by fixing one coefficient to 0 and drawing the remaining 19 values from a normal distribution $\mathcal{N} \sim (0, \lambda)$. The standard deviation parameter $\lambda$ effectively represents the strength of selection; smaller $\lambda$ values will produce similar amino acid fitness values, whereas larger values will naturally lead to a stronger preference for certain amino acids. For each simulation, we selected a value for $\lambda$ from $\mathcal{U} \sim (0.5, 3.5)$.
-We converted these selection coefficients to steady-state amino acid frequencies $F(a)$ according to \begin{equation} F(a) = \frac{e^{s_a}}{\sum_b e^{s_b}} \end{equation}, where the denominator sums over all 20 amino acids \cite{Ramseyetal2011}. These frequencies were then assigned to amino acids, and subsequently converted to codon frequencies (assuming no codon bias).
+We converted these selection coefficients to steady-state amino acid frequencies $\pi_a$ according to \begin{equation} \pi_a = \frac{e^{s_a}}{\sum_b e^{s_b}}, \end{equation} where the denominator sums over all 20 amino acids \cite{Ramseyetal2011}. These frequencies were then assigned to amino acids, and subsequently converted to codon frequencies (assuming no codon bias).
 
 We simulated protein-coding sequences along a 10-taxon phylogeny, with all branch lengths equal to 0.01, beginning with a root sequence selected using steady-state codon frequencies. For all simulations, we set a global symmetric mutation rate of $10^{-5}$, and we selected a value for each simulation's $\kappa$ from $\mathcal{U} \sim (1, 5)$. Unless otherwise stated, we simulated alignments of 500,000 codon positions. A single evolutionary model was applied to all positions in the simulated sequences, meaning that we did not incorporate any site-wise variation into the evolutionary process. While this lack of site-wise heterogeneity is unrealistic for real sequence evolution, it allows us to verify our derived relationship between selection coefficients and $\omega$ with a sufficiently sized data set.
 
@@ -62,39 +60,42 @@ For each simulated alignment, we inferred $\omega$ in two main ways; first, we c
 We describe here how to calculate $dN/dS$ from the parameters of a MutSel model. We assume the following: (i) the mutational process is symmetric, such that $\mu_{xy}=\mu_{yx}$ for all nucleotide pairs $xy$; (ii) all synonymous codons for a given amino acid have the same fitness; there is no synonymous rate variation or codon bias.
 
 In the framework of a MutSel model, we can write the steady-state frequency of amino acid $a$ as
-\begin{equation}\label{eq:fa}
- F_a=\frac{e^{s_a}}{\sum_b e^{s_b}},
+\begin{equation}\label{eq:pi_a}
+ \pi_a=\frac{e^{s_a}}{\sum_b e^{s_b}},
 \end{equation}
-where the sum in the denominator runs over all 20 amino acids \cite{SellaHirsh2005}. Here, $s_a$ is the \emph{scaled selection coefficient} for amino acid $a$; larger $s_a$ values correspond to higher frequencies of amino acid $a$, and corresponds precisely to MutSel model parameters \cite{HalpernBruno1998}. Amino acid frequencies can be subsequently converted to codon frequencies, assuming no codon bias, as 
+where the sum in the denominator runs over all 20 amino acids \cite{SellaHirsh2005}. Here, $s_a$ is the scaled selection coefficient for amino acid $a$; larger $s_a$ values correspond to higher frequencies of amino acid $a$, and corresponds precisely to MutSel model parameters \cite{HalpernBruno1998}. Amino acid frequencies can be subsequently converted to codon frequencies, assuming no codon bias, as 
 \begin{equation}
-F_i = F_a / n_a ,	
+\pi_i = \pi_a / n_a ,	
 \end{equation} where $i$ is any codon coding for amino acid $a$ and $n_a$ is the total number of codons which code for $a$.
 
 The fixation probability for a mutation from codon $i$ to codon $j$ is \cite{HalpernBruno1998,SellaHirsh2005}
-\begin{equation}\label{eq:pi}
-  \pi_{i\rightarrow j} = \frac{1-(F_i/F_j)^{1/N_e}}{1-F_i/F_j}
-  \approx \frac{1}{N_e} \frac{\ln F_j - \ln F_i}{1-F_i/F_j}\,,
+\begin{equation}\label{eq:fij}
+  f_{ij} = \frac{1-(\pi_i/\pi_j)^{1/N_e}}{1-\pi_i/\pi_j}
+  \approx \frac{1}{N_e} \frac{\ln \pi_j - \ln \pi_i}{1-\pi_i/\pi_j}\,,
 \end{equation}
-where $N_e$ is the effective population size. We can calculate an evolutionary rate by summing over all fixation probabilities weighted by the frequency of the originating codon. For example, we can write the synonymous rate $K_\text{S}$ as
+where $N_e$ is the effective population size. We can calculate an evolutionary rate 
+Using this framework, we can calculate an evolutionary rate by summing over all fixation probabilities weighted by the frequency of the originating codon. Further, we can establish expressions specifically for nonsynonymous and synonymous evolutionary rate, and then divide them in order to obtain a value for the evolutionary rate ratio $dN/dS$.
+
+For example, we can write the synonymous rate $K_\text{S}$ as
 \begin{equation}\label{eq:KS}
-  K_\text{S} = N_e \sum_i \sum_{j \in {\cal S}_i} F_i  \pi_{i\rightarrow j}\mu_{ij}\,,
+  K_\text{S} = N_e \sum_i \sum_{j \in {\cal S}_i} \pi_i  f_{ij}\mu_{ij}\,,
 \end{equation}
 where ${\cal S}_i$ is the set of codons that are synonymous to codon $i$ and differ from it by one nucleotide substitution. To normalize $K_\text{S}$, we divide it by the number of synonymous sites, which we calculate according to the mutational opportunity definition of a site \cite{GoldmanYang1994, Yang2006} as 
 \begin{equation}\label{eq:LS}
-  L_\text{S} = \sum_i \sum_{j \in {\cal S}_i} F_i \mu_{ij} \,.
+  L_\text{S} = \sum_i \sum_{j \in {\cal S}_i} \pi_i \mu_{ij} \,.
 \end{equation}
-Under the assumption that all synonymous codons have equal fitness (all synonymous mutations are neutral), we have $\pi_{i\rightarrow j}=1/N_e$ \cite{CrowKimura1970}, and thus we find that $dS$, the synonymous rate per synonymous site, is equal to 1.
+Under the assumption that all synonymous codons have equal fitness, and hence all synonymous mutations are selectively neutral, we have $f_{ij}=1/N_e$ \cite{CrowKimura1970}, and thus we find that $dS$, the synonymous rate per synonymous site, is equal to 1.
 
 Similarly, we can derive an expression for $dN$, the non-synonymous rate per non-synonymous site, and we find
 \begin{equation}\label{eq:dN}
-  dN = \frac{K_\text{N}}{L_\text{N}}=\frac{ N_e \sum_i \sum_{j \in {\cal N}_i} F_i  \pi_{i\rightarrow j}\mu_{ij}}{\sum_i \sum_{j \in {\cal N}_i} F_i\mu_{ij}}\,,
+  dN = \frac{K_\text{N}}{L_\text{N}}=\frac{ N_e \sum_i \sum_{j \in {\cal N}_i} \pi_i f_{ij} \mu_{ij} } {\sum_i \sum_{j \in {\cal N}_i} \pi_i \mu_{ij} },
 \end{equation}
-where ${\cal N}_i$ is the set of codons that are not synonymous to codon $i$ and differ from it by one nucleotide substitution. The quantities $K_\text{N}$ and $L_\text{N}$ are defined as in Eqs.~\eqref{eq:KS} and \eqref{eq:LS} but summing over $j\in {\cal N}_i$ instead of $j\in {\cal S}_i$. Equations \eqref{eq:fa}--\eqref{eq:dN} establish a connection between the scaled selection coefficients $s_i$ (i.e., the primary parameters of a MutSel model) and the evolutionary rate ratio $dN/dS$. 
+where ${\cal N}_i$ is the set of codons that are nonsynonymous to codon $i$ and differ from it by one nucleotide substitution. The quantities $K_\text{N}$ and $L_\text{N}$ are defined as in Eqs.~\eqref{eq:KS} and \eqref{eq:LS} but summing over $j\in {\cal N}_i$ instead of $j\in {\cal S}_i$. Equations \eqref{eq:pi_a}--\eqref{eq:dN} establish a connection between the scaled amino acid selection coefficients $s_a$ (i.e., the primary parameters of a MutSel model) and the evolutionary rate ratio $dN/dS$. 
 
 
 \subsection*{$\omega$ values fully encapsulated by scaled selection coefficients}
 
-To validate our derived relationship between $\omega$ values and scaled selection coefficients, we simulated protein-coding sequences along a 10-taxon phylogeny according to the Halpern-Bruno mutation-selection model \cite{HalpernBruno1998}. Simulations were conducted with varying degrees of selective constraint and mutational parameterizations, although all simulated assume a symmetric mutation scheme. We calculated $\omega$ for each simulation set using both standard maximum likelihood methods, according to the GY94 \cite{GoldmanYang1994} model, and the derivation given in equations \eqref{eq:fa}--\eqref{eq:dN}. 
+To validate our derived relationship between $\omega$ values and scaled selection coefficients, we simulated protein-coding sequences along a 10-taxon phylogeny according to the Halpern-Bruno mutation-selection model \cite{HalpernBruno1998}, assuming no codon bias and symmetric nucleotide mutation rates. We calculated an $\omega$ for each simulated alignment using the derivations given in equations \eqref{eq:pi_a}--\eqref{eq:dN} as well as standard maximum likelihood methods, according to the GY94 \cite{GoldmanYang1994} rate matrix, as implemented in the HyPhy batch language \cite{KosakovskyPondetal2005};.
 
 As shown in Figure~\ref{reg_conv}A, $\omega$ values derived using selection coefficients agree nearly perfectly with those inferred using standard maximum likelihood methods. We additionally demonstrate convergence of these values with increasing amounts of data, represented by simulated alignment length (Figure~\ref{reg_conv}B). Taken together, these results clearly show that MutSel model parameters fully encapsulate information regarding the evolutionary rate ratio, $\omega$, and that the results from MutSel and $\omega$ models are largely in agreement. 
 
@@ -150,37 +151,24 @@ Now, for the frequency specification: does this really matter? Typically, when o
 Caveat about how our math relies on symmetric mutation rates and/or equal mutation rates, depending on which one ends up happening.
 	
 
-\subsection*{Mutation-selection-balance models are only valid for purifying selection}
+%\subsection*{Mutation-selection-balance models are only valid for purifying selection}
 
-\textbf{I really have no idea how to write up proofs, so I've virtually just latex'd the mathematica document. But at least the equations are there! ... next day: I'd better stop. This section might have to be yours, unfortunately.}
+%\textbf{I really have no idea how to write up proofs, so I've virtually just latex'd the mathematica document. But at least the equations are there! ... next day: I'd better stop. This section might have to be yours, unfortunately.}
 
-To show that mutation-selection models only corresponds to $dN/dS \leq 1$, we make use of that fact that each calculation of $dN/dS$, as described in equations \eqref{eq:fa}--\eqref{eq:dN}, entails summing the forward and backward fixation probabilities between codons, which are in turn divided by the codon frequency sums. We additionally assume that all mutation rates $\mu_{ij}$ are equal, and as all values for $N$ will ultimately cancel, we exclude them from the following proof. We will deal with the case of two nonsynonymous codons, $i$ and $j$, and we write their frequencies as $x$ and $y$, respectively.
+%To show that mutation-selection models only corresponds to $dN/dS \leq 1$, we make use of that fact that each calculation of $dN/dS$, as described in equations \eqref{eq:pi_a}--\eqref{eq:dN}, entails summing the forward and backward fixation probabilities between codons, which are in turn divided by the codon frequency sums. We additionally assume that all mutation rates $\mu_{ij}$ are equal, and as all values for $N$ will ultimately cancel, we exclude them from the following proof. We will deal with the case of two nonsynonymous codons, $i$ and $j$, and we write their frequencies as $x$ and $y$, respectively.
 
-As follows from \eqref{eq:pi}, the sum of the probabilities going from codon $i$ to codon $j$ and from codon $j$ to codon $i$ is \begin{equation} xP(x,y) + y(P(y,x) = \frac{2xy [\ln x - \ln y]}{x - y}\end{equation}, and we will demonstrate that this value is necessarily $\leq x + y$ for $x,y \geq 0$ and $x \leq y$.
+%As follows from \eqref{eq:pi}, the sum of the probabilities going from codon $i$ to codon $j$ and from codon $j$ to codon $i$ is \begin{equation} xP(x,y) + y(P(y,x) = \frac{2xy [\ln x - \ln y]}{x - y}\end{equation}, and we will demonstrate that this value is necessarily $\leq x + y$ for $x,y \geq 0$ and $x \leq y$.
 
-To this end, we define the function \begin{equation} F(x,y) = x + y - \frac{2xy [\ln x - \ln y]}{x - y} \end{equation}. Thus, we show that $F(x,y) \geq 0$. For the condition $x=y$, this is straightforward to show, as $\lim_{x \to y}F(x,y) = 0$.
-We now show that the first derivative of $F(x, y)$ is negative throughout $x \in (0,y)$, thus proving that $F(x, y)$ has to be monotonically decreasing, and hence $\geq0$, in this interval.
+%To this end, we define the function \begin{equation} F(x,y) = x + y - \frac{2xy [\ln x - \ln y]}{x - y} \end{equation}. Thus, we show that $F(x,y) \geq 0$. For the condition $x=y$, this is straightforward to show, as $\lim_{x \to y}F(x,y) = 0$. 
+%We now show that the first derivative of $F(x, y)$ is negative throughout $x \in (0,y)$, thus proving that $F(x, y)$ has to be monotonically decreasing, and hence $\geq0$, in this interval.
 
 %dNdS limitations:
 %One such limitation is that the $dN/dS$ parameter ignores the influence of site-specific amino acid propensities.  It is universally recognized that a particular position in a protein will only tolerate certain amino acids, due either to functional or structural constraints. However, $dN/dS$ ignores this key aspect of protein evolution and considers all nonsynonymous changes, regardless of which amino acid was substituted, as having equal weight on protein fitness, a biologically implausible assumption. An additional limitation is that codon-substitution models merely describe the result of the evolutionary process, rather than the explicit underlying mechanism producing those results. More precisely, substitutions in protein-coding sequences result from an ongoing mutation-selection balance. When a mutation occurs in a DNA sequence, natural selection must act on this mutation, either by disfavoring it, resulting in the mutation's removal from the population, or favoring it, ultimately yielding an amino acid replacement or substitution. By overlooking this underlying mechanism and focusing only on whether substitutions have occurred, codon substitution models are unable to capture the full extent of the evolutionary process. 
-
-a possible explanation: the dnds parameter, when greater than one, has 2 interpretations. one interpretation is 
 
 	
 \newpage
 \bibliographystyle{plos2009}
 \bibliography{bibliography}	
-
-
-\bigskip
-\begin{figure*}[H]
-\centerline{\includegraphics[width=6in]{figures/regression_fspec_kappafree.pdf}}
-\caption{\label{reg_fspec} Issues with frequency specifications abound. Relationship between omega values only really exists when equal codon frequencies are specified. When f3x4 or true freqs used, there is the potential to end up with dramatically inflated values. As we have shown that omegas from steady-state evolution can only }
-
-
- strongly related to the codon frequencies in the data set. Issue is more egregious when there are relatively few codons, based on entropy. As entropy increases (more permissive, and thus data set codon frequencies are flatter), the error decreases and ML more approximates the true omega value.}
-\end{figure*}
-
 
 \begin{figure*}[H]
 \centerline{\includegraphics[width=6in]{figures/regression_convergence.pdf}}
@@ -213,6 +201,13 @@ Empirical & Free & -0.608 & 59.792 & 0.76 & 0.244 \\
 \newline
 Codon frequency specifications were either set as equal (1/61 per codon), calculated from the F3x4 estimator \cite{MuseGaut1994}, calculated from the CF3x4 estimator \cite{Pond2010}, or set equal to the simulated alignment's empirical frequencies. $\kappa$ was specified as either a fixed value, its true simulated value or 1, or as a free parameter of the model. Correlations given are between the ML $\omega$ estimate and our derived $\omega$ values. Error refers to the mean absolute error between these two $\omega$ estimates. Similar values for $\kappa$ are shown for those inferences where $\kappa$ was a free parameter of the model.
 \end{table}	
+	
+
+\bigskip
+\begin{figure*}[H]
+\centerline{\includegraphics[width=6in]{figures/regression_fspec_kappatrue.pdf}}
+\caption{\label{reg_fspec} Issues with frequency specifications abound. Relationship between omega values only really exists when equal codon frequencies are specified. When f3x4 or true freqs used, there is the potential to end up with dramatically inflated values.}
+\end{figure*}
 	
 \end{document}
 
