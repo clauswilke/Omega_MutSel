@@ -234,7 +234,7 @@ def parseHyphyGY94(file):
     hylines = hyout.readlines()
     hyout.close()
     hyphy_w = None
-    hyphy_k = None
+    hyphy_k = 1000 # so R will read column as numeric
     for line in hylines:
         findw = re.search("^w=(\d+\.*\d*)", line)
         if findw:
@@ -242,6 +242,7 @@ def parseHyphyGY94(file):
         findk = re.search("^k=(\d+\.*\d*)", line)
         if findk:
             hyphy_k = float(findk.group(1))
+    assert(hyphy_w is not None)
     return hyphy_w, hyphy_k
 
 
