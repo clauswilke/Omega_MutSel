@@ -38,7 +38,7 @@ if kappa_runif:
 else:
     kappa = 1.0
 if gc_bias:
-    bias = rn.uniform(1., 5.)
+    bias = rn.uniform(2., 10.)
 else:
     bias = 1.0
 mu_dict = {'AC': mu*bias, 'CA':mu, 'AG': mu*kappa*bias, 'GA':mu*kappa, 'AT': mu, 'TA':mu, 'CG': mu*bias, 'GC':mu*bias, 'CT': mu*kappa, 'TC':mu*kappa*bias, 'GT': mu, 'TG':mu*bias} # Note that if bias is set to 1, then mu_dict contains symmetric mutation rates. Otherwise, will have a gc-bias mutation rate scheme.
