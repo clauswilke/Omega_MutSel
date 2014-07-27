@@ -40,8 +40,8 @@ We simulated protein-coding sequences as a continuous-time Markovprocess \cite{
 \begin{equation}
 Q_{ij} = \left\{ \begin{array}{rl}
               0                                           &\mbox{multiple nucleotide changes} \\
-              \mu_{ij}f_{ij}                          &\mbox{single nucleotide transversion} \\
-              \kappa\mu_{ij}f_{ij}               &\mbox{single nucleotide transition} \\
+              f_{ij}\mu_{ij}                          &\mbox{single nucleotide transversion} \\
+              f_{ij}\mu_{ij}\kappa               &\mbox{single nucleotide transition} \\
          \end{array} \right.,
 \end{equation} where $\mu_{ij}$ is the symmetric nucleotide mutation rate and $f_{ij}$ is the fixation probability from codon $i$ to $j$. The fixation probability is defined as \begin{equation}f_{ij} = ln\bigg{(}\frac{\pi_j\mu_{ij}}{\pi_i\mu_{ji}}\bigg{)}\bigg{/}\bigg{(}1 - \frac{\pi_i\mu_{ji}}{\pi_j\mu_{ij}}\bigg{)},\end{equation} where $\pi_i$ is the equilibrium frequency of codon $i$.
 
@@ -63,34 +63,33 @@ We describe here how to calculate $dN/dS$ from the parameters of a MutSel model.
 
 In the framework of a MutSel model, we can write the steady-state frequency of amino acid $a$ as
 \begin{equation}\label{eq:fa}
- f_a=\frac{e^{s_a}}{\sum_b e^{s_b}},
+ F_a=\frac{e^{s_a}}{\sum_b e^{s_b}},
 \end{equation}
 where the sum in the denominator runs over all 20 amino acids \cite{SellaHirsh2005}. Here, $s_a$ is the \emph{scaled selection coefficient} for amino acid $a$; larger $s_a$ values correspond to higher frequencies of amino acid $a$, and corresponds precisely to MutSel model parameters \cite{HalpernBruno1998}. Amino acid frequencies can be subsequently converted to codon frequencies, assuming no codon bias, as 
 \begin{equation}
-f_i = F_a / n_a ,	
+F_i = F_a / n_a ,	
 \end{equation} where $i$ is any codon coding for amino acid $a$ and $n_a$ is the total number of codons which code for $a$.
 
 The fixation probability for a mutation from codon $i$ to codon $j$ is \cite{HalpernBruno1998,SellaHirsh2005}
 \begin{equation}\label{eq:pi}
-  \pi_{i\rightarrow j} = \frac{1-(f_i/f_j)^{1/N_e}}{1-f_i/f_j}
-  \approx \frac{1}{N_e} \frac{\ln f_j - \ln f_i}{1-f_i/f_j}\,,
+  \pi_{i\rightarrow j} = \frac{1-(F_i/F_j)^{1/N_e}}{1-F_i/F_j}
+  \approx \frac{1}{N_e} \frac{\ln F_j - \ln F_i}{1-F_i/F_j}\,,
 \end{equation}
 where $N_e$ is the effective population size. We can calculate an evolutionary rate by summing over all fixation probabilities weighted by the frequency of the originating codon. For example, we can write the synonymous rate $K_\text{S}$ as
 \begin{equation}\label{eq:KS}
-  K_\text{S} = N_e \sum_i \sum_{j \in {\cal S}_i} f_i  \pi_{i\rightarrow j}\mu_{ij}\,,
+  K_\text{S} = N_e \sum_i \sum_{j \in {\cal S}_i} F_i  \pi_{i\rightarrow j}\mu_{ij}\,,
 \end{equation}
 where ${\cal S}_i$ is the set of codons that are synonymous to codon $i$ and differ from it by one nucleotide substitution. To normalize $K_\text{S}$, we divide it by the number of synonymous sites, which we calculate according to the mutational opportunity definition of a site \cite{GoldmanYang1994, Yang2006} as 
 \begin{equation}\label{eq:LS}
-  L_\text{S} = \sum_i \sum_{j \in {\cal S}_i} f_i \mu_{ij} \,.
+  L_\text{S} = \sum_i \sum_{j \in {\cal S}_i} F_i \mu_{ij} \,.
 \end{equation}
 Under the assumption that all synonymous codons have equal fitness (all synonymous mutations are neutral), we have $\pi_{i\rightarrow j}=1/N_e$ \cite{CrowKimura1970}, and thus we find that $dS$, the synonymous rate per synonymous site, is equal to 1.
 
 Similarly, we can derive an expression for $dN$, the non-synonymous rate per non-synonymous site, and we find
 \begin{equation}\label{eq:dN}
-  dN = \frac{K_\text{N}}{L_\text{N}}=\frac{ N_e \sum_i \sum_{j \in {\cal N}_i} f_i  \pi_{i\rightarrow j}\mu_{ij}}{\sum_i \sum_{j \in {\cal N}_i} f_i\mu_{ij}}\,,
+  dN = \frac{K_\text{N}}{L_\text{N}}=\frac{ N_e \sum_i \sum_{j \in {\cal N}_i} F_i  \pi_{i\rightarrow j}\mu_{ij}}{\sum_i \sum_{j \in {\cal N}_i} F_i\mu_{ij}}\,,
 \end{equation}
-where ${\cal N}_i$ is the set of codons that are not synonymous to codon $i$ and differ from it by one nucleotide substitution. The quantities $K_\text{N}$ and $L_\text{N}$ are defined as in Eqs.~\eqref{eq:KS} and \eqref{eq:LS} but summing over $j\in {\cal N}_i$ instead of $j\in {\cal S}_i$. q
-Equations \eqref{eq:fa}--\eqref{eq:dN} establish a connection between the scaled selection coefficients $s_i$ (i.e., the primary parameters of a MutSel model) and the evolutionary rate ratio $dN/dS$. 
+where ${\cal N}_i$ is the set of codons that are not synonymous to codon $i$ and differ from it by one nucleotide substitution. The quantities $K_\text{N}$ and $L_\text{N}$ are defined as in Eqs.~\eqref{eq:KS} and \eqref{eq:LS} but summing over $j\in {\cal N}_i$ instead of $j\in {\cal S}_i$. Equations \eqref{eq:fa}--\eqref{eq:dN} establish a connection between the scaled selection coefficients $s_i$ (i.e., the primary parameters of a MutSel model) and the evolutionary rate ratio $dN/dS$. 
 
 
 \subsection*{$\omega$ values fully encapsulated by scaled selection coefficients}
@@ -107,6 +106,7 @@ Moreover, as seen in Figure~\ref{reg_conv}A, estimates for $\omega$ never exceed
 
 In the previous subsection, we reported results obtained when the maximum likelihood parameterization was set to $\kappa$ as true and codon frequencies as equal, or $1/61$ for each codon. However, it is well-known that different $\omega$ model calculations or parameterizations can influence the estimated $\omega$ value \cite{YN00,Yang2006,ZhangYu2006}. Therefore, for each simulated alignment, we conducted 12 maximum likelihood inferences using different model parameterizations. Table~\ref{tab:mlspec} gives the broad results from these inferences. Our derived $\omega$ values agree nearly perfectly from those where kappa is true and freqs are 1/61. Additionally, it is worth nothing that, when kappa was a free parameter, it was also estimated best when codon frequencies were 1/61.
 
+f3x4 performs basically the same as cf3x4, so from now on we will omit the cf3x4 from discussion as the f3x4 estimator is much more widely used and known.
 
 Why does 1/61 work best? The basis for including codon frequencies in the model is to capture biases in the underlying nucleotide base frequencies.
 nucleotide base frequencbiases in the mutational process. Here, we have adopted a symmetric mutation
