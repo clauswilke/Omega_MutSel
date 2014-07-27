@@ -32,7 +32,7 @@ grantham = {'AA':0, 'AC':195, 'AD':126, 'AE':107, 'AF':113, 'AG':60, 'AH':86, 'A
 
 ################################################ SIMULATION FUNCTIONS #####################################################
 
-def simulate(f, seqfile, tree, mu_dict, kappa, length, beta=None):
+def simulate(f, seqfile, tree, mu_dict, length, beta=None):
     ''' Simulate single partition according to either codon or mutsel model (check beta (dN) value for which model).
     '''
     try:
@@ -46,6 +46,7 @@ def simulate(f, seqfile, tree, mu_dict, kappa, length, beta=None):
         model.params = params
         mat = mechCodon_MatrixBuilder(model)
     else:
+        print "Setting up MutSel model"
         params = {'stateFreqs':f, 'alpha':1.0, 'beta':1.0, 'mu': mu_dict}
         model.params = params
         mat = mutSel_MatrixBuilder(model)
@@ -57,22 +58,15 @@ def simulate(f, seqfile, tree, mu_dict, kappa, length, beta=None):
 
 
 
-def setFreqs(freqfile, lambda_, gc_min = 0., gc_max = 1.):
-    ''' Returns codon frequencies and gc content '''
-    
-    gc = -1.
+def setFreqs(freqfile, lambda_):
+    ''' Returns codon frequencies and gc content. '''
+ 
     redo = True
-    while gc < gc_min or gc > gc_max or redo:
-        print redo
+    while redo:
         # Frequencies based on boltzmann dist, such that amino acid frequencies distributed exponentially.
         raw_aafreqs = setBoltzFreqs(lambda_) # gets frequencies 
         assert(np.sum(raw_aafreqs) - 1.0 < zero), "bad amino freq calculation"
         aaFreq = dict(zip(amino_acids, raw_aafreqs))
-        
-        ### OLD: GRANTHAM ###
-        #numaa = sum(rawfreqs >= 0.05) # number of amino acids which have frequencies above random chance (favored). These amino acids should be intelligently chosen.
-        #aalist = generateAAlist(numaa)  # gets suitable list of amino acids
-        #uFreq = mergeAminoFreqs(aalist, rawfreqs) # merge aalist and rawfreqs into a dictionary, such that the preferred amino acids get assigned the Grantham group
     
         # Calculate codon state frequencies given amino acid frequencies, above.
         fobj = UserFreqs(by = 'amino', freqs = aaFreq)
@@ -87,13 +81,6 @@ def setFreqs(freqfile, lambda_, gc_min = 0., gc_max = 1.):
     return codonFreq, gc
 
 
-def calcCodonEntropy(f):
-    sum = 0.
-    for entry in f:
-        if entry > 1e-8:
-            sum += entry*np.log(entry)
-    return -1. * sum
-
 def setBoltzFreqs(lambda_):
     ''' Use Boltzmann distribution to get amino acid frequencies for a certain number of amino acids.'''
     # lambda_ basically determines the strength of selection. We are now using it as the stddev of the normal distribution from which ssc's are drawn.
@@ -105,14 +92,17 @@ def setBoltzFreqs(lambda_):
         numer_list[ssc] = val
     return numer_list/np.sum(numer_list)    
 
-
-
-
+def calcCodonEntropy(f):
+    sum = 0.
+    for entry in f:
+        if entry > 1e-8:
+            sum += entry*np.log(entry)
+    return -1. * sum
     
 
 ####################################### OMEGA DERIVATION FUNCTIONS ######################################
 
-def deriveOmega(codonFreqs, mu_dict, sym=False):
+def deriveOmega(codonFreqs, mu_dict):
     ''' NOTE: assumes dS = 1. If codon bias is introduced, this will be violated. '''
     
     numer = 0.; denom = 0.;
@@ -120,7 +110,7 @@ def deriveOmega(codonFreqs, mu_dict, sym=False):
 
     for codon in cfreqs:
         if cfreqs[codon] > zero:  
-            rate, sites = calcNonSyn(codon, cfreqs, mu_dict, sym)
+            rate, sites = calcNonSyn(codon, cfreqs, mu_dict)
             numer += rate
             denom += sites
     assert( denom != 0. ), "Omega derivation indicates no evolution, maybe?"
@@ -128,12 +118,12 @@ def deriveOmega(codonFreqs, mu_dict, sym=False):
 
 
      
-def calcNonSyn(source, cfreqs, mu_dict, sym):
+def calcNonSyn(source, cfreqs, mu_dict):
     rate = 0.
     sites = 0.
     sourceFreq = cfreqs[source]
     for target in codons:
-        diff = getNucleotideDiff(source, target, sym) # only consider single nucleotide differences since are calculating instantaneous.
+        diff = getNucleotideDiff(source, target) # only consider single nucleotide differences since are calculating instantaneous.
         if codon_dict[source] != codon_dict[target] and cfreqs[target] > zero and len(diff) == 2:
             rate  += calcFix( sourceFreq, cfreqs[target] ) * mu_dict[diff]
             sites += mu_dict[diff]
@@ -142,14 +132,11 @@ def calcNonSyn(source, cfreqs, mu_dict, sym):
     return rate, sites
     
 
-def getNucleotideDiff(source, target, sort):
+def getNucleotideDiff(source, target):
     diff = ''
     for i in range(3):
         if source[i] != target[i]: 
-            if sort:   
-                diff += "".join(sorted(source[i]+target[i]))
-            else:
-                diff += "".join( source[i]+target[i] )
+            diff += "".join( source[i]+target[i] )
     return diff
 
     
@@ -185,15 +172,12 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs):
     setup3 = subprocess.call(setuphyphy3, shell = True)
     assert(setup3 == 0), "couldn't properly define matrix"
     
-    
     # Set up frequencies.
     if codonFreqs is not None:
-        print "not none!"
         hyf = freq2hyphy(codonFreqs)
         setuphyphyf = "sed -i 's/MYFREQUENCIES/"+hyf+"/g' run.bf"
         setupf = subprocess.call(setuphyphyf, shell = True)
         assert(setupf == 0), "couldn't properly add in frequencies"
-    
     
     # Set up kappa
     if kappa != 'free':
@@ -203,17 +187,14 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs):
     else:
         shutil.copy('matrices_raw.mdl', 'matrices.mdl')
 
-
     # Run hyphy
     hyphy = "./HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
     runhyphy = subprocess.call(hyphy, shell = True)
     assert (runhyphy == 0), "hyphy fail"
     
     # grab hyphy output
-    if matrix_name == 'GY94':
-        return parseHyphyGY94('hyout.txt')
-    else:
-        return parseHyphyMG94('hyout.txt')
+    return parseHyphyGY94('hyout.txt')
+
 
 
 def freq2hyphy(f):
@@ -226,7 +207,6 @@ def freq2hyphy(f):
     hyphy_f = hyphy_f[:-1]
     hyphy_f += "};"
     return hyphy_f
-    
     
     
 def parseHyphyGY94(file):
@@ -244,266 +224,4 @@ def parseHyphyGY94(file):
             hyphy_k = float(findk.group(1))
     assert(hyphy_w is not None)
     return hyphy_w, hyphy_k
-
-
-
-
-
-
-
-
-
-
-
-
-
-def parseHyphyMG94(file):
-    hyout = open(file, 'r')
-    hylines = hyout.readlines()
-    hyout.close()
-    for line in hylines:
-        finda = re.search("^a=(\d+\.*\d*)", line)
-        findb = re.search("^b=(\d+\.*\d*)", line)
-        if finda:
-             hyphy_alpha = finda.group(1)
-        if findb:
-            hyphy_beta= findb.group(1)
-    return float(hyphy_alpha), float(hyphy_beta)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
-############################ PAML-RELATED FUNCTIONS ###############################
-def runpaml_yn00(seqfile):
-    ''' 
-        NOTE THESE ARGS NO LONGER USED SINCE THEY MADE NO DIFFERENCE AT ALL!!!! REALLY, I CHECKED THIS THOROUGHLY.
-        weight: * weighting pathways between codons (0/1)?
-        commonf3x4: * use one set of codon freqs for all pairs (0/1)? 
-    '''
-    
-    # Set up sequence file
-    setuppaml1 = "cp "+seqfile+" temp.fasta"
-    setup1 = subprocess.call(setuppaml1, shell = True)
-    assert(setup1 == 0), "couldn't create temp.fasta"
-
-    # Run paml
-    #runpaml = subprocess.call("./yn00", shell=True)
-    runpaml = subprocess.call("yn00", shell=True)
-    assert (runpaml == 0), "paml fail"
-
-    # Grab paml output
-    return parsepaml_yn00("pamloutfile")
-
-
-
-def parsepaml_yn00(pamlfile):
-    ''' parsing paml outfiles is completely the worst. IMPORTANT: CODE HERE WILL WORK ONLY WHEN INPUT DATA HAS 2 SEQUENCES ONLY!!! 
-        There are 5 omega values to retrieve:
-            1. ng86
-            2. yn00
-            3. lwl85
-            4. lwl85m
-            5. lpb93
-    '''
-
-    paml = open(pamlfile, 'rU')
-    lines = paml.readlines()
-    paml.close()
-    count = 0
-    for line in lines:
-        find_ng86 = re.search("^Nei \& Gojobori 1986\. dN/dS \(dN, dS\)", line)
-        if find_ng86:
-            ng86_line = count + 5
-        
-        find_yn00 = re.search("Yang \& Nielsen \(2000\) method", line)
-        if find_yn00:
-            yn00_line = count + 8
-        
-        find_lpb93 = re.search('LPB93\:\s+dS =\s+\d+\.\d+\s+dN =\s+\d+\.\d+\s+w =\s+(\d+\.\d+)', line)
-        if find_lpb93:
-            assert(find_lpb93.group(1) is not None)
-            w_lpb93 = find_lpb93.group(1)
-        
-        find_lwl85 = re.search('LWL85\:\s+dS =\s+\d+\.\d+\s+dN =\s+\d+\.\d+\s+w =\s+(\d+\.\d+)', line)
-        if find_lwl85:
-            assert(find_lwl85.group(1) is not None)
-            w_lwl85 = find_lwl85.group(1)
-        
-        find_lwl85m = re.search('LWL85m\:\s+dS =  \d+\.\d+\s+dN =\s+\d+\.\d+\s+w =\s+(\d+\.\d+)', line)
-        if find_lwl85m:
-            assert(find_lwl85m.group(1) is not None)
-            w_lwl85m = find_lwl85m.group(1)
-            
-        else:
-            count += 1
-    
-    find_ng86 = re.search('\s+(\d\.\d+)\s+\(', lines[ng86_line])
-    assert(find_ng86.group(1) is not None)
-    w_ng86 = find_ng86.group(1)
-    
-    find_yn00 = re.search('^\s+\w+\s+\w+\s+\d+\.\d+\s+\d+\.\d+\s+\d+\.\d+\s+\d+\.\d+\s+(\d+\.\d+)', lines[yn00_line])
-    #assert(find_yn00.group(1) is not None)
-    try:
-        w_yn00 = find_yn00.group(1)
-    except:
-        w_yn00 = '5'
-    
-    w_list = [w_ng86, w_yn00, w_lwl85, w_lwl85m, w_lpb93]
-    return(w_list)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-def runpaml_codeml(seqfile, codonFreq, estimateKappa, kappa=1.0):
-    ''' estimateKappa: 0 to estimate, 1 to fix
-        kappa: the value for fixed kappa to take on. default is 1.0
-    '''
-    
-    # Set up sequence file
-    setuppaml1 = "cp "+seqfile+" temp.fasta"
-    setup1 = subprocess.call(setuppaml1, shell = True)
-    assert(setup1 == 0), "couldn't create temp.fasta"
-    
-    # Set up codon frequency specification NOTE: 0:1/61 each, 1:F1X4, 2:F3X4, 3:codon table
-    setuppaml2 = 'sed "s/MYCODONFREQ/'+str(codonFreq)+'/g" codeml_raw.txt > codeml.ctl' 
-    setup2 = subprocess.call(setuppaml2, shell = True)
-    assert(setup2 == 0), "couldn't set paml codon frequencies"
-    
-    # Set up kappa specification
-    setuppaml3 = 'sed "s/ESTKAPPA/'+str(estimateKappa)+'/g" codeml.ctl'
-    setup3 = subprocess.call(setuppaml3, shell=True)
-    assert(setup3 == 0), "couldn't set up whether kappa should be fixed or estimated"
-    
-    setuppaml4 = 'sed "s/INITKAPPA/'+str(kappa)+'/g" codeml.ctl'
-    setup4 = subprocess.call(setuppaml4, shell=True)
-    assert(setup4 == 0), "couldn't set up initial/fixed kappa value"
-    
-    # Run paml
-    runpaml = subprocess.call("./codeml", shell=True)
-    assert (runpaml == 0), "paml fail"
-
-    # Grab paml output
-    return parsepaml_codeml("pamloutfile")
-    
-def parsepaml_codeml(pamlfile):
-    ''' get the omega from a paml file. model run is single omega for an entire alignment. '''
-    paml = open(pamlfile, 'rU')
-    pamlines = paml.readlines()
-    paml.close()
-    omega = None
-    for line in pamlines:
-        findw = re.search("^omega \(dN\/dS\)\s*=\s*(.+)", line)
-        if findw:
-            omega = findw.group(1)
-            break
-    assert (omega is not None), "couldn't get omega from paml file"
-    return float(omega)
-
-
-
-
-
-
-
-
-
-def run_neigojo(seqfile):
-    ''' Get omega using counting method '''
-    import mutation_counter as mc
-    import site_counter as sc
-    
-    M = mc.MutationCounter()
-    S = sc.SiteCounter()
-    records = list(SeqIO.parse(seqfile, 'fasta'))
-    s1 = records[0].seq
-    s2 = records[1].seq
-    ( ns_mut, s_mut ) = M.countMutations( s1, s2 )
-    ( ns_sites1, s_sites1 ) = S.countSites( s1 )
-    ( ns_sites2, s_sites2 ) = S.countSites( s2 )
-    dS = 2*sum( s_mut )/(sum( s_sites1 ) + sum( s_sites2 ))
-    dN = 2*sum( ns_mut )/(sum( ns_sites2 ) + sum( ns_sites2 ))
-    return dN/dS #, np.mean(ns_mut), np.mean(s_mut)
-
-
-
-
-
-
-
-
-######################### OLD FUNCTIONS WITH GRANTHAM STUFF ##############################
-def mergeAminoFreqs(aalist, f):
-    ''' Function ensures that the aalist gets the highest frequency values '''
-    amino = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
-    sorted_f = np.sort(f)[::-1]
-    fdict = {}
-    for i in range(len(aalist)):
-        fdict[aalist[i]] = sorted_f[i]
-        amino.pop(amino.index(aalist[i]))
-    count = 0    
-    for i in range(len(aalist), 20):
-        fdict[amino[count]] = sorted_f[i]
-        count += 1
-    return fdict
-        
-
-def checkGrantham(aalist, size, cutoff):
-    ''' Given a list of amino acids, ensure that they can reasonably co-occur based on Grantham indices (mean similarity score should be <= 100).
-    '''
-    scores = 0.
-    total = float(size*(size-1)/2)
-    for i in range(len(aalist)):
-        for j in range(i, len(aalist)):
-            if i != j:
-                key = "".join(sorted(aalist[i] + aalist[j]))
-                scores += grantham[key]
-    if scores/total <= float(cutoff):
-        return True
-    else:
-        return False
-def generateAAlist(size):
-    ''' Generate a list of size of reasonable co-occuring amino acids.
-        Ensure acceptable choices by making mean pairwise Grantham <=100.
-        If size>=10, no need to check Grantham since so many are allowed, properties probably don't matter so much.
-    '''
-    list_is_ok = False
-    while not list_is_ok:
-        aalist = []
-        amino = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]   
-        for i in range(size):
-            n = randint(0,len(amino)-1)
-            aalist.append(amino[n])
-            amino.pop(n)
-            if size == 1 or size>= 10:
-                list_is_ok = True
-            else:
-                list_is_ok = checkGrantham(aalist, size, 100.)  
-    return aalist
-#########################################################################################    
 
