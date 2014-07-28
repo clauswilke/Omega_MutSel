@@ -7,7 +7,7 @@ import sys
 import shutil
 import subprocess
 import numpy as np
-from random import randint
+from random import randint, shuffle
 
 
 # Simulation code
@@ -58,6 +58,59 @@ def simulate(f, seqfile, tree, mu_dict, length, beta=None):
 
 
 
+def setFreqsAsym(freqfile, lambda_, mu_dict):
+    ''' ummm maybe '''
+    redo = True
+    aminos = shuffle(["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"])
+    while redo:
+        # Frequencies based on boltzmann dist, such that amino acid frequencies distributed exponentially.
+        raw_aafreqs = setBoltzFreqsAsym(lambda_, aminos, mu_dict) # gets frequencies 
+        assert(np.sum(raw_aafreqs) - 1.0 < zero), "bad amino freq calculation"
+        aaFreq = dict(zip(aminos, raw_aafreqs))
+    
+        # Calculate codon state frequencies given amino acid frequencies, above.
+        fobj = UserFreqs(by = 'amino', freqs = aaFreq)
+        codonFreq = fobj.calcFreqs(type = 'codon', savefile = freqfile)
+        
+        # Should I redo based on excessive codon freq stringency?
+        redo = np.any(codonFreq >= 0.985)
+        
+        # Get gc content
+        nucFreq = fobj.calcFreqs(type = 'nuc')
+        gc = nucFreq[1] + nucFreq[2]
+    return codonFreq, gc
+
+def setBoltzFreqsAsym(lambda_, aminos, mu_dict):
+  
+    ssc_values = np.random.normal(loc=0., scale=lambda_, size = 20) #ssc = scaled selection coefficient.
+    ssc_values[0] = 0. # set one value to zero to make these values *scaled* selection coeffs 
+    numer_list = np.zeros(20)  
+    count = 0  
+    for ssc in range(20):
+        val = np.exp(-1. * ssc_values[ssc])
+        numer_list[ssc] = val + getAsymFactor(aminos[count], mu_dict['AT'], mu_dict['GC'])
+        count += 1
+    return numer_list/np.sum(numer_list)  
+
+def getAsymFactor(aa, mu_at, mu_gc):
+    aa_index = amino_acids.index(aa)
+    codons = "".join( genetic_code[aa_index] )
+    n_at = codons.count('A') + codons.count('T')
+    n_cg = codons.count('C') + codons.count('G')
+    return mu_at*n_at + mu_gc*n_gc
+
+
+
+
+
+
+
+
+
+
+
+
+
 def setFreqs(freqfile, lambda_):
     ''' Returns codon frequencies and gc content. '''
  
@@ -80,8 +133,7 @@ def setFreqs(freqfile, lambda_):
         gc = nucFreq[1] + nucFreq[2]
     return codonFreq, gc
 
-
-def setBoltzFreqs(lambda_):
+def setBoltzFreqs(lambda_, aminos, mu_dict):
     ''' Use Boltzmann distribution to get amino acid frequencies for a certain number of amino acids.'''
     # lambda_ basically determines the strength of selection. We are now using it as the stddev of the normal distribution from which ssc's are drawn.
     ssc_values = np.random.normal(loc=0., scale=lambda_, size = 20) #ssc = scaled selection coefficient.

@@ -30,7 +30,7 @@ outfile = "params"+str(rep)+".txt"
 # Parameters
 f_equal = np.zeros(61)
 f_equal[f_equal == 0.] = 1./61.
-seqlength = 500000
+seqlength = 500
 lambda_ = rn.uniform(0.5, 3.5) # sets strength of selection, effectively. This parameter will be the stddev for the normal distribution from which we draw scaled selection coefficients. Larger stddev = larger fitness differences among amino acids.
 mu = 1e-5
 if kappa_runif:
@@ -49,7 +49,7 @@ mu_dict = {'AC': mu*bias, 'CA':mu, 'AG': mu*kappa*bias, 'GA':mu*kappa, 'AT': mu,
 # Simulate
 print "simulating"
 if selection:
-    f_true, gc_true = setFreqs(freqfile, lambda_,) # last 2 args are gc min, gc max
+    f_true, gc_true = setFreqsAsym(freqfile, lambda_,mu_dict)
 else:
     f_true = f_equal
     gc_true = 0.513661202
