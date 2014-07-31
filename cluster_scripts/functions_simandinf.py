@@ -58,59 +58,80 @@ def simulate(f, seqfile, tree, mu_dict, length, beta=None):
 
 
 
-def setFreqsAsym(freqfile, lambda_, mu_dict):
+
+
+
+def setFreqsAsym(lambda_, mu_dict):
     ''' ummm maybe '''
-    redo = True
-    aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
-    shuffle(aminos)
-    while redo:
-        raw_aafreqs = setBoltzFreqsAsym(lambda_, aminos, mu_dict) # gets frequencies 
-        assert(np.sum(raw_aafreqs) - 1.0 < zero), "bad amino freq calculation"
-        aaFreq = dict(zip(amino_acids, raw_aafreqs))
     
-        # Calculate codon state frequencies given amino acid frequencies, above.
-        fobj = UserFreqs(by = 'amino', freqs = aaFreq)
-        codonFreq = fobj.calcFreqs(type = 'codon', savefile = freqfile)
+    v = 2e7 # 2N-2 ~ 2N
+    redo = True
+    
+    while redo:
+    
+        # Set up amino acid coefficients
+        ssc_values = np.random.normal(loc=0., scale=lambda_, size=20) #ssc = scaled selection coefficient.
+        ssc_values[0] = 0.
+        aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
+        shuffle(aminos)
+        aa_coeffs = dict(zip(aminos, ssc_values))
+        
+        codonFreq1 = method1(aa_coeffs, v, mu_dict)
+#        codonFreq2 = method2(aa_coeffs, v, mu_dict)
         
         # Should I redo based on excessive codon freq stringency?
-        redo = np.any(codonFreq >= 0.985)
+        redo = np.any(codonFreq1 >= 0.985)# or np.any(codonFreq2 >= 0.985)
         
-    return codonFreq
-    
+    return codonFreq1 #, codonFreq2
 
 
+
+
+def method1(aa_coeffs, v, mu_dict):
+    ''' use codon coefficients to get frequencies '''
+    
+    # Convert to codon coefficients
+    codon_coeffs = {}
+    for aa in aa_coeffs:
+        syn_codons = genetic_code[ amino_acids.index(aa) ]
+        for syn in syn_codons:
+            codon_coeffs[syn] = aa_coeffs[aa]
     
     
-def setBoltzFreqsAsym(lambda_, aminos, mu_dict):
-    ssc_values = np.random.normal(loc=0., scale=lambda_, size = 20) #ssc = scaled selection coefficient.
-    ssc_values[0] = 0. # set one value to zero to make these values *scaled* selection coeffs 
-    numer_list = np.zeros(20)  
-    count = 0  
-    for ssc in ssc_values:
-        alpha = float( getAsymFactor(aminos[count], mu_dict['AT'], mu_dict['GC']) )
-        numer_list[count] = np.exp(-1. * ( ssc + alpha ) )
+    # Get codon frequencies from their coefficients
+    codonFreq = np.zeros(61)
+    count = 0
+    for codon in codons:
+        asym_term = v*(mu_dict['AT']*( codon.count('A') + codon.count('T') ) - mu_dict['GC']*( codon.count('G') + codon.count('C') ) )
+        codonFreq[count] = np.exp( codon_coeffs[codon] + asym_term )
         count += 1
-    return numer_list/np.sum(numer_list)  
+    codonFreq /= np.sum(codonFreq)                   
+    assert(np.sum(codonFreq) - 1.0 < zero), "bad codon freq calc in method1"
+    return codonFreq
 
 
-def getAsymFactor(aa, mu_at, mu_gc):
-    aa_index = amino_acids.index(aa)
-    tempcodons = "".join( genetic_code[aa_index] )
-    n_at = tempcodons.count('A') + tempcodons.count('T')
-    n_gc = tempcodons.count('C') + tempcodons.count('G')
-    return mu_at*n_at + mu_gc*n_gc
+def method2(aa_coeffs, v, mu_dict):
+    ''' get aa freqs and then convert to codons'''
+    print aa_coeffs
+    aaFreq = np.zeros(20)
+    count = 0
+    for amino in amino_acids:
+        syn = "".join( genetic_code[count] )
+        asym_term = v * (mu_dict['AT'] * float(syn.count('A') + syn.count('T')) - mu_dict['GC'] * float(syn.count('G') + syn.count('C')) )
+        print amino, syn, asym_term, aa_coeffs[amino]
+        aaFreq[count] = np.exp( aa_coeffs[amino] + asym_term )
+        print aaFreq[count]
+        print
+        count += 1
+    aaFreq /= np.sum(aaFreq)
+    print aaFreq
+    assert 1==6
+    aaFreq_dict = dict(zip(amino_acids, aaFreq))
+    obj = UserFreqs(by = 'amino', freqs=aaFreq_dict)
+    return obj.calcFreqs(type = 'codon')
 
 
-
-
-
-
-
-
-
-
-
-
+###################################### SYMMETRIC ###########################################
 
 def setFreqs(freqfile, lambda_):
     ''' Returns codon frequencies and gc content. '''
@@ -138,10 +159,7 @@ def setFreqs(freqfile, lambda_):
         gc = nucFreq[1] + nucFreq[2]
     return codonFreq, gc
 
-
-def setBoltzFreqs(lambda_, aminos, mu_dict):
-    ''' Use Boltzmann distribution to get amino acid frequencies for a certain number of amino acids.'''
-    # lambda_ basically determines the strength of selection. We are now using it as the stddev of the normal distribution from which ssc's are drawn.
+def setBoltzFreqs(lambda_):
     ssc_values = np.random.normal(loc=0., scale=1., size = 20) #ssc = scaled selection coefficient.
     ssc_values[0] = 0. # set one value to zero to make these values relative to 1 aa, as a mutsel model would do.
     numer_list = np.zeros(20)
@@ -149,6 +167,8 @@ def setBoltzFreqs(lambda_, aminos, mu_dict):
         val = np.exp(-1. * ssc_values[ssc] * lambda_)
         numer_list[ssc] = val
     return numer_list/np.sum(numer_list)    
+#############################################################################################
+
 
 def calcCodonEntropy(f):
     sum = 0.
