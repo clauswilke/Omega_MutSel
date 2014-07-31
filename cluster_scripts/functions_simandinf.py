@@ -115,12 +115,16 @@ def getAsymFactor(aa, mu_at, mu_gc):
 def setFreqs(freqfile, lambda_):
     ''' Returns codon frequencies and gc content. '''
  
+    # To randomly assign frequencies, shuffle aminos. 
+    aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
+    shuffle(aminos)
+    
     redo = True
     while redo:
         # Frequencies based on boltzmann dist, such that amino acid frequencies distributed exponentially.
         raw_aafreqs = setBoltzFreqs(lambda_) # gets frequencies 
         assert(np.sum(raw_aafreqs) - 1.0 < zero), "bad amino freq calculation"
-        aaFreq = dict(zip(amino_acids, raw_aafreqs))
+        aaFreq = dict(zip(aminos, raw_aafreqs))
     
         # Calculate codon state frequencies given amino acid frequencies, above.
         fobj = UserFreqs(by = 'amino', freqs = aaFreq)
