@@ -17,7 +17,7 @@ source ~/.bash_profile
 SIMDIR=/home/sjs3495/MutSel/Simulator/src
 SCRIPTDIR=/home/sjs3495/Omega_MutSel/cluster_scripts
 WDIR=/share/WilkeLab/work/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
-RDIR=/home/sjs3495/$JOB_NAME-TEST
+RDIR=/home/sjs3495/$JOB_NAME
 
 mkdir -p $WDIR
 if [ ! -d $WDIR ]

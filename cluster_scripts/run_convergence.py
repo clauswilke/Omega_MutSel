@@ -20,7 +20,8 @@ seqfile   = "seqs"+str(rep)+".fasta"
 freqfile  = "codonFreqs" + str(rep)+".txt"
 paramfile = "params"+str(rep)+".txt"
 mu = 1e-6
-kappa = rn.uniform(1.0, 5.5)
+kappa = rn.uniform(1.0, 6.0)
+sd = rn.uniform(0.5, 1.5)
 mu_dict = {'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'AC': mu, 'CA':mu, 'GT':mu, 'TG':mu, 'AG': kappa*mu, 'GA':kappa*mu, 'CT':kappa*mu, 'TC':kappa*mu}
 
 # To test convergence, select random sequence length between 5e2 and 5e5
@@ -37,7 +38,7 @@ seqlength = int( times * 10**expon )
 
 # Set up steady-state codon frequencies based on selection coefficients
 print "Deriving equilibrium codon frequencies"
-codon_freqs_true, codon_freqs_true_dict, gc_content = set_codon_freqs(freqfile)
+codon_freqs_true, codon_freqs_true_dict, gc_content = set_codon_freqs(sd, freqfile)
 
 
 # Simulate according to MutSel model along phylogeny
@@ -56,7 +57,7 @@ err = (derivedw - mlw) / derivedw
 
 # Save
 outf = open(paramfile,'w')
-outf.write(rep + '\t' + str(seqlength) + '\t' + str(kappa) + '\t' + str(derivedw) + '\t' + str(mlw) + '\t' + str(err) + '\n')
+outf.write(rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(sd) + '\t' + str(derivedw) + '\t' + str(mlw) + '\t' + str(err) + '\n')
 outf.close()
 
 

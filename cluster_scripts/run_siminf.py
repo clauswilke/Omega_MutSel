@@ -23,14 +23,15 @@ freqfile  = "codonFreqs" + str(rep)+".txt"
 paramfile = "params"+str(rep)+".txt"
 seqlength = 500000
 mu = 1e-6
-kappa = rn.uniform(1.0, 5.5)
+kappa = rn.uniform(1.0, 6.0)
+sd = rn.uniform(0.5, 1.5)
 mu_dict = {'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'AC': mu, 'CA':mu, 'GT':mu, 'TG':mu, 'AG': kappa*mu, 'GA':kappa*mu, 'CT':kappa*mu, 'TC':kappa*mu}
 
 
 
 # Set up steady-state codon frequencies based on selection coefficients
 print "Deriving equilibrium codon frequencies"
-codon_freqs_true, codon_freqs_true_dict, gc_content = set_codon_freqs(freqfile)
+codon_freqs_true, codon_freqs_true_dict, gc_content = set_codon_freqs(sd, freqfile)
 
 
 # Simulate according to MutSel model along phylogeny
@@ -90,11 +91,11 @@ for kap in krun:
 
 
 # Finally, save results
-outstring_params = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(gc_content) + '\t' + str(derivedw)
+outstring_params = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(sd) + '\t' + str(gc_content) + '\t' + str(derivedw)
 outf = open(paramfile, 'w')
 for f in fspecs:
+    y =  fspecs.index(f)
     for k in kspecs:
         x = kspecs.index(k)
-        y =  fspecs.index(f)
-        outf.write( outstring_params + '\t' + str(fequal_error[x]) + '\t' + str(entropy[x]) + '\t' + str(entropy_error[x]) + '\t' + f + '\t' + k + '\t' + str(omegas[x,y]) + '\t' + str(omega_errors[x,y]) + '\t' + str(kappas[x,y]) + '\n')
+        outf.write( outstring_params + '\t' + str(fequal_error[y]) + '\t' + str(entropy[y]) + '\t' + str(entropy_error[y]) + '\t' + f + '\t' + k + '\t' + str(omegas[x,y]) + '\t' + str(omega_errors[x,y]) + '\t' + str(kappas[x,y]) + '\n')
 outf.close()   
