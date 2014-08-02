@@ -53,7 +53,7 @@ def simulate(f, seqfile, tree, mu_dict, length):
 
 ################################### FUNCTIONS TO SET UP SCALED SEL COEFFS, CODON FREQUENCIES #########################################
 
-def set_codon_freqs(freqfile):
+def set_codon_freqs(sd, freqfile):
     ''' Returns codon frequencies and gc content. Also saves codon frequencies to file. '''
  
     # To randomly assign frequencies, shuffle aminos acids.
@@ -65,7 +65,7 @@ def set_codon_freqs(freqfile):
     while redo:
     
         # Draw amino acid ssc values and assign randomly to amino acids
-        aa_coeffs = dict(zip(aminos, draw_amino_coeffs()))
+        aa_coeffs = dict(zip(aminos, draw_amino_coeffs(sd)))
         
         # Convert amino acid coefficients to codon coefficients
         codon_coeffs = aa_to_codon_coeffs(aa_coeffs)
@@ -75,7 +75,7 @@ def set_codon_freqs(freqfile):
         codon_freqs_dict = dict(zip(codons, codon_freqs))
                 
         # Should I redo based on excessive codon freq stringency?
-        redo = np.any(codon_freqs >= 0.985)
+        redo = np.any(codon_freqs >= 0.99)
      
     # Once frequencies are set, save them to file and retrieve gc content    
     np.savetxt(freqfile, codon_freqs)
@@ -87,8 +87,8 @@ def set_codon_freqs(freqfile):
 
 
 
-def draw_amino_coeffs():
-    ssc_values = np.random.normal(size=20) #ssc = scaled selection coefficient. use default mean=0, stddev=1
+def draw_amino_coeffs(sd):
+    ssc_values = np.random.normal(loc = 0., scale = sd, size=20)
     ssc_values[0] = 0.
     return ssc_values
 
