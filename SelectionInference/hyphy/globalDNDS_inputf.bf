@@ -21,7 +21,7 @@ DataSetFilter   filt_data = CreateFilter(raw_data,3,"", "","TAA,TAG,TGA");
 codonFreq = MYFREQUENCIES;
 
 /* Define the model and tree */
-Model MyModel = (MYMATRIX, codonFreq, 1);
+Model MyModel = (GY94, codonFreq, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;

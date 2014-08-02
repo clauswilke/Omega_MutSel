@@ -21,7 +21,7 @@ HarvestFrequencies(posFreqs,filt_data,3,1,1);
 codonFreq = BuildCodonFrequencies(posFreqs);
 
 
-Model MyModel = (MYMATRIX, codonFreq, 1);
+Model MyModel = (GY94, codonFreq, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;

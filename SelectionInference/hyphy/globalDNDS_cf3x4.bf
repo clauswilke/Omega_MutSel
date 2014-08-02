@@ -22,7 +22,7 @@ posFreqs_cf3x4 = CF3x4(posFreqs_raw, "TAA,TAG,TGA");
 codonFreq = BuildCodonFrequencies(posFreqs_cf3x4);
 
 
-Model MyModel = (MYMATRIX, codonFreq, 1);
+Model MyModel = (GY94, codonFreq, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
