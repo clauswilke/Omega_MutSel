@@ -1,5 +1,4 @@
-global a;
-global b;
+/* Hyphy inference with CF3x4 frequencies */
 global w;
 global k;
 global t;

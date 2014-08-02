@@ -1,5 +1,5 @@
-global a;
-global b;
+/* Hyphy inference with user-provided frequencies */
+
 global w;
 global k;
 global t;
