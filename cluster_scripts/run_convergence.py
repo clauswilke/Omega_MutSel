@@ -55,7 +55,7 @@ mlw = run_hyphy_convergence(seqfile, treefile, cpu, kappa)
 err = (derivedw - mlw) / derivedw
 
 # Save
-outf = open(outfile,'w')
+outf = open(paramfile,'w')
 outf.write(rep + '\t' + str(seqlength) + '\t' + str(kappa) + '\t' + str(derivedw) + '\t' + str(mlw) + '\t' + str(err) + '\n')
 outf.close()
 
