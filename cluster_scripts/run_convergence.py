@@ -15,11 +15,15 @@ cpu = sys.argv[4]
 sys.path.append(simdir)
 from functions_simandinf import *
 
-mu = 1e-5
-kappa = rn.uniform(1.0, 5.0)
-lambda_ = rn.uniform(0.5, 2.0)
+# Set up output files and parameters
+seqfile   = "seqs"+str(rep)+".fasta"
+freqfile  = "codonFreqs" + str(rep)+".txt"
+paramfile = "params"+str(rep)+".txt"
+mu = 1e-6
+kappa = rn.uniform(1.0, 5.5)
+mu_dict = {'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'AC': mu, 'CA':mu, 'GT':mu, 'TG':mu, 'AG': kappa*mu, 'GA':kappa*mu, 'CT':kappa*mu, 'TC':kappa*mu}
 
-# Random sequence length between 5e2 and 1e6
+# To test convergence, select random sequence length between 5e2 and 5e5
 expon = rn.randint(2,5)
 if expon == 2:
     times = rn.randint(5,10)
@@ -29,31 +33,30 @@ else:
     times = randint(1,10)
 seqlength = int( times * 10**expon )
 
-# set up output sequence and parameter files
-freqfile = "codonFreqs" + str(rep) + ".txt"
-seqfile = "seqs" + str(rep) + ".fasta"
-outfile = "params" + str(rep) + ".txt"
 
 
-# Now, simulate sequences and infer ML omegas
-# Simulate
-print "simulating"
-f, gc_content = setFreqs(freqfile, lambda_, 0.0, 1.0) # last 2 args are gc min, gc max
-simulate(f, seqfile, treefile, mu, kappa, seqlength, None) # omega is last argument. when None, sim via mutsel
+# Set up steady-state codon frequencies based on selection coefficients
+print "Deriving equilibrium codon frequencies"
+codon_freqs_true, codon_freqs_true_dict, gc_content = set_codon_freqs(freqfile)
 
-# Derive
-mu_dict = {'AT':mu, 'AC':mu, 'AG':mu*kappa, 'CG':mu, 'CT':mu*kappa, 'GT':mu}
-derivedw = deriveOmega(f, mu_dict)
+
+# Simulate according to MutSel model along phylogeny
+print "Simulating"
+simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
+
+
+# Derive omega from selection coefficients (well, frequencies, but same deal)
+print "Deriving omega from selection coefficients"
+derivedw = derive_omega(codon_freqs_true_dict, mu_dict)
 
 # ML
-f_equal = np.zeros(61)
-f_equal[f_equal == 0.] = 1./61.
-mlw, mlk = runhyphy("globalDNDS.bf", "GY94", seqfile, treefile, cpu, kappa, f_equal)
+print "Conducting ML inference with HyPhy"
+mlw = run_hyphy_convergence(seqfile, treefile, cpu, kappa)
 err = (derivedw - mlw) / derivedw
 
 # Save
 outf = open(outfile,'w')
-outf.write(rep + '\t' + str(seqlength) + '\t' + str(kappa) + '\t' + str(lambda_) + '\t' + str(derivedw) + '\t' + str(mlw) + '\t' + str(err) + '\n')
+outf.write(rep + '\t' + str(seqlength) + '\t' + str(kappa) + '\t' + str(derivedw) + '\t' + str(mlw) + '\t' + str(err) + '\n')
 outf.close()
 
 

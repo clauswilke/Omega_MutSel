@@ -5,97 +5,96 @@
 
 ######## Input parameters ########
 import sys
-if (len(sys.argv) != 8):
-    print "\n\nUsage: python run_siminf.py <rep> <treefile> <simdir> <cpu> <kappa> <gcbias> <selection>\n."
+if (len(sys.argv) != 5):
+    print "\n\nUsage: python run_siminf.py <rep> <treefile> <simdir> <cpu>\n."
     sys.exit()
-rep = sys.argv[1]
-treefile = sys.argv[2]
-simdir = sys.argv[3]
-cpu = sys.argv[4]
-kappa_runif = bool(int(sys.argv[5]))
-asym = bool(int(sys.argv[6])) # 0 or 1
-selection = bool(int(sys.argv[7])) # 0 or 1. 0 = no selection, so equal codon freqs. 1 = selection, so boltzmann amino acid, then convert to codon.
+rep = sys.argv[1]      # which rep we're on, for saving files
+treefile = sys.argv[2] # tree for simulation
+simdir = sys.argv[3]   # directory of simulation library
+cpu = sys.argv[4]      # hyphy can use
 sys.path.append(simdir)
 from functions_simandinf import *
 
 
 
-# set up output sequence and parameter files
-seqfile = "seqs_"+str(rep)+".fasta"
-freqfile = "codonFreqs" + str(rep)+".txt"
-outfile = "params"+str(rep)+".txt"
-
-
-
-# Parameters
-f_equal = np.zeros(61)
-f_equal[f_equal == 0.] = 1./61.
+# Set up output files and parameters
+seqfile   = "seqs"+str(rep)+".fasta"
+freqfile  = "codonFreqs" + str(rep)+".txt"
+paramfile = "params"+str(rep)+".txt"
 seqlength = 500000
-lambda_ = 1. #rn.uniform(0.5, 3.5) # sets strength of selection, effectively. This parameter will be the stddev for the normal distribution from which we draw scaled selection coefficients. Larger stddev = larger fitness differences among amino acids.
-# Default mutation rates
-mu = 1e-5
-c = 1.0
-kappa = 1.0
-
-# Change defaults as needed
-if kappa_runif:
-    kappa = rn.uniform(1.0, 5.0)
-if asym:
-    c = rn.uniform(1,50)
-    if rn.randint(0,1): #false (producing c>1) -> AT bias. true (producing c<1) -> GC bias.
-        c =1/c
-mu_dict = {'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'AC': mu, 'TG':mu, 'CA':c*mu, 'GT':c*mu, 'AG': kappa*mu, 'TC':kappa*mu, 'GA':c*kappa*mu, 'CT':c*kappa*mu}
+mu = 1e-6
+kappa = rn.uniform(1.0, 5.5)
+mu_dict = {'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'AC': mu, 'CA':mu, 'GT':mu, 'TG':mu, 'AG': kappa*mu, 'GA':kappa*mu, 'CT':kappa*mu, 'TC':kappa*mu}
 
 
 
-
-# Simulate
-print "freqs"
-if selection and asym:
-    f_true = setFreqsAsym(lambda_, mu_dict)
-else:
-    f_true = f_equal
-    gc_true = 0.513661202
-print "simulating"
-simulate(f_true, seqfile, treefile, mu_dict, seqlength, None) # omega is last argument. when None, sim via mutsel
+# Set up steady-state codon frequencies based on selection coefficients
+print "Deriving equilibrium codon frequencies"
+codon_freqs_true, codon_freqs_true_dict, gc_content = set_codon_freqs(freqfile)
 
 
+# Simulate according to MutSel model along phylogeny
+print "Simulating"
+simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
 
-# Get empirical codon frequency and gc content, as well as codon entropies
-f_data_obj = ReadFreqs(file = seqfile, by = 'codon')
-f_data = f_data_obj.calcFreqs(type = 'codon')
-nuc_data = f_data_obj.calcFreqs(type = 'nuc')
-gc_data = nuc_data[1] + nuc_data[2]
-entropy_true = calcCodonEntropy(f_true)
-entropy_data = calcCodonEntropy(f_data)
+
+# Derive omega from selection coefficients (well, frequencies, but same deal)
+print "Deriving omega from selection coefficients"
+derivedw = derive_omega(codon_freqs_true_dict, mu_dict)
+
+
+# Maximum likelihood omega inference across a variety of frequency, kappa specifications
+print "Conducting ML inference with HyPhy"
 
 
 
-# Derive omega
-print "deriving"
-derivedw_true = deriveOmega(f_true, mu_dict)
-derivedw_data  = deriveOmega(f_data, mu_dict)
+# Lists for storing values and printing strings
+krun = [kappa, 1.0, 'free']
+kspecs = ['true', 'one', 'free']
+fspecs = ['equal', 'true', 'f3x4', 'cf3x4'] # DO NOT CHANGE THIS LIST !!!!
+omegas = np.zeros([3,4])
+kappas = np.zeros([3,4])
+omega_errors = np.ones([3,4])
 
-
-# ML
-print "ML"
-fspecs = {'equal':'globalDNDS_inputf.bf'} #, 'true':'globalDNDS_inputf.bf',  'data': 'globalDNDS_inputf.bf', 'f3x4':'globalDNDS_f3x4.bf', 'cf3x4':'globalDNDS_cf3x4.bf'}
-kspecs = {kappa:'kappa_true'}#, 1.0:'kappa_one', 'free':'kappa_free'}
-
-#common_out_string = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(bias) + '\t' + str(lambda_) + '\t' + str(gc_true) + '\t' + str(gc_data) + '\t' + str(entropy_true) + '\t' + str(entropy_data) + '\t' + str(derivedw_true) + '\t' + str(derivedw_data)
-
-outf = open(outfile, 'w')
-for freqspec in fspecs:
-    try:
-        hyfreq = eval('f_'+freqspec)
-    except:
-        hyfreq = None
-    for kapspec in kspecs:
-        mlw, mlk = runhyphy(fspecs[freqspec], "GY94", seqfile, treefile, cpu, kapspec, hyfreq)
-        #w_err = (derivedw_true - mlw) / derivedw_true
-        outf.write(str(derivedw_true) + '\t' + str(derivedw_data) + '\t' + str(mlw) + '\t' + str(c) + '\t' + str(kappa) + '\n')
-        #outf.write(common_out_string + '\t' + 'freq_'+str(freqspec) + '\t' + str(kspecs[kapspec]) + '\t' + str(mlw) + '\t' + str(w_err) + '\t' + str(mlk) + '\n')
-outf.close()
+# Use hyphy to grab the f3x4, cf3x4 frequencies. Calculate entropies and "freq error" quantities for each frequency list. 
+print "Calculating entropies and frequency 'errors' "
+codon_freqs_f3x4, codon_freqs_cf3x4 = freqs_from_hyphy(seqfile)
+entropy = [4.11087386]
+entropy_error = [0.0]
+fequal_error = [0.0]
+for ftype in fspecs:
+    if ftype != 'equal':
+        freqs = eval('codon_freqs_' + ftype)
+        fequal_error.append( calc_fequal_error(freqs) )
+        temp_entropy = calc_entropy(freqs)
+        entropy.append(temp_entropy)
+        entropy_error.append( calc_entropy_error(temp_entropy) )
 
 
 
+# First, set up F61 (data) frequency vector in the hyphy batchfile as this applies to all hyphy runs.
+hyf = array_to_hyphy_freq(codon_freqs_true)
+setuphyphyf = "sed -i 's/DATAFREQS/"+hyf+"/g' globalDNDS.bf"
+setupf = subprocess.call(setuphyphyf, shell = True)
+assert(setupf == 0), "couldn't properly add in F61 (data) frequencies"
+
+
+# Run hyphy and save omegas, kappas (only sometimes returned, note), and omega errors along the way
+kcount = 0
+for kap in krun:
+    wtemp, ktemp = run_hyphy(seqfile, treefile, cpu, kap, fspecs)  
+    kappas[kcount] = ktemp
+    omegas[kcount] = wtemp
+    omega_errors[kcount] = (derivedw - wtemp) / derivedw
+    kcount += 1
+
+
+# Finally, save results
+outstring_params = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(gc_content) + '\t' + str(derivedw)
+outf = open(paramfile, 'w')
+for f in fspecs:
+    for k in kspecs:
+        x = kspecs.index(k)
+        y =  fspecs.index(f)
+        outf.write( outstring_params + '\t' + str(fequal_error[x]) + '\t' + str(entropy[x]) + '\t' + str(entropy_error[x]) + '\t' + f + '\t' + k + '\t' + str(omegas[x,y]) + '\t' + str(omega_errors[x,y]) + '\t' + str(kappas[x,y]) + '\n')
+outf.close()   

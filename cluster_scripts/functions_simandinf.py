@@ -19,21 +19,20 @@ from matrixBuilder import *
 from evolver import *
 
 # Globals
-zero = 1e-8
+ZERO = 1e-8
 amino_acids  = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
 codons=["AAA", "AAC", "AAG", "AAT", "ACA", "ACC", "ACG", "ACT", "AGA", "AGC", "AGG", "AGT", "ATA", "ATC", "ATG", "ATT", "CAA", "CAC", "CAG", "CAT", "CCA", "CCC", "CCG", "CCT", "CGA", "CGC", "CGG", "CGT", "CTA", "CTC", "CTG", "CTT", "GAA", "GAC", "GAG", "GAT", "GCA", "GCC", "GCG", "GCT", "GGA", "GGC", "GGG", "GGT", "GTA", "GTC", "GTG", "GTT", "TAC", "TAT", "TCA", "TCC", "TCG", "TCT", "TGC", "TGG", "TGT", "TTA", "TTC", "TTG", "TTT"]
 codon_dict = {"AAA":"K", "AAC":"N", "AAG":"K", "AAT":"N", "ACA":"T", "ACC":"T", "ACG":"T", "ACT":"T", "AGA":"R", "AGC":"S", "AGG":"R", "AGT":"S", "ATA":"I", "ATC":"I", "ATG":"M", "ATT":"I", "CAA":"Q", "CAC":"H", "CAG":"Q", "CAT":"H", "CCA":"P", "CCC":"P", "CCG":"P", "CCT":"P", "CGA":"R", "CGC":"R", "CGG":"R", "CGT":"R", "CTA":"L", "CTC":"L", "CTG":"L", "CTT":"L", "GAA":"E", "GAC":"D", "GAG":"E", "GAT":"D", "GCA":"A", "GCC":"A", "GCG":"A", "GCT":"A", "GGA":"G", "GGC":"G", "GGG":"G", "GGT":"G", "GTA":"V", "GTC":"V", "GTG":"V", "GTT":"V", "TAC":"Y", "TAT":"Y", "TCA":"S", "TCC":"S", "TCG":"S", "TCT":"S", "TGC":"C", "TGG":"W", "TGT":"C", "TTA":"L", "TTC":"F", "TTG":"L", "TTT":"F"}
 genetic_code = [["GCA", "GCC", "GCG", "GCT"], ["TGC","TGT"], ["GAC", "GAT"], ["GAA", "GAG"], ["TTC", "TTT"], ["GGA", "GGC", "GGG", "GGT"], ["CAC", "CAT"], ["ATA", "ATC", "ATT"], ["AAA", "AAG"], ["CTA", "CTC", "CTG", "CTT", "TTA", "TTG"], ["ATG"], ["AAC", "AAT"], ["CCA", "CCC", "CCG", "CCT"], ["CAA", "CAG"], ["AGA", "AGG", "CGA", "CGC", "CGG", "CGT"] , ["AGC", "AGT", "TCA", "TCC", "TCG", "TCT"], ["ACA", "ACC", "ACG", "ACT"], ["GTA", "GTC", "GTG", "GTT"], ["TGG"], ["TAC", "TAT"]]
-grantham = {'AA':0, 'AC':195, 'AD':126, 'AE':107, 'AF':113, 'AG':60, 'AH':86, 'AI':94, 'AK':106, 'AL':96, 'AM':84, 'AN':111, 'AP':27, 'AQ':91, 'AR':112, 'AS':99, 'AT':58, 'AV':64, 'AW':148, 'AY':112, 'CA':195, 'CC':0, 'CD':154, 'CE':170, 'CF':205, 'CG':159, 'CH':174, 'CI':198, 'CK':202, 'CL':198, 'CM':196, 'CN':139, 'CP':169, 'CQ':154, 'CR':180, 'CS':112, 'CT':149, 'CV':192, 'CW':215, 'CY':194, 'DA':126, 'DC':154, 'DD':0, 'DE':45, 'DF':177, 'DG':94, 'DH':81, 'DI':168, 'DK':101, 'DL':172, 'DM':160, 'DN':23, 'DP':108, 'DQ':61, 'DR':96, 'DS':65, 'DT':85, 'DV':152, 'DW':181, 'DY':160, 'EA':107, 'EC':170, 'ED':45, 'EE':0, 'EF':140, 'EG':98, 'EH':40, 'EI':134, 'EK':56, 'EL':138, 'EM':126, 'EN':42, 'EP':93, 'EQ':29, 'ER':54, 'ES':80, 'ET':65, 'EV':121, 'EW':152, 'EY':122, 'FA':113, 'FC':205, 'FD':177, 'FE':140, 'FF':0, 'FG':153, 'FH':100, 'FI':21, 'FK':102, 'FL':22, 'FM':28, 'FN':158, 'FP':114, 'FQ':116, 'FR':97, 'FS':155, 'FT':103, 'FV':50, 'FW':40, 'FY':22, 'GA':60, 'GC':159, 'GD':94, 'GE':98, 'GF':153, 'GG':0, 'GH':98, 'GI':135, 'GK':127, 'GL':138, 'GM':127, 'GN':80, 'GP':42, 'GQ':87, 'GR':125, 'GS':56, 'GT':59, 'GV':109, 'GW':184, 'GY':147, 'HA':86, 'HC':174, 'HD':81, 'HE':40, 'HF':100, 'HG':98, 'HH':0, 'HI':94, 'HK':32, 'HL':99, 'HM':87, 'HN':68, 'HP':77, 'HQ':24, 'HR':29, 'HS':89, 'HT':47, 'HV':84, 'HW':115, 'HY':83, 'IA':94, 'IC':198, 'ID':168, 'IE':134, 'IF':21, 'IG':135, 'IH':94, 'II':0, 'IK':102, 'IL':5, 'IM':10, 'IN':149, 'IP':95, 'IQ':109, 'IR':97, 'IS':142, 'IT':89, 'IV':29, 'IW':61, 'IY':33, 'KA':106, 'KC':202, 'KD':101, 'KE':56, 'KF':102, 'KG':127, 'KH':32, 'KI':102, 'KK':0, 'KL':107, 'KM':95, 'KN':94, 'KP':103, 'KQ':53, 'KR':26, 'KS':121, 'KT':78, 'KV':97, 'KW':110, 'KY':85, 'LA':96, 'LC':198, 'LD':172, 'LE':138, 'LF':22, 'LG':138, 'LH':99, 'LI':5, 'LK':107, 'LL':0, 'LM':15, 'LN':153, 'LP':98, 'LQ':113, 'LR':102, 'LS':145, 'LT':92, 'LV':32, 'LW':61, 'LY':36, 'MA':84, 'MC':196, 'MD':160, 'ME':126, 'MF':28, 'MG':127, 'MH':87, 'MI':10, 'MK':95, 'ML':15, 'MM':0, 'MN':142, 'MP':87, 'MQ':101, 'MR':91, 'MS':135, 'MT':81, 'MV':21, 'MW':67, 'MY':36, 'NA':111, 'NC':139, 'ND':23, 'NE':42, 'NF':158, 'NG':80, 'NH':68, 'NI':149, 'NK':94, 'NL':153, 'NM':142, 'NN':0, 'NP':91, 'NQ':46, 'NR':86, 'NS':46, 'NT':65, 'NV':133, 'NW':174, 'NY':143, 'PA':27, 'PC':169, 'PD':108, 'PE':93, 'PF':114, 'PG':42, 'PH':77, 'PI':95, 'PK':103, 'PL':98, 'PM':87, 'PN':91, 'PP':0, 'PQ':76, 'PR':103, 'PS':74, 'PT':38, 'PV':68, 'PW':147, 'PY':110, 'QA':91, 'QC':154, 'QD':61, 'QE':29, 'QF':116, 'QG':87, 'QH':24, 'QI':109, 'QK':53, 'QL':113, 'QM':101, 'QN':46, 'QP':76, 'QQ':0, 'QR':43, 'QS':68, 'QT':42, 'QV':96, 'QW':130, 'QY':99, 'RA':112, 'RC':180, 'RD':96, 'RE':54, 'RF':97, 'RG':125, 'RH':29, 'RI':97, 'RK':26, 'RL':102, 'RM':91, 'RN':86, 'RP':103, 'RQ':43, 'RR':0, 'RS':110, 'RT':71, 'RV':96, 'RW':101, 'RY':77, 'SA':99, 'SC':112, 'SD':65, 'SE':80, 'SF':155, 'SG':56, 'SH':89, 'SI':142, 'SK':121, 'SL':145, 'SM':135, 'SN':46, 'SP':74, 'SQ':68, 'SR':110, 'SS':0, 'ST':58, 'SV':124, 'SW':177, 'SY':144, 'TA':58, 'TC':149, 'TD':85, 'TE':65, 'TF':103, 'TG':59, 'TH':47, 'TI':89, 'TK':78, 'TL':92, 'TM':81, 'TN':65, 'TP':38, 'TQ':42, 'TR':71, 'TS':58, 'TT':0, 'TV':69, 'TW':128, 'TY':92, 'VA':64, 'VC':192, 'VD':152, 'VE':121, 'VF':50, 'VG':109, 'VH':84, 'VI':29, 'VK':97, 'VL':32, 'VM':21, 'VN':133, 'VP':68, 'VQ':96, 'VR':96, 'VS':124, 'VT':69, 'VV':0, 'VW':88, 'VY':55, 'WA':148, 'WC':215, 'WD':181, 'WE':152, 'WF':40, 'WG':184, 'WH':115, 'WI':61, 'WK':110, 'WL':61, 'WM':67, 'WN':174, 'WP':147, 'WQ':130, 'WR':101, 'WS':177, 'WT':128, 'WV':88, 'WW':0, 'WY':37, 'YA':112, 'YC':194, 'YD':160, 'YE':122, 'YF':22, 'YG':147, 'YH':83, 'YI':33, 'YK':85, 'YL':36, 'YM':36, 'YN':143, 'YP':110, 'YQ':99, 'YR':77, 'YS':144, 'YT':92, 'YV':55, 'YW':37, 'YY':0}
 
 
 
-        
+######################################################################################################################################
 
-################################################ SIMULATION FUNCTIONS #####################################################
+########################################################## SIMULATION ################################################################
 
-def simulate(f, seqfile, tree, mu_dict, length, beta=None):
-    ''' Simulate single partition according to either codon or mutsel model (check beta (dN) value for which model).
+def simulate(f, seqfile, tree, mu_dict, length):
+    ''' Simulate single partition according homogeneous mutation-selection model.
     '''
     try:
         my_tree = readTree(file = tree, flags = False)
@@ -41,154 +40,116 @@ def simulate(f, seqfile, tree, mu_dict, length, beta=None):
         my_tree = readTree(tree = tree, flags = False) 
           
     model = Model()
-    if beta:
-    	params = {'stateFreqs':f, 'alpha':1.0, 'beta':float(beta), 'mu': mu_dict}
-        model.params = params
-        mat = mechCodon_MatrixBuilder(model)
-    else:
-        print "Setting up MutSel model"
-        params = {'stateFreqs':f, 'alpha':1.0, 'beta':1.0, 'mu': mu_dict}
-        model.params = params
-        mat = mutSel_MatrixBuilder(model)
+    params = {'stateFreqs':f, 'alpha':1.0, 'beta':1.0, 'mu': mu_dict}
+    model.params = params
+    mat = mutSel_MatrixBuilder(model)
     model.Q = mat.buildQ()
     partitions = [(length, {"rootModel":model})]        
     myEvolver = Evolver(partitions, "rootModel" )
     myEvolver.simulate(my_tree)
     myEvolver.writeSequences(outfile = seqfile)
+######################################################################################################################################
 
 
+################################### FUNCTIONS TO SET UP SCALED SEL COEFFS, CODON FREQUENCIES #########################################
 
-
-
-
-def setFreqsAsym(lambda_, mu_dict):
-    ''' ummm maybe '''
+def set_codon_freqs(freqfile):
+    ''' Returns codon frequencies and gc content. Also saves codon frequencies to file. '''
+ 
+    # To randomly assign frequencies, shuffle aminos acids.
+    aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
+    shuffle(aminos)
     
-    v = 2e7 # 2N-2 ~ 2N
-    redo = True
+    redo = True # excessive stringency check (will muck with numeric approximations in simulations if virtually only a single codon is allowed)
     
     while redo:
     
-        # Set up amino acid coefficients
-        ssc_values = np.random.normal(loc=0., scale=lambda_, size=20) #ssc = scaled selection coefficient.
-        ssc_values[0] = 0.
-        aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
-        shuffle(aminos)
-        aa_coeffs = dict(zip(aminos, ssc_values))
+        # Draw amino acid ssc values and assign randomly to amino acids
+        aa_coeffs = dict(zip(aminos, draw_amino_coeffs()))
         
-        codonFreq1 = method1(aa_coeffs, v, mu_dict)
-#        codonFreq2 = method2(aa_coeffs, v, mu_dict)
+        # Convert amino acid coefficients to codon coefficients
+        codon_coeffs = aa_to_codon_coeffs(aa_coeffs)
         
+        # Convert codon coefficients to steady-state frequencies
+        codon_freqs = codon_coeffs_to_freqs(codon_coeffs)
+        codon_freqs_dict = dict(zip(codons, codon_freqs))
+                
         # Should I redo based on excessive codon freq stringency?
-        redo = np.any(codonFreq1 >= 0.985)# or np.any(codonFreq2 >= 0.985)
-        
-    return codonFreq1 #, codonFreq2
-
-
-
-
-def method1(aa_coeffs, v, mu_dict):
-    ''' use codon coefficients to get frequencies '''
+        redo = np.any(codon_freqs >= 0.985)
+     
+    # Once frequencies are set, save them to file and retrieve gc content    
+    np.savetxt(freqfile, codon_freqs)
+    fobj = UserFreqs(by = 'codon', freqs = codon_freqs_dict)
+    nuc_freq = fobj.calcFreqs(type = 'nuc')
+    gc = nuc_freq[1] + nuc_freq[2]
     
-    # Convert to codon coefficients
+    return codon_freqs, codon_freqs_dict, gc
+
+
+
+def draw_amino_coeffs():
+    ssc_values = np.random.normal(size=20) #ssc = scaled selection coefficient. use default mean=0, stddev=1
+    ssc_values[0] = 0.
+    return ssc_values
+
+
+def aa_to_codon_coeffs(aa_coeffs):
     codon_coeffs = {}
     for aa in aa_coeffs:
         syn_codons = genetic_code[ amino_acids.index(aa) ]
         for syn in syn_codons:
             codon_coeffs[syn] = aa_coeffs[aa]
-    
-    
-    # Get codon frequencies from their coefficients
-    codonFreq = np.zeros(61)
+    return codon_coeffs
+
+
+def codon_coeffs_to_freqs(codon_coeffs):
+    codon_freqs = np.zeros(61)
     count = 0
     for codon in codons:
-        asym_term = v*(mu_dict['AT']*( codon.count('A') + codon.count('T') ) - mu_dict['GC']*( codon.count('G') + codon.count('C') ) )
-        codonFreq[count] = np.exp( codon_coeffs[codon] + asym_term )
+        codon_freqs[count] = np.exp( codon_coeffs[codon] )
         count += 1
-    codonFreq /= np.sum(codonFreq)                   
-    assert(np.sum(codonFreq) - 1.0 < zero), "bad codon freq calc in method1"
-    return codonFreq
+    codon_freqs /= np.sum(codon_freqs)                   
+    assert(np.sum(codon_freqs) - 1.0 < ZERO), "codon_freq doesn't sum to 1 in codon_coeffs_to_freqs"
+    return codon_freqs
+######################################################################################################################################
 
 
-def method2(aa_coeffs, v, mu_dict):
-    ''' get aa freqs and then convert to codons'''
-    print aa_coeffs
-    aaFreq = np.zeros(20)
-    count = 0
-    for amino in amino_acids:
-        syn = "".join( genetic_code[count] )
-        asym_term = v * (mu_dict['AT'] * float(syn.count('A') + syn.count('T')) - mu_dict['GC'] * float(syn.count('G') + syn.count('C')) )
-        print amino, syn, asym_term, aa_coeffs[amino]
-        aaFreq[count] = np.exp( aa_coeffs[amino] + asym_term )
-        print aaFreq[count]
-        print
-        count += 1
-    aaFreq /= np.sum(aaFreq)
-    print aaFreq
-    assert 1==6
-    aaFreq_dict = dict(zip(amino_acids, aaFreq))
-    obj = UserFreqs(by = 'amino', freqs=aaFreq_dict)
-    return obj.calcFreqs(type = 'codon')
 
 
-###################################### SYMMETRIC ###########################################
+########################################################  ENTROPY FUNTIONS ###########################################################
 
-def setFreqs(freqfile, lambda_):
-    ''' Returns codon frequencies and gc content. '''
- 
-    # To randomly assign frequencies, shuffle aminos. 
-    aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
-    shuffle(aminos)
+def calc_entropy(f):
+    return -1. * np.sum ( f[f > ZERO] * np.log(f[f > ZERO]) )    
+
+def calc_fequal_error(f):
+    ''' given a set of frequencies (must be np array len=61), determine average distance from 1/61 (equal freqs) '''
+    return np.mean( abs(f - 1./61.)/f )
+
+def calc_entropy_error(entropy):
+    ''' return error of entropy compared to if 1/61 ''' 
+    equal_entropy = 4.1108738641733087
+    return abs(equal_entropy - entropy) / equal_entropy
     
-    redo = True
-    while redo:
-        # Frequencies based on boltzmann dist, such that amino acid frequencies distributed exponentially.
-        raw_aafreqs = setBoltzFreqs(lambda_) # gets frequencies 
-        assert(np.sum(raw_aafreqs) - 1.0 < zero), "bad amino freq calculation"
-        aaFreq = dict(zip(aminos, raw_aafreqs))
-    
-        # Calculate codon state frequencies given amino acid frequencies, above.
-        fobj = UserFreqs(by = 'amino', freqs = aaFreq)
-        codonFreq = fobj.calcFreqs(type = 'codon', savefile = freqfile)
-        
-        # Should I redo based on excessive codon freq stringency?
-        redo = np.any(codonFreq >= 0.985)
-        
-        # Get gc content
-        nucFreq = fobj.calcFreqs(type = 'nuc')
-        gc = nucFreq[1] + nucFreq[2]
-    return codonFreq, gc
-
-def setBoltzFreqs(lambda_):
-    ssc_values = np.random.normal(loc=0., scale=1., size = 20) #ssc = scaled selection coefficient.
-    ssc_values[0] = 0. # set one value to zero to make these values relative to 1 aa, as a mutsel model would do.
-    numer_list = np.zeros(20)
-    for ssc in range(20):
-        val = np.exp(-1. * ssc_values[ssc] * lambda_)
-        numer_list[ssc] = val
-    return numer_list/np.sum(numer_list)    
-#############################################################################################
-
-
-def calcCodonEntropy(f):
-    sum = 0.
-    for entry in f:
-        if entry > 1e-8:
-            sum += entry*np.log(entry)
-    return -1. * sum
     
 
-####################################### OMEGA DERIVATION FUNCTIONS ######################################
+######################################################################################################################################
 
-def deriveOmega(codonFreqs, mu_dict):
-    ''' NOTE: assumes dS = 1. If codon bias is introduced, this will be violated. '''
+
+
+
+
+    
+
+################################################# OMEGA DERIVATION FUNCTIONS #########################################################
+
+def derive_omega(codon_freqs_dict, mu_dict):
+    ''' NOTE: assumes dS = 1, which follows from a symmetric mutation rate and no codon bias (synonymous have same fitness). '''
     
     numer = 0.; denom = 0.;
-    cfreqs = dict(zip(codons, codonFreqs))
 
-    for codon in cfreqs:
-        if cfreqs[codon] > zero:  
-            rate, sites = calcNonSyn(codon, cfreqs, mu_dict)
+    for codon in codon_freqs_dict:
+        if codon_freqs_dict[codon] > ZERO:  
+            rate, sites = calc_nonsyn_paths(codon, codon_freqs_dict, mu_dict)
             numer += rate
             denom += sites
     assert( denom != 0. ), "Omega derivation indicates no evolution, maybe?"
@@ -196,21 +157,21 @@ def deriveOmega(codonFreqs, mu_dict):
 
 
      
-def calcNonSyn(source, cfreqs, mu_dict):
+def calc_nonsyn_paths(source, cfreqs, mu_dict):
     rate = 0.
     sites = 0.
-    sourceFreq = cfreqs[source]
+    source_freq = cfreqs[source]
     for target in codons:
-        diff = getNucleotideDiff(source, target) # only consider single nucleotide differences since are calculating instantaneous.
-        if codon_dict[source] != codon_dict[target] and cfreqs[target] > zero and len(diff) == 2:
-            rate  += calcFix( sourceFreq, cfreqs[target] ) * mu_dict[diff]
+        diff = get_nuc_diff(source, target) # only consider single nucleotide differences since are calculating instantaneous.
+        if codon_dict[source] != codon_dict[target] and cfreqs[target] > ZERO and len(diff) == 2:
+            rate  += calc_fixation_prob( source_freq, cfreqs[target] ) * mu_dict[diff]
             sites += mu_dict[diff]
-    rate  *= sourceFreq
-    sites *= sourceFreq
+    rate  *= source_freq
+    sites *= source_freq
     return rate, sites
     
 
-def getNucleotideDiff(source, target):
+def get_nuc_diff(source, target):
     diff = ''
     for i in range(3):
         if source[i] != target[i]: 
@@ -218,46 +179,59 @@ def getNucleotideDiff(source, target):
     return diff
 
     
-def calcFix(fi, fj):
+def calc_fixation_prob(fi, fj):
+    ''' fi is source and fj is target '''
     if fi == fj:
         return 1.
     elif fi == 0. or fj == 0.:
         return 0.
     else:
         return (np.log(fj) - np.log(fi)) / (1 - fi/fj)    
-#########################################################################################
+######################################################################################################################################
 
 
 
 
-################################################# HYPHY-RELATED FUNCTIONS ############################################################
-def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs):
-    ''' pretty specific function.
-        codonFreqs = what was simulated. note that empirical are not signif different from true, so this is fine.
+#################################################### HYPHY FUNCTIONS #################################################################
+
+
+def run_hyphy_convergence(seqfile, treefile, cpu, kappa):
+    ''' Run hyphy with kappa as true value and equal frequencies, to demonstrate convergence. '''
+    
+    # Set up sequence file with tree
+    shutil.copy(seqfile, "temp.fasta")
+    setup_tree = subprocess.call("cat "+treefile+" >> temp.fasta", shell = True)
+    assert(setup_tree == 0), "couldn't add tree to hyphy infile"
+            
+    # Set up kappa in the matrices file
+    runsedkappa = subprocess.call("sed 's/k/"+str(kappa)+"/g' matrices_raw.mdl > matrices.mdl", shell=True)
+    assert(runsedkappa == 0), "couldn't set up kappa"
+   
+    # Run hyphy.
+    runhyphy = subprocess.call( "./HYPHYMP globalDNDS_equalfreq_truekappa.bf CPU="+cpu+" > hyout.txt", shell = True)
+    assert (runhyphy == 0), "hyphy fail"
+    
+    w, k = parse_output_GY94("hyout.txt")
+    return w
+    
+    
+    
+    
+    
+def run_hyphy(seqfile, treefile, cpu, kappa, fspecs):
+    ''' Run global omega inference according to GY94. The M0 model. 
+        By default, conducts inferences for 4 sets of frequencies (equal, F61, F3x4, CF3x4) across a single kappa specification.
+        DO NOT CHANGE FILE NAMES. THEY ARE HARDCODED HERE AND IN THE HYPHY BATCHFILE.
     '''
     
   
     # Set up sequence file with tree
-    setuphyphy1 = "cp "+seqfile+" temp.fasta"
-    setup1 = subprocess.call(setuphyphy1, shell = True)
-    assert(setup1 == 0), "couldn't create temp.fasta"
-    setuphyphy2 = "cat "+treefile+" >> temp.fasta"
-    setup2 = subprocess.call(setuphyphy2, shell = True)
-    assert(setup2 == 0), "couldn't add tree to hyphy infile"
-    
-    # Set up matrix (GY94 or MG94), within run.bf
-    setuphyphy3 = "sed 's/MYMATRIX/"+matrix_name+"/g' " + batchfile + " > run.bf"
-    setup3 = subprocess.call(setuphyphy3, shell = True)
-    assert(setup3 == 0), "couldn't properly define matrix"
-    
-    # Set up frequencies.
-    if codonFreqs is not None:
-        hyf = freq2hyphy(codonFreqs)
-        setuphyphyf = "sed -i 's/MYFREQUENCIES/"+hyf+"/g' run.bf"
-        setupf = subprocess.call(setuphyphyf, shell = True)
-        assert(setupf == 0), "couldn't properly add in frequencies"
-    
-    # Set up kappa
+    shutil.copy(seqfile, "temp.fasta")
+    setup_tree = subprocess.call("cat "+treefile+" >> temp.fasta", shell = True)
+    assert(setup_tree == 0), "couldn't add tree to hyphy infile"
+            
+        
+    # Set up kappa in the matrices file
     if kappa != 'free':
         sedkappa = "sed 's/k/"+str(kappa)+"/g' matrices_raw.mdl > matrices.mdl"
         runsedkappa = subprocess.call(sedkappa, shell=True)
@@ -265,18 +239,27 @@ def runhyphy(batchfile, matrix_name, seqfile, treefile, cpu, kappa, codonFreqs):
     else:
         shutil.copy('matrices_raw.mdl', 'matrices.mdl')
 
-    # Run hyphy
-    hyphy = "./HYPHYMP run.bf CPU="+cpu+" > hyout.txt"
-    runhyphy = subprocess.call(hyphy, shell = True)
+    # Run hyphy.
+    runhyphy = subprocess.call("./HYPHYMP globalDNDS.bf CPU="+cpu, shell = True)
     assert (runhyphy == 0), "hyphy fail"
     
-    # grab hyphy output
-    return parseHyphyGY94('hyout.txt')
+    # Retrieve omega, kappa MLEs from the hyout files Produces 4 output files, named suffix = {equal_, f61_, f3x4_, cf3x4_} + hyout.txt 
+    omegas = np.zeros(4)
+    kappas = np.zeros(4)
+    count = 0
+    for suffix in fspecs:
+        file = suffix + '_hyout.txt'  
+        mlw, mlk = parse_output_GY94(file)
+        omegas[count] = mlw
+        kappas[count] = mlk
+        count += 1
+    return omegas, kappas
 
 
 
-def freq2hyphy(f):
-    ''' Convert codon frequencies to a form hyphy can use. '''
+
+def array_to_hyphy_freq(f):
+    ''' Convert codon frequencies to a hyphy frequency string. '''
     hyphy_f = "{"
     for freq in f:
         hyphy_f += "{"
@@ -285,9 +268,10 @@ def freq2hyphy(f):
     hyphy_f = hyphy_f[:-1]
     hyphy_f += "};"
     return hyphy_f
+
+ 
     
-    
-def parseHyphyGY94(file):
+def parse_output_GY94(file):
     hyout = open(file, 'r')
     hylines = hyout.readlines()
     hyout.close()
@@ -303,3 +287,17 @@ def parseHyphyGY94(file):
     assert(hyphy_w is not None)
     return hyphy_w, hyphy_k
 
+
+def freqs_from_hyphy(seqfile):
+    ''' Use hyphy to calc F3x4, CF3x4. For follow-up entropy calculations.'''
+    
+    shutil.copy(seqfile, 'temp.fasta')
+    
+    run_hyfreqs = subprocess.call("./HYPHYMP getFrequencies.bf", shell=True)
+    assert(run_hyfreqs == 0), "Couldn't get freqs from hyphy" 
+    runsedbraces = subprocess.call("sed -i -e 's/{//g' -e 's/}//g' *f3x4.txt", shell=True)
+    assert(runsedbraces == 0), "couldn't get rid of braces"
+    f3x4 = np.loadtxt('f3x4.txt')
+    cf3x4 = np.loadtxt('cf3x4.txt')
+    return f3x4, cf3x4
+######################################################################################################################################

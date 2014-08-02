@@ -11,32 +11,13 @@
 
 source ~/.bash_profile
 
-########## UNCOMMENT WHICH TO RUN ############
-
-# Default run to demonstrate omega relationship, using a symmetric mutation scheme
-#APPEND=sym_selection
-#KAPPA=1
-#GCBIAS=0
-#SELECTION=1
-
-# Asymmetric mutation scheme (gc bias) with selection
-APPEND=asym_selection
-KAPPA=1
-GCBIAS=1
-SELECTION=1
-
-# Asymmetric mutation scheme (gc bias) without selection
-#APPEND=asym_noselection
-#KAPPA=1
-#GCBIAS=1
-#SELECTION=0
 
 
 # Set up directories
 SIMDIR=/home/sjs3495/MutSel/Simulator/src
 SCRIPTDIR=/home/sjs3495/Omega_MutSel/cluster_scripts
 WDIR=/share/WilkeLab/work/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
-RDIR=/home/sjs3495/$JOB_NAME-${APPEND}
+RDIR=/home/sjs3495/$JOB_NAME-TEST
 
 mkdir -p $WDIR
 if [ ! -d $WDIR ]
@@ -57,7 +38,7 @@ cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
 
 # Run
 module load python
-python run_siminf.py $SGE_TASK_ID tree.tre $SIMDIR 15 $KAPPA $GCBIAS $SELECTION
+python run_siminf.py $SGE_TASK_ID tree.tre $SIMDIR 15
 
 # Cleanup
 mkdir -p $RDIR
