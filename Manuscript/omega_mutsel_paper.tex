@@ -6,6 +6,11 @@
 \usepackage{amsmath}
 \usepackage{cite}
 
+% definition of \customlabel, which is used to label supplementary figures and tables
+\makeatletter
+\newcommand{\customlabel}[2]{%
+\protected@write \@auxout {}{\string \newlabel {#1}{{#2}{\thepage}{}{}{}}}}
+\makeatother
 
 
 
@@ -105,7 +110,7 @@ Moreover, as seen in Figure~\ref{reg_conv}A, estimates for $\omega$ never exceed
 
 ML $\omega$ values reported in the previous subsection were obtained by fixing $\kappa$ parameter in the GY94 rate matrix to its true simulated value, and specifying equal codon frequencies. However, it is well-known that different ML parameterizations can influence its $\omega$ estimation \cite{YN00,Yang2006,ZhangYu2006}.  Therefore, we additionally inferred ML $\omega$ values according to 11 other model parameterizations. Specifically, we inferred $\omega$ when $\kappa$ was either a free parameter of the model, fixed to its true value, or fixed to 1, and we examined different equilibrium codon frequency specifications, including equal codon frequencies, frequencies calculated using either the F3x4 \cite{MuseGaut1994} or the CF3x4 \cite{Pond2010} estimators, or empirical codon frequencies as taken from the simulated alignment. Table~\ref{tab:mlspec} shows how the $\omega$ values estimated according to these different ML parameterizations relate to the $\omega$ values as calculated using equations \eqref{eq:pi_i}--\eqref{eq:dN}. 
 
-Several important insights into the behavior of ML $\omega$ models can be gained from these results. First, it is clear that equal codon frequencies dramatically outperform all other specifications. Under this frequency specification, ML also estimates $\kappa$ fairly accurately while maintaining an extremely high $\omega$ correlation of 0.993. Second, the F3x4 and CF3x4 frequency estimators perform nearly identically to one another, and neither frequency specification estimates $\omega$ values which correlate with our derived $\omega$. Finally, when empirical codon frequencies are used, $\omega$ estimates have a moderately strong, negative correlation. In fact, under this frequency specification, ML $\omega$ values are dramatically inflated, as illustrated in Figure~\ref{reg_fspec}. As we have proven that, when calculated from scaled selection coefficients, $\omega$ is necessarily less than or equal to 1, we interpret the use of F3x4 or empirical codon frequencies effectively as ML model misspecifications, leading to grossly elevated $dN/dS$ values. However, it is interesting to note that, while ML yields the most accurate $\kappa$ estimates when codon frequencies are set to $1/61$ each, all frequency specifications yield $\kappa$ estimates which correlate relatively strongly with the true $\kappa$ values. Thus, the ML model's ability to accurately estimate $\kappa$ appears much more robust to codon frequency specifications is than its ability to estimate $\omega$.
+Several important insights into the behavior of ML $\omega$ models can be gained from these results. First, it is clear that equal codon frequencies dramatically outperform all other specifications. Under this frequency specification, ML also estimates $\kappa$ fairly accurately while maintaining an extremely high $\omega$ correlation of 0.993. Second, the F3x4 and CF3x4 frequency estimators perform nearly identically to one another, and neither frequency specification estimates $\omega$ values which correlate with our derived $\omega$. Finally, when empirical codon frequencies are used, $\omega$ estimates have a moderately strong, negative correlation. In fact, under this frequency specification, ML $\omega$ values are dramatically inflated, as illustrated in Figure~\ref{reg_fspec} (plots showing all regressions are in Figure~\ref{fig:reg_allspecs}). As we have proven that, when calculated from scaled selection coefficients, $\omega$ is necessarily less than or equal to 1, we interpret the use of F3x4 or empirical codon frequencies effectively as ML model misspecifications, leading to grossly elevated $dN/dS$ values. However, it is interesting to note that, while ML yields the most accurate $\kappa$ estimates when codon frequencies are set to $1/61$ each, all frequency specifications yield $\kappa$ estimates which correlate relatively strongly with the true $\kappa$ values. Thus, the ML model's ability to accurately estimate $\kappa$ appears much more robust to codon frequency specifications is than its ability to estimate $\omega$.
 
 %Additionally, the error between our derived $\omega$ and the ML $\omega$ estimate scales well with the extent of selection pressure. Something about how entropy correlates well with omega, too, like r=0.91. this makes sense. more constraint because fewer codons are allowed. however the opposite sort of happens with ml inference - more constraint, more elevated values. While way less of an issue than with f3x4 or empirical freqs, also occurs with equal freqs. The question is, is this a problem for real analyses? Probably not terribly, but it might be.
 
@@ -176,7 +181,7 @@ Caveat about how our math relies on symmetric mutation rates and/or equal mutati
 \bibliography{bibliography}	
 
 \begin{figure*}[H]
-\centerline{\includegraphics[width=6in]{figures/regression_convergence.pdf}}
+\centerline{\includegraphics[width=5in]{figures/regression_convergence.pdf}}
 \caption{\label{reg_conv} Relationship works exceedingly well. Left panel shows 100 points, each of which corresponds to single simulation. Note that here the ml inference is shown for equal codon frequency specs and kappa fixed to true value (a similar plot for free kappa is shown in suppfigs, but results are qualitatively identical.) Right panels shows convergence of omega values as data set size (represented as simulated alignment length) increases. The y-axis indicates relative error of the ML $dN/dS$ estimates, and the x-axis indicates sequence length on a log-scale. As the sequence length, or the data set size, increases, the two $dN/dS$ estimates converge to the same value. }
 \end{figure*}
 
@@ -215,6 +220,17 @@ Codon frequency specifications were either set as equal (1/61 per codon), calcul
 \centerline{\includegraphics[width=6in]{figures/regression_fspec_kappatrue.pdf}}
 \caption{\label{reg_fspec} Issues with frequency specifications abound. In each plot, red line indicates 1:1 agreement, so note the y-axis differences. Relationship between omega values only really exists when equal codon frequencies are specified. When f3x4 or true freqs used, there is the potential to end up with dramatically inflated values. cf3x4 not shown because its results are statistically the same as f3x4.}
 \end{figure*}
-	
+
+
+
+\clearpage
+\newpage
+
+\section*{Supplementary Figures}
+
+\centerline{\includegraphics[width=6in]{figures/regression_allspecs.pdf}}
+\noindent \textbf{Fig. S1} Regression for all ML parameterizations.
+\customlabel{fig:reg_allspecs}{S1}
+
 \end{document}
 
