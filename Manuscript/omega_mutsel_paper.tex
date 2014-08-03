@@ -43,10 +43,11 @@ Q_{ij} = \left\{ \begin{array}{rl}
          \end{array} \right.,
 \end{equation} where $\mu_{ij}$ is the symmetric nucleotide mutation rate and $f_{ij}$ is the fixation probability from codon $i$ to $j$. The fixation probability is defined as \begin{equation}f_{ij} = ln\bigg{(}\frac{\pi_j\mu_{ij}}{\pi_i\mu_{ji}}\bigg{)}\bigg{/}\bigg{(}1 - \frac{\pi_i\mu_{ji}}{\pi_j\mu_{ij}}\bigg{)},\end{equation} where $\pi_i$ is the equilibrium frequency of codon $i$.
 
-For each simulation, we generated scaled amino acid selection coefficients, $s_a$, by fixing one coefficient to 0 and drawing the remaining 19 values from a normal distribution $\mathcal{N} \sim (0, \lambda)$. The standard deviation parameter $\lambda$ effectively represents the strength of selection; smaller $\lambda$ values will produce similar amino acid fitness values, whereas larger values will naturally lead to a stronger preference for certain amino acids. For each simulation, we selected a value for $\lambda$ from $\mathcal{U} \sim (0.5, 3.5)$.
-We converted these selection coefficients to steady-state amino acid frequencies $\pi_a$ according to \begin{equation} \pi_a = \frac{e^{s_a}}{\sum_b e^{s_b}}, \end{equation} where the denominator sums over all 20 amino acids \cite{Ramseyetal2011}. These frequencies were then assigned to amino acids, and subsequently converted to codon frequencies (assuming no codon bias).
+For each simulation, we generated 20 scaled selection coefficients, $S_a$, by fixing one coefficient to 0 and drawing the remaining 19 values from a normal distribution $\mathcal(N)\sim(0,\sigma)$, where $\sigma ~ U(0.5, 1.5)$. We assigned these coefficients to codons such that all synonymous codons had the same scaled selection coefficient. Following the theory developed by \cite{SellaHirsh2005}, we determined steady-state codon frequencies $\pi_i$ according to \begin{equation} \pi_a = \frac{e^{S_i}}{\sum_k e^{S_k}}, \end{equation} where $S_i$ is the scaled selection coefficient for codon $i$ and the denominator sums over all 61 sense codons. 
+ 
+We simulated protein-coding sequences along a 10-taxon phylogeny, with all branch lengths equal to 0.01, beginning with a root sequence selected using steady-state codon frequencies. Unless otherwise stated, we simulated alignments of 500,000 codon positions with a global, symmetric mutation rate $\mu_{xy} = 10^{-6}$, and a value for for $\kappa$ was drawn from $\mathcal{U} \sim (1,5.5)$. A single evolutionary model was applied to all positions in the simulated sequences, meaning that we did not incorporate any site-wise variation into the evolutionary process. While this lack of site-wise heterogeneity is unrealistic for real sequence evolution, it allows us to verify our derived relationship between selection coefficients and $\omega$ with a sufficiently sized data set.
 
-We simulated protein-coding sequences along a 10-taxon phylogeny, with all branch lengths equal to 0.01, beginning with a root sequence selected using steady-state codon frequencies. Unless otherwise stated, we simulated alignments of 500,000 codon positions with a global, symmetric mutation rate $\mu_{xy} = 10^{-5}$, and a value for for $\kappa$ was drawn from $\mathcal{U} \sim (1,5)$. A single evolutionary model was applied to all positions in the simulated sequences, meaning that we did not incorporate any site-wise variation into the evolutionary process. While this lack of site-wise heterogeneity is unrealistic for real sequence evolution, it allows us to verify our derived relationship between selection coefficients and $\omega$ with a sufficiently sized data set.
+Note that we additionally verified that the system was evolving under a state-state process by comparing the true codon frequencies with empirical codon frequencies calculated from the simulated alignment. The two sets of frequencies were virtually identical.
 
 For each simulated alignment, we inferred $\omega$ in two main ways; first, we calculated $\omega$ using the mathematical framework described in \eqref{eq:fa}--\eqref{eq:dN}, and second, we inferred $\omega$ used the standard maximum likelihood M0 model \cite{NielsenYang1998}, which uses the GY94 rate matrix \cite{GoldmanYang1994}, as implemented in HyPhy \cite{KosakovskyPondetal2005}. The GY94 matrix includes the primary parameters $\omega$, $\kappa$, and equilibrium codon frequencies. As it is well-known that the manner of specification for the latter two parameters strongly influences $\omega$ estimates \cite{YN00, Yang2006}, we inferred $\omega$ under a variety of model parameterizations, including three $\kappa$ parameterizations ($\kappa$ fixed to 1, $\kappa$ fixed to its true value, and $\kappa$ as a free parameter), and four codon frequency specifications (equal codon frequencies,  F3x4 codon frequencies \cite{MuseGaut1994}, CF3x4 codon frequencies \cite{Pond2010} and empirical, or F61, codon frequencies \cite{GoldmanYang1994}). These different specifications yielded twelve maximum likelihood $\omega$ inferences per simulated alignment. All code used is freely available at \textbf{github}.
 
@@ -57,20 +58,17 @@ For each simulated alignment, we inferred $\omega$ in two main ways; first, we c
 \section*{Mathematical relationship between selection coefficients and omega}
 
 
-We describe here how to calculate $dN/dS$ from the parameters of a MutSel model. We assume the following: (i) the mutational process is symmetric, such that $\mu_{xy}=\mu_{yx}$ for all nucleotide pairs $xy$; (ii) all synonymous codons for a given amino acid have the same fitness; there is no synonymous rate variation or codon bias.
+We describe here how to calculate $dN/dS$ from the parameters of a MutSel model. We assume the following: (i) the mutational process is symmetric, such that $\mu_{xy}=\mu_{yx}$ for all nucleotide pairs $xy$; (ii) all synonymous codons for a given amino acid have the same fitness (and therefore the same scaled selection coefficient); there is no synonymous rate variation or codon bias.
 
-In the framework of a MutSel model, we can write the steady-state frequency of amino acid $a$ as
+In the framework of a MutSel model, we can write the steady-state frequency of codon $i$ as
 \begin{equation}\label{eq:pi_a}
- \pi_a=\frac{e^{s_a}}{\sum_b e^{s_b}},
+ \pi_i=\frac{e^{S_i}}{\sum_k e^{S_k}},
 \end{equation}
-where the sum in the denominator runs over all 20 amino acids \cite{SellaHirsh2005}. Here, $s_a$ is the scaled selection coefficient for amino acid $a$; larger $s_a$ values correspond to higher frequencies of amino acid $a$, and corresponds precisely to MutSel model parameters \cite{HalpernBruno1998}. Amino acid frequencies can be subsequently converted to codon frequencies, assuming no codon bias, as 
-\begin{equation}
-\pi_i = \pi_a / n_a ,	
-\end{equation} where $i$ is any codon coding for amino acid $a$ and $n_a$ is the total number of codons which code for $a$.
+where the sum in the denominator runs over all 61 sense codons amino acids \cite{SellaHirsh2005}. Here, $S_i$ is the scaled selection coefficient for codon $i$; larger $S_i$ values correspond to higher frequencies of codon $i$. 
 
 The fixation probability for a mutation from codon $i$ to codon $j$ is \cite{HalpernBruno1998,SellaHirsh2005}
-\begin{equation}\label{eq:fij}
-  f_{ij} = \frac{1-(\pi_i/\pi_j)^{1/N_e}}{1-\pi_i/\pi_j}
+\begin{equation}\label{eq:u_ij}
+  u_{ij} = \frac{1-(\pi_i/\pi_j)^{1/N_e}}{1-\pi_i/\pi_j}
   \approx \frac{1}{N_e} \frac{\ln \pi_j - \ln \pi_i}{1-\pi_i/\pi_j}\,,
 \end{equation}
 where $N_e$ is the effective population size. We can calculate an evolutionary rate 
@@ -78,51 +76,49 @@ Using this framework, we can calculate an evolutionary rate by summing over all 
 
 For example, we can write the synonymous rate $K_\text{S}$ as
 \begin{equation}\label{eq:KS}
-  K_\text{S} = N_e \sum_i \sum_{j \in {\cal S}_i} \pi_i  f_{ij}\mu_{ij}\,,
+  K_\text{S} = N_e \sum_i \sum_{j \in {\cal S}_i} \pi_i  u_{ij}\mu_{ij}\,,
 \end{equation}
 where ${\cal S}_i$ is the set of codons that are synonymous to codon $i$ and differ from it by one nucleotide substitution. To normalize $K_\text{S}$, we divide it by the number of synonymous sites, which we calculate according to the mutational opportunity definition of a site \cite{GoldmanYang1994, Yang2006} as 
 \begin{equation}\label{eq:LS}
-  L_\text{S} = \sum_i \sum_{j \in {\cal S}_i} \pi_i \mu_{ij} \,.
+  L_\text{S} = \sum_i \sum_{j \in {\cal S}_i} \pi_i \mu_{ij},.
 \end{equation}
-Under the assumption that all synonymous codons have equal fitness, and hence all synonymous mutations are selectively neutral, we have $f_{ij}=1/N_e$ \cite{CrowKimura1970}, and thus we find that $dS$, the synonymous rate per synonymous site, is equal to 1.
+Under the assumption that all synonymous codons have equal fitness, and hence all synonymous mutations are selectively neutral, we have $u_{ij}=1/N_e$ \cite{CrowKimura1970}, and thus we find that $dS$, the synonymous rate per synonymous site, is equal to 1.
 
 Similarly, we can derive an expression for $dN$, the non-synonymous rate per non-synonymous site, and we find
 \begin{equation}\label{eq:dN}
-  dN = \frac{K_\text{N}}{L_\text{N}}=\frac{ N_e \sum_i \sum_{j \in {\cal N}_i} \pi_i f_{ij} \mu_{ij} } {\sum_i \sum_{j \in {\cal N}_i} \pi_i \mu_{ij} },
+  dN = \frac{K_\text{N}}{L_\text{N}}=\frac{ N_e \sum_i \sum_{j \in {\cal N}_i} \pi_i u_{ij} \mu_{ij} } {\sum_i \sum_{j \in {\cal N}_i} \pi_i \mu_{ij} },
 \end{equation}
-where ${\cal N}_i$ is the set of codons that are nonsynonymous to codon $i$ and differ from it by one nucleotide substitution. The quantities $K_\text{N}$ and $L_\text{N}$ are defined as in Eqs.~\eqref{eq:KS} and \eqref{eq:LS} but summing over $j\in {\cal N}_i$ instead of $j\in {\cal S}_i$. Equations \eqref{eq:pi_a}--\eqref{eq:dN} establish a connection between the scaled amino acid selection coefficients $s_a$ (i.e., the primary parameters of a MutSel model) and the evolutionary rate ratio $dN/dS$. 
+where ${\cal N}_i$ is the set of codons that are nonsynonymous to codon $i$ and differ from it by one nucleotide substitution. The quantities $K_\text{N}$ and $L_\text{N}$ are defined as in Eqs.~\eqref{eq:KS} and \eqref{eq:LS} but summing over $j\in {\cal N}_i$ instead of $j\in {\cal S}_i$. Equations \eqref{eq:pi_i}--\eqref{eq:dN} establish a connection between the scaled amino acid selection coefficients $s_a$ (i.e., the primary parameters of a MutSel model) and the evolutionary rate ratio $dN/dS$. 
 
 
 \subsection*{Scaled selection coefficients fully encapsulate $\omega$}
 
-To validate our derived relationship between scaled selection coefficients and $\omega$, we simulated protein-coding sequences along a 10-taxon phylogeny according to the Halpern-Bruno mutation-selection model \cite{HalpernBruno1998}, assuming no codon bias and symmetric nucleotide mutation rates. We calculated an $\omega$ for each simulated alignment using the derivations given in equations \eqref{eq:pi_a}--\eqref{eq:dN} as well as standard (ML) methods, according to the GY94 \cite{GoldmanYang1994} rate matrix, as implemented in the HyPhy batch language \cite{KosakovskyPondetal2005}.
+To validate our derived relationship between scaled selection coefficients and $\omega$, we simulated protein-coding sequences along a 10-taxon phylogeny according to the Halpern-Bruno mutation-selection model \cite{HalpernBruno1998}, assuming no codon bias and symmetric nucleotide mutation rates. We calculated an $\omega$ for each simulated alignment using the derivations given in equations \eqref{eq:pi_i}--\eqref{eq:dN} as well as standard (ML) methods, according to the GY94 \cite{GoldmanYang1994} rate matrix, as implemented in the HyPhy batch language \cite{KosakovskyPondetal2005}.
 
 As shown in Figure~\ref{reg_conv}A, $\omega$ values derived using selection coefficients agree nearly perfectly with those inferred using standard maximum likelihood methods. We additionally demonstrate convergence of these values with increasing amounts of data, represented by simulated alignment length (Figure~\ref{reg_conv}B). Taken together, these results clearly show that MutSel model parameters fully encapsulate information regarding the evolutionary rate ratio, $\omega$, and that the results from MutSel and $\omega$ models are largely in agreement. 
 
-Moreover, as seen in Figure~\ref{reg_conv}A, estimates for $\omega$ never exceed 1, but rather all reflect a regime of purifying selection. In fact, in SuppMat, we prove that, when calculated using amino acid selection coefficients, $\omega$ is always less than or equal to 1. Thus important insight reveals that, while MutSel models fully agree with $\omega$ models, they only do so under conditions of purifying selection or neutral evolution. MutSel models, therefore, are inherently unable to describe protein evolution under positive, diversifying selection ($\omega > 1$).
+Moreover, as seen in Figure~\ref{reg_conv}A, estimates for $\omega$ never exceed 1, but rather all reflect a regime of purifying selection. In fact, in SuppMat, we prove that, when calculated using scaled selection coefficients, $\omega$ is necessarily always less than or equal to 1. This important insight reveals that, while MutSel models fully agree with $\omega$ models, this relationship only holds under conditions of purifying selection or neutral evolution. MutSel models, therefore, are inherently unable to describe protein evolution under positive, diversifying selection ($\omega > 1$).
 
 
 
 \subsection*{Influence of ML model parameterizations}
 
-ML $\omega$ values reported in the previous subsection were obtained by fixing $\kappa$ parameter in the GY94 rate matrix to its true simulated value, and specifying equal codon frequencies. However, it is well-known that different ML parameterizations can influence its $\omega$ estimation \cite{YN00,Yang2006,ZhangYu2006}.  Therefore, we additionally inferred ML $\omega$ values according to 11 other model parameterizations. Specifically, we inferred $\omega$ when $\kappa$ was either a free parameter of the model, fixed to its true value, or fixed to 1, and we examined different equilibrium codon frequency specifications, including equal codon frequencies, frequencies calculated using either the F3x4 \cite{MuseGaut1994} or the CF3x4 \cite{Pond2010} estimators, or empirical codon frequencies as taken from the simulated alignment. Table~\ref{tab:mlspec} shows how the $\omega$ values estimated according to these different ML parameterizations relate to the $\omega$ values as calculated using equations \eqref{eq:pi_a}--\eqref{eq:dN}. 
+ML $\omega$ values reported in the previous subsection were obtained by fixing $\kappa$ parameter in the GY94 rate matrix to its true simulated value, and specifying equal codon frequencies. However, it is well-known that different ML parameterizations can influence its $\omega$ estimation \cite{YN00,Yang2006,ZhangYu2006}.  Therefore, we additionally inferred ML $\omega$ values according to 11 other model parameterizations. Specifically, we inferred $\omega$ when $\kappa$ was either a free parameter of the model, fixed to its true value, or fixed to 1, and we examined different equilibrium codon frequency specifications, including equal codon frequencies, frequencies calculated using either the F3x4 \cite{MuseGaut1994} or the CF3x4 \cite{Pond2010} estimators, or empirical codon frequencies as taken from the simulated alignment. Table~\ref{tab:mlspec} shows how the $\omega$ values estimated according to these different ML parameterizations relate to the $\omega$ values as calculated using equations \eqref{eq:pi_i}--\eqref{eq:dN}. 
 
 Several important insights into the behavior of ML $\omega$ models can be gained from these results. First, it is clear that equal codon frequencies dramatically outperform all other specifications. Under this frequency specification, ML also estimates $\kappa$ fairly accurately while maintaining an extremely high $\omega$ correlation of 0.993. Second, the F3x4 and CF3x4 frequency estimators perform nearly identically to one another, and neither frequency specification estimates $\omega$ values which correlate with our derived $\omega$. Finally, when empirical codon frequencies are used, $\omega$ estimates have a moderately strong, negative correlation. In fact, under this frequency specification, ML $\omega$ values are dramatically inflated, as illustrated in Figure~\ref{reg_fspec}. As we have proven that, when calculated from scaled selection coefficients, $\omega$ is necessarily less than or equal to 1, we interpret the use of F3x4 or empirical codon frequencies effectively as ML model misspecifications, leading to grossly elevated $dN/dS$ values. However, it is interesting to note that, while ML yields the most accurate $\kappa$ estimates when codon frequencies are set to $1/61$ each, all frequency specifications yield $\kappa$ estimates which correlate relatively strongly with the true $\kappa$ values. Thus, the ML model's ability to accurately estimate $\kappa$ appears much more robust to codon frequency specifications is than its ability to estimate $\omega$.
 
 %Additionally, the error between our derived $\omega$ and the ML $\omega$ estimate scales well with the extent of selection pressure. Something about how entropy correlates well with omega, too, like r=0.91. this makes sense. more constraint because fewer codons are allowed. however the opposite sort of happens with ml inference - more constraint, more elevated values. While way less of an issue than with f3x4 or empirical freqs, also occurs with equal freqs. The question is, is this a problem for real analyses? Probably not terribly, but it might be.
 
-Thus, the question emerges of why specifying equal codon frequencies leads to precisely accurate $dN/dS$ estimates, whereas the other, more commonly used specifications produce incorrect and biased estimates. The basis for including codon frequencies in mechanistic codon substitution models is to capture biases in the underlying nucleotide base frequencies \cite{YN00, Yang2006}. Indeed, our simulations produced alignments with a wide array of GC-content values (ranging from 0.23 - 0.72), yet the GC-content had no effect on $\omega$ correlations (p = 0.55,when lm(derived~ml+gc)). Importantly, as we adopted symmetric mutation rates in our simulations, these varying degrees of GC-content were not caused by any bias towards unequal base frequencies, but rather by codon fitness differences alone, as dictated by amino acid propensities. Thus, the correct frequencies to specify in ML inference should reflect those frequencies which would be present \textit{in the absence} of selection, which in this case corresponds to equal codon frequencies.
+Thus, the question emerges of why specifying equal codon frequencies leads to precisely accurate $dN/dS$ estimates, whereas the other, more commonly used specifications produce incorrect and biased estimates. The basis for including codon frequencies in mechanistic codon substitution models is to capture biases in the underlying nucleotide base frequencies \cite{YN00, Yang2006}. Indeed, our simulations produced alignments with a wide array of GC-content values (ranging from ??? - ??? ), yet the GC-content had no effect on $\omega$ correlations (p = ???,when lm(derived~ml+gc)). Importantly, as we adopted symmetric mutation rates in our simulations, these varying degrees of GC-content were not caused by any bias towards unequal base frequencies, but rather by codon fitness differences alone. Thus, the correct frequencies to specify in ML inference should reflect those frequencies which would be present \textit{in the absence} of selection, which, the case of symmetric mutation rates, corresponds to equal codon frequencies.
 
-To further demonstrate this point, we conducted additional simulations which used asymmetric mutation rates. We adopted the asymmetric mutation scheme proposed in \cite{SellaHirsh2005} that promotes compositional bias either towards an AT-rich or GC-rich sequence. We simulated sequences according to two broad simulation frameworks: one in which equilibrium codon frequencies were determined as before (e.g. from Boltzmann-distributed amino acid frequencies), and the other in which all codons had an equal equilibrium frequency of 1/61. In other words, the former scenario produced GC-content biases from two sources (mutation and selection), whereas the latter scenario produced GC-content bias from only mutation.
+So, it is critical to parameterize models properly in order to be confident that $\omega$ is the sole parameter representing selection. If, as is the case when non-equal freqs were specified, other parameters in the model take on an interpretation of selection, then $\omega$ is not going to mean what we naively assume it must.
+Highlights potential issues with the $\omega$ class of models. While the framework for $dN/dS$ is one rooted in popgen, these markov processes are not. MutSel models, on the other hand, use a markov process explicitly based on the underlying population genetics principles governing the evolutionary process. 
 
-Results here were pretty straightforward - when only mutation produced the unequal base frequencies, ML performed roughly the same across frequency specifications (albeit a slight error increase when f3x4) and when kappa was true or a free parameter. Interesting, when kappa was fixed to 1 here, ML systematically underestimated omega. However in cases when kappa was a free parameter, ML basically got omega and kappa correct. 
-
-However, when we simulated with selection and asymmetric mutation, ML was largely unable to capture the derived omega value. Oddly enough, ML performed the best when kappa was fixed to 1, and equal frequencies dramatically outperformed other freq specs, although again even this specification did not perform excellently - strongly correlated omegas at r=0.94 (when kappa 1 and freq equal), but hardly the robust 1-1 relationship recovered under a symmetric scheme.
-
-Thus, it seems as though codon frequencies are, in the simulations we have conducted here, a confounding parameter, considering that everything worked best when they were set to equal (and thus might as well not be there at all). Indeed, even when mutation alone drove the emergence of unequal base frequencies, equal was still best.
-HOWEVER - It is very very important to note that selection was still apparently much stronger than mutation, since gc content barely changed at all. When kappa = 1 for the selection runs, gc content did increase by about 3\% give or take, but when no selection and just mutation driving the gc stuff, the gc content of the data was still basically the same as that of the input codons.
 
 In conclusion, when diffs in gc-content are driven by mutational processes alone, we are mostly ok. when, however, selective forces contribute to compositional, for instance by favoring gc-rich codons, inference is wacky, but best when equal frequencies are specified. Thus, we see no reason to continue including this parameter, at least in cases of purifying selection. Although we are able to test only ML performance when evolving under steady-state, we also suspect that eq freqs shouldnt be there for positive selection either, because if positive selection is happening then clearly the system is not at equilibrium and thus using steady-state codon frequencies is a logical flaw.
+
+
+
 
 Important result from our study was the methodological approach of benchmarking ML methods. This is not typically how benchmarking is done, but probably represents something very robust. The specific approach here is somewhat limited; 
 
@@ -192,23 +188,25 @@ Caveat about how our math relies on symmetric mutation rates and/or equal mutati
 \hline\noalign{\smallskip}
 \multicolumn{1}{l}{Codon frequencies} & \multicolumn{1}{l}{$\kappa$ parameterization} & \multicolumn{1}{l}{$\omega$ correlation} &\multicolumn{1}{l}{$\omega$ error} & \multicolumn{1}{l}{$\kappa$ correlation} &\multicolumn{1}{l}{$\kappa$ error} \\
 \hline\noalign{\smallskip}
-Equal & True & \textbf{0.999} & 0.012 &   &   \\ 
-Equal & 1 & \textbf{0.951} & 0.22 &   &   \\ 
-Equal & Free & \textbf{0.993} & 0.045 & \textbf{0.869} & 0.148 \\ 
-F3x4 & True & 0.077 & 5.284 &   &   \\ 
-F3x4 & 1 & 0.032 & 3.553 &   &   \\ 
-F3x4 & Free & 0.147 & 2.152 & \textbf{0.772} & 0.215 \\ 
-CF3x4 & True & 0.076 & 5.265 &   &   \\ 
-CF3x4 & 1 & 0.022 & 3.519 &   &   \\ 
-CF3x4 & Free & 0.149 & 2.141 & \textbf{0.764} & 0.22 \\ 
-Empirical & True & \textbf{-0.62} & 51.851 &   &   \\ 
-Empirical & 1 & \textbf{-0.61} & 28.06 &   &   \\ 
-Empirical & Free & \textbf{-0.608} & 59.792 & \textbf{0.76} & 0.244 \\ 
-
+Equal & True & 0.999 & 0.008 &   &   \\ % the 1.0 is 0.9997 
+Equal & 1 & 0.916 & 0.195 &   &   \\ 
+Equal & Free & 0.996 & 0.023 & 0.913 & 0.106 \\ 
+\hline\noalign{\smallskip}
+F3x4 & True & -0.276 & 1.696 &   &   \\ 
+F3x4 & 1 & -0.233 & 1.317 &   &   \\ 
+F3x4 & Free & -0.278 & 1.727 & 0.929 & 0.141 \\ 
+\hline\noalign{\smallskip}
+CF3x4 & True & -0.301 & 1.718 &   &   \\ 
+CF3x4 & 1 & -0.259 & 1.317 &   &   \\ 
+CF3x4 & Free & -0.301 & 1.747 & 0.932 & 0.136 \\ 
+\hline\noalign{\smallskip}
+Empirical & True & -0.648 & 10.09 &   &   \\ 
+Empirical & 1 & -0.629 & 7.992 &   &   \\ 
+Empirical & Free & -0.656 & 10.29 & 0.804 & 0.227 \\ 
 \noalign{\smallskip}\hline\noalign{\smallskip}
 \end{tabular}
 \newline
-Codon frequency specifications were either set as equal (1/61 per codon), calculated from the F3x4 estimator \cite{MuseGaut1994}, calculated from the CF3x4 estimator \cite{Pond2010}, or set equal to the simulated alignment's empirical frequencies. $\kappa$ was specified as either a fixed value, its true simulated value or 1, or as a free parameter of the model. Correlations given are between the ML $\omega$ estimate and our derived $\omega$ values. Error refers to the mean absolute error between these two $\omega$ estimates. Similar values for $\kappa$ are shown for those inferences where $\kappa$ was a free parameter of the model. bold corresponds to  $p < 1^{-10}$. Nothing else was significant.
+Codon frequency specifications were either set as equal (1/61 per codon), calculated from the F3x4 estimator \cite{MuseGaut1994}, calculated from the CF3x4 estimator \cite{Pond2010}, or set equal to the simulated alignment's empirical frequencies. $\kappa$ was specified as either a fixed value, its true simulated value or 1, or as a free parameter of the model. Correlations given are between the ML $\omega$ estimate and our derived $\omega$ values. Error refers to the mean absolute error between these two $\omega$ estimates. Similar values for $\kappa$ are shown for those inferences where $\kappa$ was a free parameter of the model. Note that all is significant.
 \end{table}	
 	
 
