@@ -68,7 +68,8 @@ def set_codon_freqs(sd, freqfile):
         aa_coeffs = dict(zip(aminos, draw_amino_coeffs(sd)))
         
         # Convert amino acid coefficients to codon coefficients
-        codon_coeffs = aa_to_codon_coeffs(aa_coeffs)
+        #codon_coeffs = aa_to_codon_coeffs(aa_coeffs)
+        codon_coeffs = aa_to_codon_coeffs_bias(aa_coeffs)
         
         # Convert codon coefficients to steady-state frequencies
         codon_freqs = codon_coeffs_to_freqs(codon_coeffs)
@@ -89,18 +90,39 @@ def set_codon_freqs(sd, freqfile):
 
 def draw_amino_coeffs(sd):
     ssc_values = np.random.normal(loc = 0., scale = sd, size=20)
-    ssc_values[0] = 0.
+#    ssc_values[0] = 0.
     return ssc_values
+
+
+def aa_to_codon_coeffs_bias(aa_coeffs):
+    bias = 0.75 # 75% of codons for a given amino acid are a preferred one
+    codon_coeffs = {}
+    for aa in aa_coeffs:
+        syn_codons = genetic_code[ amino_acids.index(aa) ]
+        shuffle(syn_codons) # randomize otherwise the preferred will be the first one alphabetically
+        temp_coeff = aa_coeffs[aa]
+        divide = float(len(syn_codons) - 1)
+        first=True
+        for syn in syn_codons:
+            if first:
+                if len(syn_codons) == 1:
+                    codon_coeffs[syn] = temp_coeff
+                else:
+                    codon_coeffs[syn] = temp_coeff * bias
+                first=False
+            else:
+                codon_coeffs[syn] = temp_coeff * (1. - bias)/divide               
+    return codon_coeffs
+
 
 
 def aa_to_codon_coeffs(aa_coeffs):
     codon_coeffs = {}
     for aa in aa_coeffs:
-        syn_codons = genetic_code[ amino_acids.index(aa) ]
+        syn_codons = genetic_code[ amino_acids.index(aa) ]        
         for syn in syn_codons:
             codon_coeffs[syn] = aa_coeffs[aa]
     return codon_coeffs
-
 
 def codon_coeffs_to_freqs(codon_coeffs):
     codon_freqs = np.zeros(61)
