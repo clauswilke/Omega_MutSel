@@ -53,7 +53,7 @@ def simulate(f, seqfile, tree, mu_dict, length):
 
 ################################### FUNCTIONS TO SET UP SCALED SEL COEFFS, CODON FREQUENCIES #########################################
 
-def set_codon_freqs(sd, freqfile):
+def set_codon_freqs(sd, freqfile, bias = None):
     ''' Returns codon frequencies and gc content. Also saves codon frequencies to file. '''
  
     # To randomly assign frequencies, shuffle aminos acids.
@@ -68,8 +68,10 @@ def set_codon_freqs(sd, freqfile):
         aa_coeffs = dict(zip(aminos, draw_amino_coeffs(sd)))
         
         # Convert amino acid coefficients to codon coefficients
-        #codon_coeffs = aa_to_codon_coeffs(aa_coeffs)
-        codon_coeffs = aa_to_codon_coeffs_bias(aa_coeffs)
+        if bias:
+            codon_coeffs = aa_to_codon_coeffs_bias(aa_coeffs)
+        else:
+            codon_coeffs = aa_to_codon_coeffs(aa_coeffs)
         
         # Convert codon coefficients to steady-state frequencies
         codon_freqs = codon_coeffs_to_freqs(codon_coeffs)
