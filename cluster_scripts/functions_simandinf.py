@@ -53,8 +53,8 @@ def simulate(f, seqfile, tree, mu_dict, length):
 
 ################################### FUNCTIONS TO SET UP SCALED SEL COEFFS, CODON FREQUENCIES #########################################
 
-def set_codon_freqs(sd, freqfile, bias = None):
-    ''' Returns codon frequencies and gc content. Also saves codon frequencies to file. '''
+def set_codon_freqs(sd, freqfile, aafile, codonfile, bias = None):
+    ''' Returns codon frequencies, entropy, and gc content. Also saves codon frequencies, aa coefficients, and codon coefficients to file. '''
  
     # To randomly assign frequencies, shuffle aminos acids.
     aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
@@ -72,6 +72,7 @@ def set_codon_freqs(sd, freqfile, bias = None):
             codon_coeffs = aa_to_codon_coeffs(aa_coeffs)
         else:
             codon_coeffs = aa_to_codon_coeffs_bias(aa_coeffs, bias)
+        
 
         # Convert codon coefficients to steady-state frequencies
         codon_freqs = codon_coeffs_to_freqs(codon_coeffs)
@@ -80,15 +81,21 @@ def set_codon_freqs(sd, freqfile, bias = None):
         # Should I redo based on excessive codon freq stringency?
         redo = np.any(codon_freqs >= 0.99)
      
-    # Once frequencies are set, save them to file and retrieve gc content    
+    # Once frequencies are set, save them and selection coeffs to file  
     np.savetxt(freqfile, codon_freqs)
+    np.savetxt(aafile, [aa_coeffs[key] for key in sorted(aa_coeffs)])
+    np.savetxt(codonfile, [codon_coeffs[key] for key in sorted(codon_coeffs)])
+    
+    # Determine gc content
     fobj = UserFreqs(by = 'codon', freqs = codon_freqs_dict)
     nuc_freq = fobj.calcFreqs(type = 'nuc')
     gc = nuc_freq[1] + nuc_freq[2]
+    
+    # Determine entropy
+    entropy = calc_entropy(codon_freqs)
 
-    return codon_freqs, codon_freqs_dict, gc
-
-
+    return codon_freqs, codon_freqs_dict, gc, entropy
+    
 
 def draw_amino_coeffs(sd):
     ssc_values = np.random.normal(loc = 0., scale = sd, size=20)
@@ -131,24 +138,18 @@ def codon_coeffs_to_freqs(codon_coeffs):
     codon_freqs /= np.sum(codon_freqs)                   
     assert(np.sum(codon_freqs) - 1.0 < ZERO), "codon_freq doesn't sum to 1 in codon_coeffs_to_freqs"
     return codon_freqs
+    
+def calc_entropy(f):
+    return -1. * np.sum ( f[f > ZERO] * np.log(f[f > ZERO]) )    
+
 ######################################################################################################################################
 
 
 
 
-########################################################  ENTROPY FUNTIONS ###########################################################
+########################################################  ENTROPY AND CAI FUNTIONS ###########################################################
 
-def calc_entropy(f):
-    return -1. * np.sum ( f[f > ZERO] * np.log(f[f > ZERO]) )    
 
-def calc_fequal_error(f):
-    ''' given a set of frequencies (must be np array len=61), determine average distance from 1/61 (equal freqs) '''
-    return np.mean( abs(f - 1./61.)/f )
-
-def calc_entropy_error(entropy):
-    ''' return error of entropy compared to if 1/61 ''' 
-    equal_entropy = 4.1108738641733087
-    return abs(equal_entropy - entropy) / equal_entropy
     
     
 

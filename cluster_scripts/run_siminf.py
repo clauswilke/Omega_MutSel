@@ -12,16 +12,18 @@ rep = sys.argv[1]             # which rep we're on, for saving files
 treefile = sys.argv[2]        # tree for simulation
 simdir = sys.argv[3]          # directory of simulation library
 cpu = sys.argv[4]             # hyphy can use
-bias = bool(int(sys.argv[5])) # implement codon bias or not?
+bias = bool(int(sys.argv[5])) # implement codon bias or not? 0 - not. 1 - low. 2 - med. 3 - high.
 sys.path.append(simdir)
 from functions_simandinf import *
 
 
-
 # Set up output files and parameters
-seqfile   = "seqs"+str(rep)+".fasta"
-freqfile  = "codonFreqs" + str(rep)+".txt"
-paramfile = "params"+str(rep)+".txt"
+seqfile       = "seqs"+str(rep)+".fasta"
+freqfile      = "codonFreqs" + str(rep)+".txt"
+amino_sscfile = "aminoCoeffs" + str(rep)+".txt"
+codon_sscfile = "codonCoeffs" + str(rep)+".txt"
+paramfile     = "params"+str(rep)+".txt"
+
 
 seqlength = 500000
 mu = 1e-6
@@ -29,12 +31,12 @@ kappa = rn.uniform(1.0, 6.0)
 sd = rn.uniform(1., 2.)
 mu_dict = {'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'AC': mu, 'CA':mu, 'GT':mu, 'TG':mu, 'AG': kappa*mu, 'GA':kappa*mu, 'CT':kappa*mu, 'TC':kappa*mu}
 if bias:
-    bias = 2. #probably reasonable.
+    bias = 10. #probably reasonable.
 
 
 # Set up steady-state codon frequencies based on selection coefficients
 print "Deriving equilibrium codon frequencies"
-codon_freqs_true, codon_freqs_true_dict, gc_content = set_codon_freqs(sd, freqfile, bias)
+codon_freqs_true, codon_freqs_true_dict, gc_content, entropy = set_codon_freqs(sd, freqfile, amino_sscfile, codon_sscfile, bias)
 
 
 # Simulate according to MutSel model along phylogeny
@@ -60,21 +62,6 @@ omegas = np.zeros([3,4])
 kappas = np.zeros([3,4])
 omega_errors = np.ones([3,4])
 
-# Use hyphy to grab the f3x4, cf3x4 frequencies. Calculate entropies and "freq error" quantities for each frequency list. 
-print "Calculating entropies and frequency 'errors' "
-codon_freqs_f3x4, codon_freqs_cf3x4 = freqs_from_hyphy(seqfile)
-entropy = [4.11087386]
-entropy_error = [0.0]
-fequal_error = [0.0]
-for ftype in fspecs:
-    if ftype != 'equal':
-        freqs = eval('codon_freqs_' + ftype)
-        fequal_error.append( calc_fequal_error(freqs) )
-        temp_entropy = calc_entropy(freqs)
-        entropy.append(temp_entropy)
-        entropy_error.append( calc_entropy_error(temp_entropy) )
-
-
 
 # First, set up F61 (data) frequency vector in the hyphy batchfile as this applies to all hyphy runs.
 hyf = array_to_hyphy_freq(codon_freqs_true)
@@ -94,11 +81,11 @@ for kap in krun:
 
 
 # Finally, save results
-outstring_params = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(sd) + '\t' + str(gc_content) + '\t' + str(derivedw)
+outstring_params = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(sd) + '\t' + str(gc_content) + '\t' + str(entropy) + '\t' + str(derivedw)
 outf = open(paramfile, 'w')
 for f in fspecs:
     y =  fspecs.index(f)
     for k in kspecs:
         x = kspecs.index(k)
-        outf.write( outstring_params + '\t' + str(fequal_error[y]) + '\t' + str(entropy[y]) + '\t' + str(entropy_error[y]) + '\t' + f + '\t' + k + '\t' + str(omegas[x,y]) + '\t' + str(omega_errors[x,y]) + '\t' + str(kappas[x,y]) + '\n')
+        outf.write( outstring_params + '\t' + f + '\t' + k + '\t' + str(omegas[x,y]) + '\t' + str(omega_errors[x,y]) + '\t' + str(kappas[x,y]) + '\n')
 outf.close()   
