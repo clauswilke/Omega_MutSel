@@ -24,7 +24,7 @@
 
 \section*{Introduction}
 
-Over the years, various methods have been used to calculate the strength of natural selection acting on protein-coding sequences. Traditionally, the focus has been on estimating the evolutionary rate ratio, $dN/dS$, the rate of nonsynonymous to synonymous substitution rates. This metric indicates how quickly a protein's constituent amino acids change, and is widely used to identify cases of positive selection ($dN/dS$ > 1). Following early counting methods for estimating $dN/dS$ (e.g. refs \cite{LWL85} and \cite{NG86}), mechanistic codon substitution models, which assume an explicit Markov-process model of sequence evolution (see ref.~\cite{Anisimova2009} for a comprehensive review), have taken a leading role as the inference method of choice since their introduction in the 1990s \cite{GoldmanYang1994, MuseGaut1994}. These models yield maximum likelihood estimates (MLEs) for the parameter $\omega$, which represents the quantity $dN/dS$, and have seen great success in the field of molecular evolution. 
+Over the years, various methods have been used to calculate the strength of natural selection acting on protein-coding sequences. Traditionally, the focus has been on estimating the evolutionary rate ratio, $dN/dS$, the rate of nonsynonymous to synonymous substitution rates. This metric indicates how quickly a protein's constituent amino acids change, and is widely used to identify cases of positive selection ($dN/dS > 1$). Following early counting methods for estimating $dN/dS$ (e.g. refs \cite{LWL85} and \cite{NG86}), mechanistic codon substitution models, which assume an explicit Markov-process model of sequence evolution (see ref.~\cite{Anisimova2009} for a comprehensive review), have taken a leading role as the inference method of choice since their introduction in the 1990s \cite{GoldmanYang1994, MuseGaut1994}. These models yield maximum likelihood estimates (MLEs) for the parameter $\omega$, which represents the quantity $dN/dS$, and have seen great success in the field of molecular evolution. 
 
 A second class of models, known as mutation-selection-balance (MutSel) models, has emerged recently as a popular alternative to mechanistic codon models. The MutSel framework, couched firmly in population genetics theory, models the dynamic interplay between mutation and selection in a protein-coding sequence. MutSel models yield estimates of site-wise scaled selection coefficients, which indicate the extent to which natural selection favors, or disfavors, particular codons or amino acids at a given protein position. Although MutSel models were first introduced over 15 years ago \cite{HalpernBruno1998}, they have seen virtually no use due to their high computational expense. However, recently, several computationally tractable model implementations have emerged \cite{RodrigueLartillot2014,Tamurietal2014}, allowing for the first time the potential for widespread use. 
 
@@ -38,7 +38,7 @@ Moreover, our analyses incidentally have revealed certain biases inherent in the
 
 \section*{Methods}
 
-\subsection*{Sequence simulation and omega inference}
+\subsection*{Sequence simulation}
 We simulated protein-coding sequences as a continuous-time Markovprocess \cite{Yang2006} according to the MutSel model proposed by \cite{HalpernBruno1998}. This model's instantaneous rate matrix $Q$ is given by 
 
 \begin{equation}
@@ -49,11 +49,21 @@ Q_{ij} = \left\{ \begin{array}{rl}
          \end{array} \right.,
 \end{equation} where $\mu_{ij}$ is the symmetric nucleotide mutation rate and $f_{ij}$, the fixation probability from codon $i$ to $j$, is defined as \begin{equation}f_{ij} = ln\bigg{(}\frac{\pi_j\mu_{ij}}{\pi_i\mu_{ji}}\bigg{)}\bigg{/}\bigg{(}1 - \frac{\pi_i\mu_{ji}}{\pi_j\mu_{ij}}\bigg{)},\end{equation} where $\pi_i$ is the equilibrium frequency of codon $i$.
 
-For each simulation, we generated 20 scaled selection coefficients, $S_a$, by fixing one coefficient to 0 and drawing the remaining 19 values from a normal distribution $\mathcal(N)\sim(0,x)$, where $x \sim U(1,2)$. We assigned these coefficients to codons such that all synonymous codons had the same scaled selection coefficient. Following the theory developed by \cite{SellaHirsh2005}, we determined steady-state codon frequencies $\pi_i$ according to \begin{equation} \pi_a = \frac{e^{S_i}}{\sum_k e^{S_k}}, \end{equation} where $S_i$ is the scaled selection coefficient for codon $i$ and the denominator sums over all 61 sense codons. 
- 
-We simulated protein-coding sequences along a 10-taxon phylogeny, with all branch lengths equal to 0.01, beginning with a root sequence selected using steady-state codon frequencies. Unless otherwise stated, we simulated alignments of 500,000 codon positions with a global, symmetric mutation rate $\mu_{xy} = 10^{-6}$, and a value for for $\kappa$ was drawn from $\mathcal{U} \sim (1,6)$. A single evolutionary model was applied to all positions in the simulated sequences. While this lack of site-wise heterogeneity is unrealistic for real sequence evolution, it allows us to verify our derived relationship between selection coefficients and $\omega$ with a sufficiently sized data set.
+We simulated protein-coding sequences along a 10-taxon phylogeny, with all branch lengths equal to 0.01, beginning with a root sequence selected using steady-state codon frequencies. All simulations featured a symmetric mutation rate $\mu_{xy} = 10^{-6}$, and a value for for $\kappa$ was drawn from $\mathcal{U} \sim (1,6)$, resulting in a fully symmetric mutation matrix. Unless otherwise stated, all simulated alignments contained 500,000 codon positions. A single evolutionary model was applied to all positions in the simulated sequences. While this lack of site-wise heterogeneity is unrealistic for real sequence evolution, it allows us to verify our derived relationship between selection coefficients and $dN/dS$ with a sufficiently sized data set.
 
-For each simulated alignment, we inferred $\omega$ in two main ways; first, we calculated $\omega$ using the mathematical framework described in \eqref{eq:pi_i}--\eqref{eq:dN}, and second, we inferred $\omega$ used the standard maximum likelihood M0 model \cite{NielsenYang1998}, which uses the GY94 rate matrix \cite{GoldmanYang1994}, as implemented in HyPhy \cite{KosakovskyPondetal2005}. The GY94 matrix includes the primary parameters $\omega$, $\kappa$, and equilibrium codon frequencies. As different $\kappa$ and equilibrium codon frequency parameterizations can change $\omega$ estimates \cite{YN00, Yang2006}, we inferred $\omega$ under a variety of model parameterizations, including three $\kappa$ parameterizations ($\kappa$ fixed to 1, $\kappa$ as a free parameter, and $\kappa$ fixed to its true, simulated value), and four codon frequency specifications (equal codon frequencies,  F3x4 codon frequencies \cite{MuseGaut1994}, CF3x4 codon frequencies \cite{Pond2010} and empirical codon frequencies \cite{GoldmanYang1994}). These different specifications yielded twelve maximum likelihood $\omega$ inferences per simulated alignment. Note that we additionally verified that the system was evolving under a state-state process by verifying that the true, simulated codon frequencies were the same as the empirical codon frequencies calculated from the simulated alignment. All code used is freely available at \textbf{github}. 
+\subsection*{Assigning scaled selection coefficients}
+
+We simulated two primary sets of 100 alignments. The first set assumed no codon bias, and assigned all synonymous codons the same selection coefficient and therefore the same fitness. For each simulation, we generated 20 scaled selection coefficients, $S_a$, by fixing one coefficient to 0 and drawing the remaining 19 values from a normal distribution $\mathcal(N)\sim(0,x)$, where $x \sim U(1,2)$. We assigned these coefficients to codons such that all synonymous codons had the same scaled selection coefficient. Following the theory developed by \cite{SellaHirsh2005}, we determined steady-state codon frequencies $\pi_i$ according to \begin{equation} \pi_a = \frac{e^{S_i}}{\sum_k e^{S_k}}, \end{equation} where $S_i$ is the scaled selection coefficient for codon $i$ and the denominator sums over all 61 sense codons. 
+
+
+The second set assumed that each fitness differences among synonymous codons, as represented by a preferred codon. 
+
+
+ 
+
+
+\subsection*{$dN/dS$ Inference}
+We calculated a global $dN/dS$ for each alignment using the mathematical framework outlined in \eqref{eq:pi_i}--\eqref{eq:dS} as well using standard maximum likelihood methods. Specifically, we estimated the $\omega$ parameter using the GY94 mechanistic codon model\cite{GoldmanYang1994,NielsenYang1998}, as implemented in HyPhy \cite{KosakovskyPondetal2005}. The GY94 instantaneous rate matrix includes the primary parameters $\omega$, $\kappa$, and equilibrium codon frequencies. As different $\kappa$ and equilibrium codon frequency parameterizations can change $\omega$ estimates \cite{YN00, Yang2006, ZhangYu2006}, we inferred $\omega$ under a variety of model parameterizations, including three $\kappa$ parameterizations ($\kappa$ fixed to 1, $\kappa$ as a free parameter, and $\kappa$ fixed to its true, simulated value), and four codon frequency specifications (equal codon frequencies,  F3x4 codon frequencies \cite{MuseGaut1994}, CF3x4 codon frequencies \cite{Pond2010} and empirical codon frequencies). These different specifications yielded twelve $\omega$ MLEs per simulated alignment. Note that we additionally verified that the system was evolving under a state-state process by verifying that the true, simulated codon frequencies were the same as the empirical codon frequencies calculated from the simulated alignment. All code used is freely available at \textbf{github}. 
 
 
 
@@ -63,9 +73,7 @@ For each simulated alignment, we inferred $\omega$ in two main ways; first, we c
 \section*{Mathematical relationship between selection coefficients and omega}
 
 
-We describe here how to calculate $dN/dS$ from the parameters of a MutSel model. We assume the following: (i) the mutational process is symmetric, such that $\mu_{xy}=\mu_{yx}$ for all nucleotide pairs $xy$; (ii) all synonymous codons for a given amino acid have the same fitness (and therefore the same scaled selection coefficient); there is no synonymous rate variation or codon bias.
-
-In the framework of a MutSel model, we can write the steady-state frequency of codon $i$ as
+We describe here how to calculate $dN/dS$ from the parameters of a MutSel model. Under the assumption that the mutational process is symmetric, e.g. $\mu_{xy}=\mu_{yx}$ for all nucleotide pairs $xy$, we can write the steady-state frequency of codon $i$ as 
 \begin{equation}\label{eq:pi_i}
  \pi_i=\frac{e^{S_i}}{\sum_k e^{S_k}},
 \end{equation}
@@ -84,32 +92,35 @@ To begin, we can write the nonsynonymous rate $K_\text{N}$ as
 \end{equation}
 where ${\cal N}_i$ is the set of codons that are nonsynonymous to codon $i$ and differ from it by one nucleotide. To normalize $K_\text{N}$, we divide it by the number of nonsynonymous sites, which we calculate according to the mutational opportunity definition of a site \cite{GoldmanYang1994, Yang2006} as 
 \begin{equation}\label{eq:LN}
-  L_\text{N} = \sum_i \sum_{j \in {\cal N}_i} \pi_i \mu_{ij}, 
+  L_\text{N} = \sum_i \sum_{j \in {\cal N}_i} \pi_i \mu_{ij}\,, 
 \end{equation} and thus we find that 
 \begin{equation}\label{eq:dN}
-  dN = \frac{K_\text{N}}{L_\text{N}}=\frac{ N_e \sum_i \sum_{j \in {\cal N}_i} \pi_i f_{ij} \mu_{ij} } {\sum_i \sum_{j \in {\cal N}_i} \pi_i \mu_{ij} }.
+  dN = \frac{K_\text{N}}{L_\text{N}}=\frac{ N_e \sum_i \sum_{j \in {\cal N}_i} \pi_i f_{ij} \mu_{ij} } {\sum_i \sum_{j \in {\cal N}_i} \pi_i \mu_{ij} }\,.
 \end{equation}
 
-We can similarly calculate the synonymous evolutionary rate $K_\text{S}$ as 
-\begin{equation}\label{eq:KS}
-  K_\text{S} = N_e \sum_i \sum_{j \in {\cal S}_i} \pi_i  f_{ij}\mu_{ij},
-\end{equation} where ${\cal S}_i$ is the set of codons that are synonymous to codon $i$ and differ from it by one nucleotide. Under the assumption that all synonymous codons have equal fitness, and hence all synonymous mutations are selectively neutral, we have $f_{ij}=1/N_e$ \cite{CrowKimura1970}, yielding \begin{equation}\label{eq:KS_2}
-  K_\text{S} = \sum_i \sum_{j \in {\cal S}_i} \pi_i  \mu_{ij}.
-\end{equation} We can subsequently normalize $K_\text{S}$ by the number of synonymous sites 
-\begin{equation}\label{eq:LS}
-  L_\text{S} = \sum_i \sum_{j \in {\cal S}_i} \pi_i \mu_{ij}, 
-\end{equation} thus revealing that the synonymous rate per synonymous site $dS$ is equal to 1. 
-Equations \eqref{eq:pi_i}--\eqref{eq:LS} establish a connection between the scaled selection coefficients and the evolutionary rate ratio $dN/dS$. 
+Similarly, for $dS$, the synonymous evolutionary rate $K_\text{S}$ per synonymous site $L_\text{S}$, we find
+\begin{equation}\label{eq:dS}
+  dS = \frac{K_\text{S}}{L_\text{S}}=\frac{ N_e \sum_i \sum_{j \in {\cal S}_i} \pi_i f_{ij} \mu_{ij} } {\sum_i \sum_{j \in {\cal S}_i} \pi_i \mu_{ij} }\,,
+\end{equation}
+where ${\cal S}_i$ is the set of codons that are synonymous to codon $i$ and differ from it by one nucleotide substitution. The quantities $K_\text{S}$ and $L_\text{S}$ are defined as in Eqs.~\eqref{eq:KN} and \eqref{eq:LN} but summing over $j\in {\cal S}_i$ instead of $j\in {\cal N}_i$.
+
+Equations \eqref{eq:pi_i}--\eqref{eq:dS} establish a connection between the scaled selection coefficients and the evolutionary rate ratio $dN/dS$. Moreover, we note that, if we assume that all synonymous codons have equal fitness (e.g. synonymous mutations are neutral), the synonymous fixation rate $f_ij = 1/N_e$ \cite{CrowKimura1970}. Under this circumstance, the value for $dS$ would reduce to 1.
 
 
 \subsection*{Scaled selection coefficients fully encapsulate $\omega$}
 
-To validate our derived relationship between scaled selection coefficients and $dN/dS$, we simulated protein-coding sequences along a 10-taxon phylogeny according to a mutation-selection model framework \cite{HalpernBruno1998,SellaHirsh2005}. For these simulations, we assume no codon bias (i.e. all synonymous codons share the same selection coefficient) and symmetric nucleotide mutation rates. We calculated an $dN/dS$ for each simulated alignment using the derivations given in equations \eqref{eq:pi_i}--\eqref{eq:LS} as well as using a standard maximum likelihood (ML) approach, according to the GY94 \cite{GoldmanYang1994} rate matrix, as implemented in the HyPhy batch language \cite{KosakovskyPondetal2005}.
+To validate our derived relationship between scaled selection coefficients and $dN/dS$, we simulated protein-coding sequences along a 10-taxon phylogeny according to a mutation-selection model framework \cite{HalpernBruno1998,SellaHirsh2005}. We simulated 100 replicate alignments according to two primary model specifications: codon bias and no codon bias. In the 
+
+
+
+
+assume no codon bias (i.e. all synonymous codons share the same selection coefficient) and symmetric nucleotide mutation rates. We calculated an $dN/dS$ for each simulated alignment using the derivations given in equations \eqref{eq:pi_i}--\eqref{eq:LS} as well as using a standard maximum likelihood (ML) approach, according to the GY94 \cite{GoldmanYang1994} rate matrix, as implemented in the HyPhy batch language \cite{KosakovskyPondetal2005}.
 
 As shown in Figure~\ref{reg_conv}A, $dN/dS$ values derived using selection coefficients agree nearly perfectly with those inferred using standard maximum likelihood methods. We additionally demonstrate convergence of these values with increasing amounts of data, represented by simulated alignment length (Figure~\ref{reg_conv}B). Taken together, these results clearly show that MutSel model parameters fully encapsulate information regarding $dN/dS$, and that the results from MutSel and $\omega$ models are in complete agreement. 
 
 Moreover, as seen in Figure~\ref{reg_conv}A, $dN/dS$ values are always less than 1, reflecting a universal regime of purifying selection. In fact, \textbf{in SuppMat,} we prove that, when calculated using scaled selection coefficients, $dN/dS$ is necessarily always less than or equal to 1. This important insight reveals that, while MutSel and mechanistic codon models fully agree, their relationship only holds under conditions of purifying selection or neutral evolution. MutSel models, therefore, are inherently unable to describe protein evolution under positive, diversifying selection ($dN/dS > 1$).
 
+BUT NOTE ABOUT THE SYNONYMOUS FITNESS DIFFERENCES.
 
 
 \subsection*{Influence of ML model parameterizations}
@@ -129,12 +140,40 @@ The oldest and most-widely used method to infer selection pressure in protein-co
 
 Until now, however, it has been an open question how these two modeling frameworks relate to one another. Here, we have derived a formal mathematical relationship between the parameter estimates of $\omega$ and MutSel models, and through a simulation approach, we find that these two models are in full agreement. Importantly, this relationship holds only if the protein evolves accordingly to a strictly steady-state process, otherwise known as purifying selection. Alternatively, under non-equilibrium conditions, (e.g. positive selection, when $\omega > 1$), MutSel models are inherently unable to describe protein evolution. These findings have important implications for when the use of each model is justified; if positive selection has occurred along the protein's evolutionary trajectory, MutSel models will likely yield spurious results.
 
+
+Importantly, this mathematical relationship between scaled selection coefficients and $dN/dS$ holds both when synonymous codons have equal and distinct fitness values.
+
+
+
 In addition, we simulated according to 
 
 however, it is not immediately clear how to benchmark these conditions. for omega to be properly inferred under codon bias, one would have to properly parameterize the equilibrium codon frequencies in the mechcodon model. how to go about this is not immediately clear.
 secondly, for asymmetric mutation rates, one would need a suitable function to determine steady-state codon frequencies which incorporates this, and there is no general case for doing this either.These issues could be studied further, but are beyond the scope of our aim here. 
 
-the results presented here rely on two main assumptions: there is no codon bias (e.g. synonymous codons have equal fitness), and underlying mutation rates are symmetrical. In principle, the mathematical equivalency between scaled selection coefficients and $dN/dS$ values should hold regardless of either of these phenomena. The main caveat we note is that our proof that this derived $dN/dS < 1$ may not hold under cases of asymmetric mutations rates, e.g. where $\mu_{AT} \neq \mu_{TA}$.
+the results presented here rely on two main assumptions: there is no codon bias (e.g. synonymous codons have equal fitness), and underlying mutation rates are symmetrical. In principle, the mathematical equivalency between scaled selection coefficients and $dN/dS$ values should hold regardless of either of these phenomena. In circumstances in which synonymous codons have 
+
+
+The main caveat we note is that our proof that this derived $dN/dS < 1$ may not hold under cases of asymmetric mutations rates, e.g. where $\mu_{AT} \neq \mu_{TA}$.
+
+
+
+Our implementation of codon bias explicitly assumed that frequency differences among synonymous codons resulted from fitness differences alone. This implementation might not be entirely biologically realistic, as it is generally assumed that both mutational and selective forces contribute to codon bias in real genomes \cite{Blumer1991, HershbergPetrov2008,PlotkinKudla2010}. However, the key finding that we present is that fitness differences among synonymous codons do not affect the robust mathematical equivalency between scaled selection coefficients and $dN/dS$. 
+
+Moreover, results obtained when fitness differences among synonymous codons were considered raise an additional issue with $dN/dS$; even though all sequences were simulated according to a strictly steady-state process, these sequences frequently featured $dN/dS$ values greater than 1. Indeed, our derivation of $dN/dS$ from selection coefficients shows that, when fitness differences exist among synonymous codons, $dN/dS$ need not be less than 1. In contrast, the most extreme case of codon bias, in which only a single codon per amino acid is selectively tolerated, the number of synonymous sites $L_\text{S} = 0$, and thus the value for $dN/dS$ approaches infinity. This finding seems paradoxical to classic interpretations of $dN/dS >1$. Typically, these values are viewed as hallmarks of positive or diversifying selection, which is assumed to occur when the protein sequence experiences strong selective pressure to change its constituent amino acids. Positive selection, therefore, necessarily implies that the protein does not evolve at equilibrium, but rather a shift in selective constraint caused new amino acids to be favored. 
+
+However, one must also recognize that the contention that $dN/dS > 1$ represents positive selection assumes that synonymous substitutions are selectively neutral, which is clearly not the case when codon bias exists. Therefore, it is entirely possible that estimates of positive selection as inferred via $dN/dS$ estimates in species with high levels of codon bias, such as many bacterial, \textit{Drosophila}, or certain mammalian species \cite{Chamaryetal2006, HershbergPetrov2008, PlotkinKudla2010}, may not be true cases of positive selection, but rather simply signals of strong codon bias.
+
+
+However, our derivation of 
+This result seems paradoxical; our calculations rest on the assumption that the protein is evolving at an equilibrium, but it seems that even equilibrium processes are capable of producing values of $dN/dS > 1$. 
+
+
+
+ which will yield $dN/dS$ values far greater than 1. However, the calculations here necessitate that the protein is evolving according to a strictly equilibrium process, which seems paradoxical to having positive selection. In other words, even if the protein is evolving according to a static fitness landscape, sufficient levels of codon bias may yield values for $dN/dS$ which are well above 1. Thus, it seems as though what is classically termed positive selection can result simply from strong synonymous fitness differences.
+ 
+
+Alternatively, we have performed all calculations under the assumption that mutation rates are symmetric, e.g. $\mu_{xy} = \mu_{yx}$. This assumption allows us to calculate steady-state codon frequencies from selection coefficients (equation \eqref{eq:pi_i}), according to theory developed by Sella and Hirsh relating statistical physics to steady-state protein evolution \cite{SellaHirsh2005}. How to derive steady-state frequencies under an asymmetric mutation scheme remains non-trivial, and merits further study. 
+
 
 While some may prefer one model over another, it is important to have a full understanding of why one model might be applied over another. Our results demonstrate that, for circumstances of purifying selection or neutral, the models are robust and in agreement. However, be careful, because sometimes they don't agree, and this is equally important.
 
