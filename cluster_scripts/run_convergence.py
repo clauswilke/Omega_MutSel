@@ -21,7 +21,7 @@ freqfile  = "codonFreqs" + str(rep)+".txt"
 paramfile = "params"+str(rep)+".txt"
 mu = 1e-6
 kappa = rn.uniform(1.0, 6.0)
-sd = rn.uniform(0.5, 1.5)
+sd = rn.uniform(1., 2.)
 mu_dict = {'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'AC': mu, 'CA':mu, 'GT':mu, 'TG':mu, 'AG': kappa*mu, 'GA':kappa*mu, 'CT':kappa*mu, 'TC':kappa*mu}
 
 # To test convergence, select random sequence length between 5e2 and 5e5
