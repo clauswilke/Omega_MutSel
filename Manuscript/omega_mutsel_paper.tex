@@ -1,7 +1,7 @@
 \documentclass[11pt]{article}
 
 \usepackage[margin=1.0in]{geometry}
-\linespread{1.5}
+%\linespread{1.5}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{cite}
@@ -43,13 +43,13 @@ We simulated protein-coding sequences as a continuous-time Markovprocess \cite{
 
 \begin{equation}
 Q_{ij} = \left\{ \begin{array}{rl}
-              0                                           &\mbox{multiple nucleotide changes} \\
-              f_{ij}\mu_{ij}                          &\mbox{single nucleotide transversion} \\
               f_{ij}\mu_{ij}\kappa               &\mbox{single nucleotide transition} \\
+              f_{ij}\mu_{ij}                          &\mbox{single nucleotide transversion} \\
+              0                                           &\mbox{multiple nucleotide changes} \\             
          \end{array} \right.,
 \end{equation} where $\mu_{ij}$ is the symmetric nucleotide mutation rate and $f_{ij}$, the fixation probability from codon $i$ to $j$, is defined as \begin{equation}f_{ij} = ln\bigg{(}\frac{\pi_j\mu_{ij}}{\pi_i\mu_{ji}}\bigg{)}\bigg{/}\bigg{(}1 - \frac{\pi_i\mu_{ji}}{\pi_j\mu_{ij}}\bigg{)},\end{equation} where $\pi_i$ is the equilibrium frequency of codon $i$.
 
-For each simulation, we generated 20 scaled selection coefficients, $S_a$, by fixing one coefficient to 0 and drawing the remaining 19 values from a normal distribution $\mathcal(N)\sim(0,\sigma)$, where $\sigma ~ U(1,2)$. We assigned these coefficients to codons such that all synonymous codons had the same scaled selection coefficient. Following the theory developed by \cite{SellaHirsh2005}, we determined steady-state codon frequencies $\pi_i$ according to \begin{equation} \pi_a = \frac{e^{S_i}}{\sum_k e^{S_k}}, \end{equation} where $S_i$ is the scaled selection coefficient for codon $i$ and the denominator sums over all 61 sense codons. 
+For each simulation, we generated 20 scaled selection coefficients, $S_a$, by fixing one coefficient to 0 and drawing the remaining 19 values from a normal distribution $\mathcal(N)\sim(0,x)$, where $x \sim U(1,2)$. We assigned these coefficients to codons such that all synonymous codons had the same scaled selection coefficient. Following the theory developed by \cite{SellaHirsh2005}, we determined steady-state codon frequencies $\pi_i$ according to \begin{equation} \pi_a = \frac{e^{S_i}}{\sum_k e^{S_k}}, \end{equation} where $S_i$ is the scaled selection coefficient for codon $i$ and the denominator sums over all 61 sense codons. 
  
 We simulated protein-coding sequences along a 10-taxon phylogeny, with all branch lengths equal to 0.01, beginning with a root sequence selected using steady-state codon frequencies. Unless otherwise stated, we simulated alignments of 500,000 codon positions with a global, symmetric mutation rate $\mu_{xy} = 10^{-6}$, and a value for for $\kappa$ was drawn from $\mathcal{U} \sim (1,6)$. A single evolutionary model was applied to all positions in the simulated sequences. While this lack of site-wise heterogeneity is unrealistic for real sequence evolution, it allows us to verify our derived relationship between selection coefficients and $\omega$ with a sufficiently sized data set.
 
@@ -127,13 +127,18 @@ Importantly, however, our simulated alignments contained relatively constrained 
 \subsection*{Discussion}
 The oldest and most-widely used method to infer selection pressure in protein-coding genes calculates calculates the ratio of non-synonymous ($dN$) to synonymous ($dS$) substitution rates $dN/dS$ to identify sites that experience negative selection ($dN/dS<1$), sites that evolve neutrally ($dN/dS\approx1$), and sites that experience positive diversifying selection ($dN/dS>1$). By contrast, MutSel models estimate scaled selection coefficients, either for individual amino acids \cite{HalpernBruno1998,Bruno1996,Rodrigueetal2010,Tamurietal2012,Tamurietal2014}, for codons \cite{YangNielsen2008}, or for both. Thus, while mechanistic codon models describe the how quickly a protein's constituent amino acids change, MutSel models calculate the strength of natural selection operating on the specific amino-acid changes.  
 
-Until now, however, it has been an open question how these two modeling frameworks relate to one another. Here, we have derived a formal mathematical relationship between the parameter estimates of $\omega$ and MutSel models, and through a simulation approach, we find that these two models are in full agreement. Importantly, this relationship holds only if the protein evolves accordingly to a strictly steady-state process, otherwise known as purifying selection. Alternatively, under non-equilibrium conditions, (e.g. positive selection, when $\omega > 1$), MutSel models are inherently unable to describe protein evolution. These findings have important implications for when the use of each model is justified; if positive selection has occurred along the protein's evolutionary trajectory, MutSel models will likely yield spurious results. 
+Until now, however, it has been an open question how these two modeling frameworks relate to one another. Here, we have derived a formal mathematical relationship between the parameter estimates of $\omega$ and MutSel models, and through a simulation approach, we find that these two models are in full agreement. Importantly, this relationship holds only if the protein evolves accordingly to a strictly steady-state process, otherwise known as purifying selection. Alternatively, under non-equilibrium conditions, (e.g. positive selection, when $\omega > 1$), MutSel models are inherently unable to describe protein evolution. These findings have important implications for when the use of each model is justified; if positive selection has occurred along the protein's evolutionary trajectory, MutSel models will likely yield spurious results.
 
+In addition, we simulated according to 
 
+however, it is not immediately clear how to benchmark these conditions. for omega to be properly inferred under codon bias, one would have to properly parameterize the equilibrium codon frequencies in the mechcodon model. how to go about this is not immediately clear.
+secondly, for asymmetric mutation rates, one would need a suitable function to determine steady-state codon frequencies which incorporates this, and there is no general case for doing this either.These issues could be studied further, but are beyond the scope of our aim here. 
 
+the results presented here rely on two main assumptions: there is no codon bias (e.g. synonymous codons have equal fitness), and underlying mutation rates are symmetrical. In principle, the mathematical equivalency between scaled selection coefficients and $dN/dS$ values should hold regardless of either of these phenomena. The main caveat we note is that our proof that this derived $dN/dS < 1$ may not hold under cases of asymmetric mutations rates, e.g. where $\mu_{AT} \neq \mu_{TA}$.
 
-Moreover, we found that the widely-used maximum likelihood approach to estimate $\omega$ was only accurate under certain model parameterizations. In particular, $\omega$ MLE values were only correct when equilibrium codon frequency parameters were specified as equal (e.g. each codon had an equilibrium frequency of $1/61$), regardless of the true codon frequency distribution, while using common frequency estimators such as F3x4 \cite{MuseGaut1994} and CF3x4 \cite{Pond2010} or empirical codon frequencies (also known as the F61 estimator) always yielded strongly inflated $\omega$ estimates.
+While some may prefer one model over another, it is important to have a full understanding of why one model might be applied over another. Our results demonstrate that, for circumstances of purifying selection or neutral, the models are robust and in agreement. However, be careful, because sometimes they don't agree, and this is equally important.
 
+Incidentally, this study revealed the strong importance of properly parameterizing mechanistic codon substitution models. biases in the performance of mechanistic codon substitution models  we found that the widely-used maximum likelihood approach to estimate $\omega$ was only accurate under certain model parameterizations. In particular, $\omega$ MLE values were only correct when equilibrium codon frequency parameters were specified as equal (e.g. each codon had an equilibrium frequency of $1/61$), regardless of the true codon frequency distribution, while using common frequency estimators such as F3x4 \cite{MuseGaut1994} and CF3x4 \cite{Pond2010} or empirical codon frequencies (also known as the F61 estimator) always yielded strongly inflated $\omega$ estimates. 
 
 We explain this phenomenon by recognizing that the rationale for including codon frequency parameters in mechanistic codon substitution models is to capture biases in the underlying nucleotide base frequencies \cite{YN00, Yang2006}. It is further assumed that any nucleotide composition bias results strictly from mutational processes, and not from natural selection. This assumption, however, may not be fully justified. Indeed, our simulated alignments featured a wide array of nucleotide compositions, with GC-contents ranging from 0.22-0.79. Given that we simulated sequences according to a symmetric mutation matrix, these compositional biases resulted entirely from natural selection favoring particular codons, not by any bias towards unequal base frequencies. Therefore, the proper equilibrium frequency specification for our alignments was indeed equal codon frequencies, which would result from a symmetric mutation scheme in the absence of natural selection. Unfortunately, however, even the commonly-used F3x4 and CF3x4 frequency estimators were unable to properly specify codon frequencies, resulting in elevated $\omega$ values. Thus, it is critical to parameterize mechanistic codon models properly in order to ensure that the $\omega$ parameter is the sole parameter measuring the strength of natural selection. Otherwise, other model parameters may contain information about the selection process, and the resulting $\omega$ MLE will not accurately represent the true $dN/dS$ value. 
 %The motivation for using frequency estimators such as F3x4 is that the resulting equilibrium codon frequencies will reflect those which would have been produced solely by mutational processes, and not from selection. However, without experimental evidence, there is no clear way to know \textit{a priori} the source of nucleotide biases.  
@@ -142,26 +147,16 @@ We explain this phenomenon by recognizing that the rationale for including codon
 %Finally, we must ask whether this issue could be problematic in real sequence analyses. Our alignments were simulated through a homogenous evolutionary process, whereas in real sequence data, different amino acid (codon) frequencies would be naturally expected across sites. The median entropy in our simulated data set was 3.261, but ranged from 1.3 - 3.91. In real analyses, codon frequencies are treated as a global parameter, with the notion that averaging across sites will give a selection-proof estimate. We looked at e.coli genome which is known to have a lot of codon bias and thus may have low codon entropy. e coli ranges from 3.2-3.9, and half of our data is in that range. Thus, it is possible that incorrect frequency specs are producing false positives or getting the extent of selection basically wrong. Unless you are sure that codon frequency biases are attributed to mutation instead of selection, we don't recommend this parameter.
 
 
+% possible paragraph on dnds issues. would need to see where this fits though.
 
-% why this study was good
-This study highlights the importance of examining the  While some may prefer one model over another, it is important to have a full understanding of why one model might be applied over another. Our results demonstrate that, for circumstances of purifying selection or neutral, the models are robust and in agreement. However, be careful, because sometimes they don't agree, and this is equally important.
+Omega models have come under fire for not considering amino acid fitness but focusing only on this ratio. Recent work has suggested that models which explicitly consider amino acid fitness dramatically outperform omega models for phylogenetic inference. We not only find that these models are totally comparable, but that information that would otherwise be garnered from an omega model can be readily calculated from the results of a mutsel model. thus, going forward, we tend to recommend using mutsel models, as they effectively represent both. this conclusion, however, comes with a major caveat - mutsel models cannot describe positive selection, and thus it is important to cautiously apply these models. 
+
+
+
 
 %implications for future model use. - models have limitations. omega estimates when produced via ml methods are not strictly based on population genetics theory, although they have parameters that are. there is no necessary guarantee however that the values that omega takes on are actually selection. our study proves that blah blah blah. please publish me.
 
-
-
-Methods which characterize evolutionary dynamics of protein-coding sequences are among the most widely-used tools in comparative sequence analysis, with applications ranging from identifying key functional protein residues to predicting the evolutionary trajectories and virulence of disease. Traditional codon substitution models used to study protein evolution assess evolutionary rate, or how quickly a protein's constituent amino acids change over phylogenetic time-scales. 
-
-Several studies have pointed out that $\omega$ models suffer from 
-
-
-However, these models overlook a key aspect of protein evolutionary dynamics: natural selection favors distinct, site-specific distributions of amino acids across positions in proteins. To address this gap, a class of computational models, known as mutation-selection models, have appeared in the literature. These models explicitly account for the dynamic interplay between the mutational and selective forces shaping protein evolution, and in doing so prioritize site-specific amino acid propensities. Although mutation-selection models were first proposed over 15 years ago, it is only within the past year that our computational power has reached a point where such models are tractable. Therefore, there exists critical need for the development of tools which can assess the validity of and test hypotheses regarding these models. 
-
-
-Many have pointed out that $\omega$ models suffer from certain 
-
-However, while widely-applied, codon-substitution models have several serious drawbacks.
-
+%However, these models overlook a key aspect of protein evolutionary dynamics: natural selection favors distinct, site-specific distributions of amino acids across positions in proteins. To address this gap, a class of computational models, known as mutation-selection models, have appeared in the literature. These models explicitly account for the dynamic interplay between the mutational and selective forces shaping protein evolution, and in doing so prioritize site-specific amino acid propensities. Although mutation-selection models were first proposed over 15 years ago, it is only within the past year that our computational power has reached a point where such models are tractable. Therefore, there exists critical need for the development of tools which can assess the validity of and test hypotheses regarding these models. 
 
 %this relationship and demonstrated that these models yield nearly identical results. However, we additionally found that MutSel models necessarily cannot describe scenarios in which positive or diversifying selection occurs, or when $dN/dS > 1$. Although it is generally acknowledged that MutSel models carry the assumption of purifying selection, we formalize and prove this result. These findings have important implications for how and when these models should be applied. In cases of purifying selection or neutral evolution, these two competing models are virtually no different from one another, and thus use of either model is fully justified. Alternatively, if positive selection is occurring, MutSel models cannot be used as they mathematically cannot capture the actual evolutionary process.
 
@@ -172,18 +167,10 @@ However, while widely-applied, codon-substitution models have several serious dr
 
 
 %any study problems
-Results presented here rely on two main assumptions: synonymous codons have equal fitness, and underlying mutation rates are symmetrical. Therefore, it is possible that, if these conditions were violated, $dN/dS$ as calculated from selection coefficients might indeed be greater than 1. While these are certainly simplifying assumptions, we contend that  ...
+
 
 
 This study moreover reveals a promising future avenue for methodological benchmarking. Typically, researchers assess the performance of a given inference framework through simulations which adhere to the underlying model's assumptions. However, this strategy can only confirm that inference methods are behaving as expected; it cannot confirm that the underlying model accurately represents the evolutionary process. Instead, we suggest an alternate approach to benchmark inference methods, and indeed evolutionary models: assessing the extent to which distinct models agree may serve as a novel, robust strategy to determine the accuracy of different modeling frameworks.
-
-
-
- Here, by deriving an explicit relationship between $dN/dS$ and selection coefficients, we incidentally uncovered some biases in mechanistic codon model inference. 
-
-
-
-
 
 
 
