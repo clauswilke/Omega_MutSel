@@ -75,9 +75,7 @@ def set_codon_freqs(sd, freqfile, bias = None):
 
         # Convert codon coefficients to steady-state frequencies
         codon_freqs = codon_coeffs_to_freqs(codon_coeffs)
-        codon_freqs_dict = dict(zip(codons, codon_freqs))
-        print codon_freqs_dict
-        assert 1==6       
+        codon_freqs_dict = dict(zip(codons, codon_freqs))    
         # Should I redo based on excessive codon freq stringency?
         redo = np.any(codon_freqs >= 0.99)
      
