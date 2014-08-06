@@ -5,13 +5,14 @@
 
 ######## Input parameters ########
 import sys
-if (len(sys.argv) != 5):
-    print "\n\nUsage: python run_siminf.py <rep> <treefile> <simdir> <cpu>\n."
+if (len(sys.argv) != 6):
+    print "\n\nUsage: python run_siminf.py <rep> <treefile> <simdir> <cpu> <bias>\n."
     sys.exit()
-rep = sys.argv[1]      # which rep we're on, for saving files
-treefile = sys.argv[2] # tree for simulation
-simdir = sys.argv[3]   # directory of simulation library
-cpu = sys.argv[4]      # hyphy can use
+rep = sys.argv[1]             # which rep we're on, for saving files
+treefile = sys.argv[2]        # tree for simulation
+simdir = sys.argv[3]          # directory of simulation library
+cpu = sys.argv[4]             # hyphy can use
+bias = bool(int(sys.argv[5])) # implement codon bias or not?
 sys.path.append(simdir)
 from functions_simandinf import *
 
@@ -27,11 +28,14 @@ kappa = rn.uniform(1.0, 6.0)
 sd = rn.uniform(1., 2.)
 mu_dict = {'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'AC': mu, 'CA':mu, 'GT':mu, 'TG':mu, 'AG': kappa*mu, 'GA':kappa*mu, 'CT':kappa*mu, 'TC':kappa*mu}
 
+# Set up bias such that, if called, unpreferred codons will have frequencies half that of preferred codons.
+if bias:
+    bias = 2.
 
 
 # Set up steady-state codon frequencies based on selection coefficients
 print "Deriving equilibrium codon frequencies"
-codon_freqs_true, codon_freqs_true_dict, gc_content = set_codon_freqs(sd, freqfile)
+codon_freqs_true, codon_freqs_true_dict, gc_content = set_codon_freqs(sd, freqfile, bias)
 
 
 # Simulate according to MutSel model along phylogeny
@@ -41,7 +45,7 @@ simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
 
 # Derive omega from selection coefficients (well, frequencies, but same deal)
 print "Deriving omega from selection coefficients"
-derivedw = derive_omega(codon_freqs_true_dict, mu_dict)
+derivedw = derive_omega(codon_freqs_true_dict, mu_dict, bias)
 
 
 # Maximum likelihood omega inference across a variety of frequency, kappa specifications

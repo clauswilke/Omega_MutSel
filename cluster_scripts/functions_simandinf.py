@@ -68,15 +68,16 @@ def set_codon_freqs(sd, freqfile, bias = None):
         aa_coeffs = dict(zip(aminos, draw_amino_coeffs(sd)))
         
         # Convert amino acid coefficients to codon coefficients
-        if bias:
-            codon_coeffs = aa_to_codon_coeffs_bias(aa_coeffs)
-        else:
+        if bias is None:
             codon_coeffs = aa_to_codon_coeffs(aa_coeffs)
-        
+        else:
+            codon_coeffs = aa_to_codon_coeffs_bias(aa_coeffs, bias)
+
         # Convert codon coefficients to steady-state frequencies
         codon_freqs = codon_coeffs_to_freqs(codon_coeffs)
         codon_freqs_dict = dict(zip(codons, codon_freqs))
-                
+        print codon_freqs_dict
+        assert 1==6       
         # Should I redo based on excessive codon freq stringency?
         redo = np.any(codon_freqs >= 0.99)
      
@@ -85,7 +86,7 @@ def set_codon_freqs(sd, freqfile, bias = None):
     fobj = UserFreqs(by = 'codon', freqs = codon_freqs_dict)
     nuc_freq = fobj.calcFreqs(type = 'nuc')
     gc = nuc_freq[1] + nuc_freq[2]
-    
+
     return codon_freqs, codon_freqs_dict, gc
 
 
@@ -96,24 +97,18 @@ def draw_amino_coeffs(sd):
     return ssc_values
 
 
-def aa_to_codon_coeffs_bias(aa_coeffs):
-    bias = 0.75 # 75% of codons for a given amino acid are a preferred one
+def aa_to_codon_coeffs_bias(aa_coeffs, bias):
     codon_coeffs = {}
     for aa in aa_coeffs:
         syn_codons = genetic_code[ amino_acids.index(aa) ]
         shuffle(syn_codons) # randomize otherwise the preferred will be the first one alphabetically
-        temp_coeff = aa_coeffs[aa]
-        divide = float(len(syn_codons) - 1)
         first=True
         for syn in syn_codons:
             if first:
-                if len(syn_codons) == 1:
-                    codon_coeffs[syn] = temp_coeff
-                else:
-                    codon_coeffs[syn] = temp_coeff * bias
+                codon_coeffs[syn] = aa_coeffs[aa]
                 first=False
             else:
-                codon_coeffs[syn] = temp_coeff * (1. - bias)/divide               
+                codon_coeffs[syn] = aa_coeffs[aa] - np.log(bias)
     return codon_coeffs
 
 
@@ -166,18 +161,34 @@ def calc_entropy_error(entropy):
 
 ################################################# OMEGA DERIVATION FUNCTIONS #########################################################
 
-def derive_omega(codon_freqs_dict, mu_dict):
-    ''' NOTE: assumes dS = 1, which follows from a symmetric mutation rate and no codon bias (synonymous have same fitness). '''
+def derive_omega(codon_freqs_dict, mu_dict, bias = False):
+    ''' NOTE: bias=None assumes dS = 1, which follows from a symmetric mutation rate and no codon bias (synonymous have same fitness). 
+        When bias is not none, then dS is also computed.
+    '''
     
-    numer = 0.; denom = 0.;
+    numer_dn = 0.; denom_dn = 0.;
+    numer_ds = 0.; denom_ds = 0.;
 
     for codon in codon_freqs_dict:
         if codon_freqs_dict[codon] > ZERO:  
+        
             rate, sites = calc_nonsyn_paths(codon, codon_freqs_dict, mu_dict)
-            numer += rate
-            denom += sites
-    assert( denom != 0. ), "Omega derivation indicates no evolution, maybe?"
-    return numer/denom
+            numer_dn += rate
+            denom_dn += sites
+    
+            if bias:
+                rate, sites = calc_syn_paths(codon, codon_freqs_dict, mu_dict)
+                numer_ds += rate
+                denom_ds += sites
+    
+    if bias is False:
+        assert( denom_dn != 0. ), "Omega derivation indicates no evolution, maybe?"
+        return numer_dn/denom_dn
+        
+    else:
+        assert( denom_dn != 0. and denom_ds != 0.), "Omega derivation, with bias, indicates no evolution, maybe?"
+        return (numer_dn/denom_dn)/(numer_ds/denom_ds)
+    
 
 
      
@@ -194,6 +205,20 @@ def calc_nonsyn_paths(source, cfreqs, mu_dict):
     sites *= source_freq
     return rate, sites
     
+
+def calc_syn_paths(source, cfreqs, mu_dict):
+    rate = 0.
+    sites = 0.
+    source_freq = cfreqs[source]
+    for target in codons:
+        diff = get_nuc_diff(source, target) # only consider single nucleotide differences since are calculating instantaneous.
+        if codon_dict[source] == codon_dict[target] and cfreqs[target] > ZERO and len(diff) == 2:
+            rate  += calc_fixation_prob( source_freq, cfreqs[target] ) * mu_dict[diff]
+            sites += mu_dict[diff]
+    rate  *= source_freq
+    sites *= source_freq
+    return rate, sites
+
 
 def get_nuc_diff(source, target):
     diff = ''
