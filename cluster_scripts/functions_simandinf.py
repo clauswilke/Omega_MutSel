@@ -75,7 +75,8 @@ def set_codon_freqs(sd, freqfile, bias = None):
 
         # Convert codon coefficients to steady-state frequencies
         codon_freqs = codon_coeffs_to_freqs(codon_coeffs)
-        codon_freqs_dict = dict(zip(codons, codon_freqs))    
+        codon_freqs_dict = dict(zip(codons, codon_freqs))
+            
         # Should I redo based on excessive codon freq stringency?
         redo = np.any(codon_freqs >= 0.99)
      
@@ -100,13 +101,15 @@ def aa_to_codon_coeffs_bias(aa_coeffs, bias):
     for aa in aa_coeffs:
         syn_codons = genetic_code[ amino_acids.index(aa) ]
         shuffle(syn_codons) # randomize otherwise the preferred will be the first one alphabetically
+        k = float(len(syn_codons) - 1.)
+        bias_factor = np.log(bias)
         first=True
         for syn in syn_codons:
             if first:
-                codon_coeffs[syn] = aa_coeffs[aa]
+                codon_coeffs[syn] = aa_coeffs[aa] + bias_factor
                 first=False
             else:
-                codon_coeffs[syn] = aa_coeffs[aa] - np.log(bias)
+                codon_coeffs[syn] = aa_coeffs[aa] - bias_factor/k
     return codon_coeffs
 
 
