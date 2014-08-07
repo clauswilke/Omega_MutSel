@@ -9,7 +9,7 @@
 #$ -pe serial 15
 
 
-BIAS=1 # 0=no codon bias. 1=yes codon bias.
+BIAS=2   # 0=no codon bias. other number = the bias factor.
 source ~/.bash_profile
 
 
@@ -46,4 +46,6 @@ mkdir -p $RDIR
 cp params* $RDIR
 cp seqs* $RDIR
 cp codonFreqs* $RDIR
+cp aminoCoeffs* $RDIR
+cp codonCoeffs* $RDIR
 rm -rf $WDIR

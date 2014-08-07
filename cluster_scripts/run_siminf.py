@@ -28,7 +28,7 @@ paramfile     = "params"+str(rep)+".txt"
 seqlength = 500000
 mu = 1e-6
 kappa = rn.uniform(1.0, 6.0)
-sd = rn.uniform(0.5, 3.0)
+sd = rn.uniform(0., 4.)
 mu_dict = {'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'AC': mu, 'CA':mu, 'GT':mu, 'TG':mu, 'AG': kappa*mu, 'GA':kappa*mu, 'CT':kappa*mu, 'TC':kappa*mu}
 
 

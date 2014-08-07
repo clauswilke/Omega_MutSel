@@ -53,7 +53,7 @@ def simulate(f, seqfile, tree, mu_dict, length):
 
 ################################### FUNCTIONS TO SET UP SCALED SEL COEFFS, CODON FREQUENCIES #########################################
 
-def set_codon_freqs(sd, freqfile, aafile, codonfile, bias = None):
+def set_codon_freqs(sd, freqfile, aafile, codonfile, bias):
     ''' Returns codon frequencies, entropy, and gc content. Also saves codon frequencies, aa coefficients, and codon coefficients to file. '''
  
     # To randomly assign frequencies, shuffle aminos acids.
@@ -68,11 +68,8 @@ def set_codon_freqs(sd, freqfile, aafile, codonfile, bias = None):
         aa_coeffs = dict(zip(aminos, draw_amino_coeffs(sd)))
         
         # Convert amino acid coefficients to codon coefficients
-        if bias is None:
-            codon_coeffs = aa_to_codon_coeffs(aa_coeffs)
-        else:
-            codon_coeffs = aa_to_codon_coeffs_bias(aa_coeffs, bias)
-        
+        codon_coeffs = aa_to_codon_coeffs(aa_coeffs, bias)
+
 
         # Convert codon coefficients to steady-state frequencies
         codon_freqs = codon_coeffs_to_freqs(codon_coeffs)
@@ -98,36 +95,28 @@ def set_codon_freqs(sd, freqfile, aafile, codonfile, bias = None):
     
 
 def draw_amino_coeffs(sd):
-    ssc_values = np.random.normal(loc = 0., scale = sd, size=20)
+    ssc_values = np.random.normal(loc=0., scale=sd, size=20) # note: default np fxn is mean=0, sd=1.
     ssc_values[0] = 0.
     return ssc_values
 
 
-def aa_to_codon_coeffs_bias(aa_coeffs, bias):
+def aa_to_codon_coeffs(aa_coeffs, bias):
+    ''' Assign amino acid selection coefficients to codons. Note that if bias=0, then there's no codon bias. '''
     codon_coeffs = {}
     for aa in aa_coeffs:
         syn_codons = genetic_code[ amino_acids.index(aa) ]
         shuffle(syn_codons) # randomize otherwise the preferred will be the first one alphabetically
         k = float(len(syn_codons) - 1.)
-        bias_factor = np.log(bias)
         first=True
         for syn in syn_codons:
             if first:
-                codon_coeffs[syn] = aa_coeffs[aa] + bias_factor
+                codon_coeffs[syn] = aa_coeffs[aa] + bias
                 first=False
             else:
-                codon_coeffs[syn] = aa_coeffs[aa] - bias_factor/k
+                codon_coeffs[syn] = aa_coeffs[aa] - bias/k
     return codon_coeffs
 
 
-
-def aa_to_codon_coeffs(aa_coeffs):
-    codon_coeffs = {}
-    for aa in aa_coeffs:
-        syn_codons = genetic_code[ amino_acids.index(aa) ]        
-        for syn in syn_codons:
-            codon_coeffs[syn] = aa_coeffs[aa]
-    return codon_coeffs
 
 def codon_coeffs_to_freqs(codon_coeffs):
     codon_freqs = np.zeros(61)
@@ -163,9 +152,9 @@ def calc_entropy(f):
 
 ################################################# OMEGA DERIVATION FUNCTIONS #########################################################
 
-def derive_omega(codon_freqs_dict, mu_dict, bias = False):
-    ''' NOTE: bias=None assumes dS = 1, which follows from a symmetric mutation rate and no codon bias (synonymous have same fitness). 
-        When bias is not none, then dS is also computed.
+def derive_omega(codon_freqs_dict, mu_dict, bias):
+    ''' NOTE: bias=0 assumes dS = 1, which follows from a symmetric mutation rate and no codon bias (synonymous have same fitness). 
+        When bias is 0, then dS is also computed. Mutation matrix still symmetric though.
     '''
     
     numer_dn = 0.; denom_dn = 0.;
@@ -179,7 +168,7 @@ def derive_omega(codon_freqs_dict, mu_dict, bias = False):
             denom_dn += sites
     
             if bias:
-                rate, sites = calc_syn_paths(codon, codon_freqs_dict, mu_dict)
+		rate, sites = calc_syn_paths(codon, codon_freqs_dict, mu_dict)
                 numer_ds += rate
                 denom_ds += sites
     
