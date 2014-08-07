@@ -1,18 +1,18 @@
-# SJS.
-# Generic code for simulating and deriving omega via math, hyphy ML.
+# SJS. stephanie.spielman@gmail.com
+# Generic code for simulating and deriving dN/dS via selection coeffcients and hyphy ML.
 # Be sure to cp src/ directory (simulator), hyphy files, and the functions_simandinf.py script into working directory
-# NOTE: very little to no sanity checking for input args
+# NOTE: very little (ok, none) sanity checking for input args..
 
 ######## Input parameters ########
 import sys
 if (len(sys.argv) != 6):
     print "\n\nUsage: python run_siminf.py <rep> <treefile> <simdir> <cpu> <bias>\n."
     sys.exit()
-rep = sys.argv[1]             # which rep we're on, for saving files
-treefile = sys.argv[2]        # tree for simulation
-simdir = sys.argv[3]          # directory of simulation library
-cpu = sys.argv[4]             # hyphy can use
-bias = bool(int(sys.argv[5])) # implement codon bias or not? 0 - not. 1 - low. 2 - med. 3 - high.
+rep = sys.argv[1]         # which rep we're on, for saving files
+treefile = sys.argv[2]    # tree for simulation
+simdir = sys.argv[3]      # directory of simulation library
+cpu = sys.argv[4]         # hyphy can use
+bias = float(sys.argv[5]) # codon bias factor
 sys.path.append(simdir)
 from functions_simandinf import *
 
@@ -28,10 +28,8 @@ paramfile     = "params"+str(rep)+".txt"
 seqlength = 500000
 mu = 1e-6
 kappa = rn.uniform(1.0, 6.0)
-sd = rn.uniform(1., 2.)
+sd = rn.uniform(0.5, 3.0)
 mu_dict = {'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'AC': mu, 'CA':mu, 'GT':mu, 'TG':mu, 'AG': kappa*mu, 'GA':kappa*mu, 'CT':kappa*mu, 'TC':kappa*mu}
-if bias:
-    bias = 10. #probably reasonable.
 
 
 # Set up steady-state codon frequencies based on selection coefficients
@@ -46,7 +44,7 @@ simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
 
 # Derive omega from selection coefficients (well, frequencies, but same deal)
 print "Deriving omega from selection coefficients"
-derivedw = derive_omega(codon_freqs_true_dict, mu_dict, bias)
+derivedw = derive_omega(codon_freqs_true_dict, mu_dict, bias!=0.) # last argument as bool for function to know whether to compute dS.
 
 
 # Maximum likelihood omega inference across a variety of frequency, kappa specifications
@@ -81,7 +79,7 @@ for kap in krun:
 
 
 # Finally, save results
-outstring_params = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(sd) + '\t' + str(gc_content) + '\t' + str(entropy) + '\t' + str(derivedw)
+outstring_params = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(sd) + '\t' + str(bias) + '\t' + str(gc_content) + '\t' + str(entropy) + '\t' + str(derivedw)
 outf = open(paramfile, 'w')
 for f in fspecs:
     y =  fspecs.index(f)
