@@ -52,33 +52,29 @@ def simulate(f, seqfile, tree, mu_dict, length):
 
 
 ################################### FUNCTIONS TO SET UP SCALED SEL COEFFS, CODON FREQUENCIES #########################################
-
 def set_codon_freqs(sd, freqfile, aafile, codonfile, bias):
     ''' Returns codon frequencies, entropy, and gc content. Also saves codon frequencies, aa coefficients, and codon coefficients to file. '''
- 
-    # To randomly assign frequencies, shuffle aminos acids.
-    aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
-    shuffle(aminos)
-    
-    redo = True # excessive stringency check (will muck with numeric approximations in simulations if virtually only a single codon is allowed)
-    
-    while redo:
-    
-        # Draw amino acid ssc values and assign randomly to amino acids
-        aa_coeffs = dict(zip(aminos, draw_amino_coeffs(sd)))
         
-        # Convert amino acid coefficients to codon coefficients
-        codon_coeffs = aa_to_codon_coeffs(aa_coeffs, bias)
+    # Draw amino acid ssc values and assign randomly to amino acids. NOTE: the sd argument is either the sd or it is the pre-determined amino acid selection coefficients.
+    if type(sd) is float:
+        aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
+        shuffle(aminos)  # To randomly assign coefficients, shuffle aminos acids.
+        aa_coeffs = dict(zip(aminos, draw_amino_coeffs(sd)))
+     	print aa_coeffs   
+    elif type(sd) is dict:
+        aa_coeffs = sd
+
+        
+    # Convert amino acid coefficients to codon coefficients
+    codon_coeffs = aa_to_codon_coeffs(aa_coeffs, bias)
 
 
-        # Convert codon coefficients to steady-state frequencies
-        codon_freqs = codon_coeffs_to_freqs(codon_coeffs)
-        codon_freqs_dict = dict(zip(codons, codon_freqs))
+    # Convert codon coefficients to steady-state frequencies
+    codon_freqs = codon_coeffs_to_freqs(codon_coeffs)
+    codon_freqs_dict = dict(zip(codons, codon_freqs))
             
-        # Should I redo based on excessive codon freq stringency?
-        redo = np.any(codon_freqs >= 0.99)
      
-    # Once frequencies are set, save them and selection coeffs to file  
+    # Save frequencies and selection coeffs to file  
     np.savetxt(freqfile, codon_freqs)
     np.savetxt(aafile, [aa_coeffs[key] for key in sorted(aa_coeffs)])
     np.savetxt(codonfile, [codon_coeffs[key] for key in sorted(codon_coeffs)])
