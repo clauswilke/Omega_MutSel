@@ -41,18 +41,17 @@ seqlength = int( times * 10**expon )
 
 # Set up steady-state codon frequencies based on selection coefficients
 print "Deriving equilibrium codon frequencies"
-codon_freqs_tru_true_dict, gc_content, entropy = set_codon_freqs(sd, freqfile, amino_sscfile, codon_sscfile, 0.)
+codon_freqs, codon_freqs_dict, gc_content, entropy = set_codon_freqs(sd, freqfile, amino_sscfile, codon_sscfile, 0.)
 
 
 
 # Simulate according to MutSel model along phylogeny
 print "Simulating"
-simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
-
+simulate(codon_freqs, seqfile, treefile, mu_dict, seqlength)
 
 # Derive omega from selection coefficients (well, frequencies, but same deal)
 print "Deriving omega from selection coefficients"
-derivedw = derive_omega(codon_freqs_true_dict, mu_dict, False)
+derivedw = derive_omega(codon_freqs_dict, mu_dict, False)
 
 # ML
 print "Conducting ML inference with HyPhy"
