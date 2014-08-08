@@ -21,6 +21,34 @@
 
 
 \begin{document}
+\title{\textbf{The relationship between dN/dS and scaled selection coefficients}}
+\author{Stephanie J. Spielman$^{1}$ and Claus O. Wilke$^{1}$}
+\date{}
+
+\maketitle
+\noindent
+Address:\\
+$^1$Department of Integrative Biology, Center for Computational Biology and Bioinformatics, and Institute of Cellular and Molecular Biology.
+The University of Texas at Austin, Austin, TX 78712, USA.\\
+
+\bigskip
+\noindent
+$^*$Corresponding author\\
+$\phantom{^*}$Email: ??????????\\
+
+\bigskip
+\noindent
+Manuscript type: Letter
+
+\bigskip
+\noindent Keywords: selection coefficients, $dN/dS$, natural selection, protein evolution, models of sequence evolution
+
+\newpage
+\begin{abstract}
+Two measures of the strength of selection on protein coding sequences $dN/dS$
+  
+\end{abstract}
+
 
 \section*{Introduction}
 
@@ -28,10 +56,12 @@ Over the years, various methods have been used to calculate the strength of natu
 
 A second class of models, known as mutation-selection-balance (MutSel) models, have emerged recently as a popular alternative to mechanistic codon models. The MutSel framework, couched firmly in population genetics theory, models the dynamic interplay between mutation and selection in a protein-coding sequence. MutSel models yield estimates of site-wise scaled selection coefficients, which indicate the extent to which natural selection favors, or disfavors, particular codons or amino acids at a given protein position. Although MutSel models were first introduced over 15 years ago \cite{HalpernBruno1998}, they have seen virtually no use due to their high computational expense. However, recently, several computationally tractable model implementations have emerged \cite{RodrigueLartillot2014,Tamurietal2014}, allowing for the first time the potential for widespread use. 
 
-Although both $dN/dS$ models and MutSel models describe the same fundamental process of protein-coding sequence evolution along a phylogeny, it is largely unknown how these two classes of models relate to one another. In particular, as these inference methods have been developed independently, it remains an open question whether or not parameter estimates from one model are comparable to those of the other model. Therefore, while certain rhetorical arguments may be made in favor of using one method over another, there is currently no formalized, concrete rationale to guide researchers in their methodological choices. 
+
+Although both $dN/dS$ models and MutSel models describe the same fundamental process of protein-coding sequence evolution along a phylogeny, it is largely unknown how these two classes of models relate to one another. In particular, as these inference methods have been developed independently, it remains an open question whether or not parameter estimates from one model are comparable to those of the other model. Whether $dN/dS$ values have any correspondence with scaled selection coefficients remains an open question. Therefore, while certain rhetorical arguments may be made in favor of using one method over another, there is currently no formalized, concrete rationale to guide researchers in their methodological choices. 
 
 Here, we formalize the relationship between $\omega$ and MutSel models by examining the extent to which their focal parameters, $dN/dS$ and scaled selection coefficients, yield overlapping information about the evolutionary process. To this end, we derive a mathematical relationship these models' primary parameters from which one can infer $dN/dS$ values from selection coefficients alone. Using a simulation approach, we verify that $dN/dS$ values estimated using selection coefficients alone correspond precisely to $\omega$ MLEs inferred using standard mechanistic codon models. 
 
+% MORE NEEDS TO BE WRITTEN HERE FOR SURE ONCE THE REST OF THE MS IS COMPLETE
 (???)Further, we prove that, under conditions of symmetric mutation rates, this relationship holds only under regimes of purifying selection or neutral evolution ($dN/dS \leq 1$). This proof reveals that MutSel models are inherently unable to describe accurately protein evolution under a regime of positive diversifying selection, or when $dN/dS > 1$.
 
 Moreover, our analyses incidentally have revealed certain biases inherent in the ML $\omega$ inference approach. (...)
@@ -55,9 +85,10 @@ We simulated protein-coding sequences along a 10-taxon phylogeny, with all branc
 
 \subsection*{Assigning scaled selection coefficients}
 
-We simulated 100 alignments under the assumption that all synonymous codons have equal fitness (e.g. no codon bias), and a second set of 100 alignments which incorporated codon bias. For both frameworks, we generated amino acid scaled selection coefficients, $S_a$, for each simulation, by fixing one coefficient to 0 and drawing the remaining 19 values from a normal distribution $\mathcal(N)\sim(0,x)$, where $x \sim U(1,2)$. 
+We simulated 100 alignments under the assumption that all synonymous codons have equal fitness (e.g. no codon bias), and a second set of 100 alignments which incorporated codon bias. For both frameworks, we generated amino acid scaled selection coefficients, $S_a$, for each simulation, by fixing one coefficient to 0 and drawing the remaining 19 values from a normal distribution $\mathcal(N)\sim(0,x)$, where $x \sim U(0,4)$. Here, this standard deviation $x$ effectively represents the strength of natural selection; larger values of $x$ will correspond to greater fitness differences among amino acids, and thus more selective pressure.
 
-For simulations without codon bias, we assigned these amino acid selection coefficients to codons such that all synonymous codons had the same scaled selection coefficient. For simulations with codon bias, we randomly selected a preferred codon for each amino acid. We then assigned the preferred codon a selection coefficient of $S_a + x$, where $x=ln(2)$, and we assigned non-preferred codons selection coefficients of $S_a - x/(k-1)$, where $k$ is the total number of synonymous codons for the given amino acid. In this way, the average selection coefficient for this amino acid remained unchanged, whereas selective strength was partitioned such that a single codon was most selectively favored.
+
+For simulations without codon bias, we assigned these amino acid selection coefficients to codons such that all synonymous codons had the same scaled selection coefficient. For simulations with codon bias, we randomly selected a preferred codon for each amino acid. We then assigned the preferred codon a selection coefficient of $S_a + b$, where $b=(2)$, and we assigned non-preferred codons selection coefficients of $S_a - b/(k-1)$, where $k$ is the total number of synonymous codons for the given amino acid. In this way, the average selection coefficient for this amino acid remained unchanged, but one codon per amino acid was much more selectively favored.
 
 
 
@@ -110,8 +141,13 @@ Equations \eqref{eq:pi_i}--\eqref{eq:dS} establish a connection between the scal
 
 To validate our derived relationship between scaled selection coefficients and $dN/dS$, we simulated protein-coding sequences along a 10-taxon phylogeny according to a mutation-selection model framework \cite{HalpernBruno1998,SellaHirsh2005}. We simulated 100 alignments which gave equal fitness values to synonymous codons, and 100 alignments which incorporated codon bias (see Method for details). All simulations assumed a symmetric nucleotide rate matrix. For each alignment, we calculated $dN/dS$ using equations \eqref{eq:pi_i}--\eqref{eq:dS} as well as using the M0 mechanistic codon model \cite{GoldmanYang1994,NielsenYang1998,Yangetal2000}, as implemented in the HyPhy batch language \cite{KosakovskyPondetal2005}.
 
-The relationship between $dN/dS$ calculations is shown in Figure~\ref{reg_conv}A (for simulations with no codon bias) and Figure~\ref{reg_conv}B (for simulations with codon bias), and it is clear that $dN/dS$ values derived using selection coefficients agree nearly perfectly with those inferred using standard maximum likelihood methods. Fitness differences among synonymous codons do not influence this robust relationship. Additionally, in Figure~\ref{reg_conv}C, we demonstrate convergence of $dN/dS$ estimates as the size of the data set, represented by simulated alignment length,increases. Taken together, these results demonstrate that MutSel model parameters fully encapsulate information regarding $dN/dS$, and that the results from MutSel and mechanistic codon models are in complete agreement. As the results the datasets simulated with and without codon bias are largely the same, we focus the rest of our results on simulations without codon bias.
+The relationship between $dN/dS$ calculations is shown in Figure~\ref{reg_conv}A (for simulations with no codon bias) and Figure~\ref{reg_conv}B (for simulations with codon bias), and it is clear that $dN/dS$ values derived using selection coefficients agree nearly perfectly with those inferred using standard maximum likelihood methods. Fitness differences among synonymous codons do not influence this robust relationship. Additionally, in Figure~\ref{reg_conv}C, we demonstrate convergence of $dN/dS$ estimates as the size of the data set, represented by simulated alignment length,increases. Taken together, these results demonstrate that MutSel model parameters fully encapsulate information regarding $dN/dS$, and that the results from MutSel and mechanistic codon models are in complete agreement.
 
+
+\subsection*{coefficients and dn/ds relate to each other}
+
+We can prove that codon bias is less than 1 for when there is no codon bias and mutation rates are symmetric. but if you have codon bias and asymmetric mutation rates, in trouble.
+also, selection coefficients and dnds are good. when selection is stronger, dnds is lower. same goes for the bias dataset, but the effect is somewhat lessened as aa coeffs no longer are totally the same as the selection process since it;s been partitioned differently.
 
 Moreover, as seen in Figure~\ref{reg_conv}A-B, $dN/dS$ values are always less than 1, reflecting a universal regime of purifying selection. In fact, \textbf{in SuppMat,} we prove that, when calculated using scaled selection coefficients, $dN/dS$ is necessarily always less than or equal to 1, although this proof holds only when all synonymous codons have the same fitness value. 
 %This important insight reveals that, while MutSel and mechanistic codon models fully agree, their relationship only holds under conditions of purifying selection or neutral evolution. MutSel models, therefore, are inherently unable to describe protein evolution under positive, diversifying selection ($dN/dS > 1$).
@@ -126,6 +162,9 @@ Results in Table~\ref{tab:mlspec} yield several important insights into the beha
 for simulations without codon bias in Figure~\ref{fig:reg_allspecs_nobias} and for simulations with codon bias in Figure~\ref{fig:reg_allspecs_bias}).
 
 However, it is interesting to note that, while ML yields the most accurate $\kappa$ estimates when equal codon frequencies are specified, all frequency specifications yield $\kappa$ estimates which correlate fairly well with the true, simulated $\kappa$ values. Thus, the ML model's ability to accurately estimate $\kappa$ appears much more robust to codon frequency specifications is than its ability to estimate $\omega$. Regression plots displaying the relationship between true $\kappa$ values and $\kappa$ MLEs are shown in Figures~\ref{fig:reg_kappa_nobias} and ~\ref{fig:reg_kappa_bias}, for simulations without and with codon bias, respectively.
+
+
+LIMITING CASES - when sd=0,basically you have neutral evolution. ml actually seems able to pick up on the neutral, but when fitness differences among amino acids are bigger, you have more problems.
 
 Importantly, however, our simulated alignments contained relatively constrained codon frequency distributions, given that each position in a given alignment followed the same evolutionary model. Therefore, we examined whether these frequency constraints influenced the error in $\omega$ MLEs. For each alignment, we calculated the codon entropy, \begin{equation} H(i) = - \sum_i \pi_i \ln \pi_i \end{equation}, where $\pi_i$ is the frequency of codon $i$ and the sum runs over all sense codons. Note that the maximum $H(i) = 4.11$ value is reached when all codons have a frequency of $1/61$. In Figure~\ref{entropyerror_nobias}, we show the relationship between each alignment's codon entropy and the error between selection coefficient-derived $dN/dS$ values and $\omega$ MLE values, when inferred across equal, F3x4, and empirical frequency specifications. Here, codon entropy does not independently affect the $\omega$ MLE error (p=0.78), but rather the error stems primarily from the specific codon frequency parameterizations in the ML model. Again, these results carry over precisely to simulations with codon bias (Figure~\ref{entropyerror_bias})
 
@@ -143,7 +182,7 @@ Our results rest on the key assumptions that the protein sequence is evolving un
 The equivalency between selection coefficients and $dN/dS$ values we have demonstrated is robust to differences in synonymous codon fitnesses. However, it is important to note that our implementation of codon bias explicitly assumed that frequency differences among synonymous codons resulted from fitness differences alone. In other words, the sole source of codon bias in our simulations was selection, not mutation. This implementation might not be entirely biologically realistic, as both mutational and selective forces likely contribute to codon bias in real genomes \cite{Blumer1991, Duret2002, HershbergPetrov2008, PlotkinKudla2010}. However, the key finding that we present is that fitness differences among synonymous codons do not affect the robust mathematical equivalency between scaled selection coefficients and $dN/dS$. 
 
 Incidentally, our study recovered that mechanistic codon models can produce strongly biased inferences when parameters are incorrectly specified. In particular, $\omega$ MLE values only corresponded to the true $dN/dS$ value when the equilibrium codon frequency parameters were specified as equal (e.g. each codon had an equilibrium frequency of $1/61$). Alternatively, 
- the more common approaches of using empirical codon frequencies (also known as the F61 estimator \cite{GoldmanYang1994}) or frequency estimators such as F3x4 \cite{MuseGaut1994} and CF3x4 \cite{Pond2010} always yielded strongly dramatically inflated $\omega$ MLEs. We additionally demonstrated that the narrow distribution of codon frequencies in our alignments did not cause these errors (Figures~\ref{entropyerror_nobias} and \ref{fig:entropyerror_bias}), but rather the error stemmed specifically from the ML frequency parameterizations themselves. 
+ the more common approaches of using empirical codon frequencies (also known as the F61 estimator \cite{GoldmanYang1994}) or frequency estimators such as F3x4 \cite{MuseGaut1994} and CF3x4 \cite{Pond2010} always yielded strongly dramatically inflated $\omega$ MLEs. \texbtf{We additionally demonstrated that the narrow distribution of codon frequencies in our alignments did not cause these errors (Figures~\ref{entropyerror_nobias} and \ref{fig:entropyerror_bias}), but rather the error stemmed specifically from the ML frequency parameterizations themselves. }
 
 We explain this phenomenon by recognizing that the rationale for including codon frequency parameters in mechanistic codon  models is to account for unequal nucleotide frequencies specifically caused by mutational and not selective forces \cite{YN00, Yang2006}. The proper values for these parameters, then, should be the codon frequencies which would exist \textit{in the absence of natural selection}. This approach is the only way to ensure that $\omega$ is the sole model parameter which contains information about natural selection. Otherwise, the $\omega$ parameter will no longer represent the true $dN/dS$ evolutionary rate ratio.
 
