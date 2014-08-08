@@ -6,9 +6,9 @@
 #$ -q wilke
 #$ -m beas
 #$ -t 1-200:1
-#$ -pe serial 15
+#$ -pe serial 4
 
-CPU=15
+CPU=4
 
 source ~/.bash_profile
 

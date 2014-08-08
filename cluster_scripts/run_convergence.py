@@ -1,8 +1,6 @@
 # SJS. Code specifically for generating data to demonstrate omega convergence.
 
 
-
-
 import sys
 # Input parameters and global stuff
 if (len(sys.argv) != 5):
@@ -19,17 +17,18 @@ from functions_simandinf import *
 seqfile   = "seqs"+str(rep)+".fasta"
 freqfile  = "codonFreqs" + str(rep)+".txt"
 paramfile = "params"+str(rep)+".txt"
+amino_sscfile = "aminoCoeffs" + str(rep)+".txt"
+codon_sscfile = "codonCoeffs" + str(rep)+".txt"
+
 mu = 1e-6
 kappa = rn.uniform(1.0, 6.0)
-sd = rn.uniform(1., 2.)
+sd = rn.uniform(0., 4.)
 mu_dict = {'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'AC': mu, 'CA':mu, 'GT':mu, 'TG':mu, 'AG': kappa*mu, 'GA':kappa*mu, 'CT':kappa*mu, 'TC':kappa*mu}
 
-# To test convergence, select random sequence length between 5e2 and 5e5
+# To test convergence, select random sequence length between 5e2 and 1e6
 expon = rn.randint(2,5)
 if expon == 2:
     times = rn.randint(5,10)
-elif expon == 5:
-	times = rn.randint(1,5)
 else:
     times = randint(1,10)
 seqlength = int( times * 10**expon )
@@ -38,17 +37,16 @@ seqlength = int( times * 10**expon )
 
 # Set up steady-state codon frequencies based on selection coefficients
 print "Deriving equilibrium codon frequencies"
-codon_freqs_true, codon_freqs_true_dict, gc_content = set_codon_freqs(sd, freqfile)
+codon_freqs, codon_freqs_dict, gc_content, entropy = set_codon_freqs(sd, freqfile, amino_sscfile, codon_sscfile, 0.)
 
 
 # Simulate according to MutSel model along phylogeny
 print "Simulating"
-simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
-
+simulate(codon_freqs, seqfile, treefile, mu_dict, seqlength)
 
 # Derive omega from selection coefficients (well, frequencies, but same deal)
 print "Deriving omega from selection coefficients"
-derivedw = derive_omega(codon_freqs_true_dict, mu_dict)
+derivedw = derive_omega(codon_freqs_dict, mu_dict, False)
 
 # ML
 print "Conducting ML inference with HyPhy"
