@@ -1,5 +1,5 @@
 **/.DS_Store
-**/.pyc
+**/*.pyc
 Manuscript/*.aux
 Manuscript/*.bbl
 Manuscript/*.blg
