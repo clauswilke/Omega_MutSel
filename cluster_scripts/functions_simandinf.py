@@ -329,5 +329,20 @@ def parse_output_GY94(file):
             hyphy_k = float(findk.group(1))
     assert(hyphy_w is not None)
     return hyphy_w, hyphy_k
+
+
+def array_to_hyphy_freq(f):
+    ''' Convert codon frequencies to a hyphy frequency string. '''
+    hyphy_f = "{"
+    for freq in f:
+        hyphy_f += "{"
+        hyphy_f += str(freq)
+        hyphy_f += "},"
+    hyphy_f = hyphy_f[:-1]
+    hyphy_f += "};"
+    return hyphy_f
+
+
+
 ######################################################################################################################################
 
