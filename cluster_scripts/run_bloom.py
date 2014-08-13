@@ -16,28 +16,17 @@ from functions_simandinf import *
 
 # Set up output files and parameters
 seqfile       = "seqs"+str(rep)+".fasta"
-freqfile      = "codonFreqs" + str(rep)+".txt"
 paramfile     = "params"+str(rep)+".txt"
 
 
-seqlength = 50
+seqlength = 500000
 # from the NP paper, Bloom 2014 MBE.
 mu_dict = {'AG':2.4e-5, 'TC':2.4e-5, 'GA':2.3e-5, 'CT':2.3e-5, 'AC':9.0e-6, 'TG':9.0e-6, 'CA':9.4e-6, 'GT':9.4e-6, 'AT':3.0e-6, 'TA':3.0e-6, 'GC':1.9e-6, 'CG':1.9e-6}
+np_freqs = np.loadtxt("np_codon_eq_freqs.txt") # these have been calc'd in Omega_MutSel/np_scripts .
 
-# Set up equilibrium frequencies, and determine gc content and entropy
-aa_freqs = flu_freqs[int(rep)-1]
-diff = np.sum(aa_freqs) - 1.
-if diff < ZERO:
-    if diff < 0.:
-        aa_freqs[0] -=  diff
-    else:
-        aa_freqs[0] +=  diff  
-aa_freqs_dict = dict(zip(amino_acids, aa_freqs))
-fobj = UserFreqs(by = 'amino', freqs = aa_freqs_dict)
-codon_freqs_true = fobj.calcFreqs(type = 'codon', savefile=freqfile)
+# Read in equilibrium frequencies and determine entropy
+codon_freqs_true = np_freqs[ int(rep) - 1 ]
 codon_freqs_true_dict = dict(zip(codons, codon_freqs_true))
-nuc_freq = fobj.calcFreqs(type = 'nuc') 
-gc_content = nuc_freq[1] + nuc_freq[2]
 entropy = calc_entropy(codon_freqs_true)
 
 
