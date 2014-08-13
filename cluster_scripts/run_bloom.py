@@ -20,12 +20,12 @@ freqfile      = "codonFreqs" + str(rep)+".txt"
 paramfile     = "params"+str(rep)+".txt"
 
 
-seqlength = 500
+seqlength = 500000
 # from the NP paper, Bloom 2014 MBE.
 mu_dict = {'AG':2.4e-5, 'TC':2.4e-5, 'GA':2.3e-5, 'CT':2.3e-5, 'AC':9.0e-6, 'TG':9.0e-6, 'CA':9.4e-6, 'GT':9.4e-6, 'AT':3.0e-6, 'TA':3.0e-6, 'GC':1.9e-6, 'CG':1.9e-6}
 
 # Set up equilibrium frequencies, and determine gc content and entropy
-aa_freqs = flu_freqs[int(rep)-1])
+aa_freqs = flu_freqs[int(rep)-1]
 diff = np.sum(aa_freqs) - 1.
 if diff < ZERO:
     if diff < 0.:
@@ -35,9 +35,9 @@ if diff < ZERO:
 aa_freqs_dict = dict(zip(amino_acids, aa_freqs))
 fobj = UserFreqs(by = 'amino', freqs = aa_freqs_dict)
 codon_freqs_true = fobj.calcFreqs(type = 'codon', savefile=freqfile)
-codon_freqs_true_dict = zip(dict(codons, codon_freqs_true))
+codon_freqs_true_dict = dict(zip(codons, codon_freqs_true))
 nuc_freq = fobj.calcFreqs(type = 'nuc') 
-gc = nuc_freq[1] + nuc_freq[2]
+gc_content = nuc_freq[1] + nuc_freq[2]
 entropy = calc_entropy(codon_freqs_true)
 
 
@@ -56,12 +56,12 @@ print "Conducting ML inference with HyPhy"
 
 
 # Lists for storing values and printing strings
-krun = [kappa, 1.0, 'free']
-kspecs = ['true', 'one', 'free']
+krun = [1.0, 'free']
+kspecs = ['one', 'free'] # no kappa true here, since there's no kappa.
 fspecs = ['equal', 'true', 'f3x4', 'cf3x4'] # DO NOT CHANGE THIS LIST !!!!
-omegas = np.zeros([3,4])
-kappas = np.zeros([3,4])
-omega_errors = np.ones([3,4])
+omegas = np.zeros([2,4])
+kappas = np.zeros([2,4])
+omega_errors = np.ones([2,4])
 
 
 # First, set up F61 (data) frequency vector in the hyphy batchfile as this applies to all hyphy runs.
@@ -82,7 +82,7 @@ for kap in krun:
 
 
 # Finally, save results
-outstring_params = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(sd) + '\t' + str(bias) + '\t' + str(gc_content) + '\t' + str(entropy) + '\t' + str(derivedw)
+outstring_params = rep + '\t' + str(seqlength) + '\t' + str(gc_content) + '\t' + str(entropy) + '\t' + str(derivedw)
 outf = open(paramfile, 'w')
 for f in fspecs:
     y =  fspecs.index(f)
