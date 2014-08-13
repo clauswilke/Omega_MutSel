@@ -27,6 +27,7 @@ cd $WDIR
 # Copy files
 cp /home/sjs3495/Omega_MutSel/trees/10.tre tree.tre
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/run_bloom.py .
+cp /home/sjs3495/Omega_MutSel/np_scripts/np_codon_eq_freqs.txt .
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/functions_simandinf.py .
 
 #Hyphy
