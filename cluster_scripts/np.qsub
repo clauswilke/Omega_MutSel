@@ -1,13 +1,14 @@
 #!/bin/bash
-#$ -N bloom
+#$ -N nucleoprotein
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
 #$ -q wilke
 #$ -m beas
-#$ -t 51-498:1
-#$ -pe serial 3
+#$ -t 1-498:1
+#$ -pe serial 5
 
+CPU=5
 source ~/.bash_profile
 
 # Set up directories
@@ -26,7 +27,7 @@ cd $WDIR
 
 # Copy files
 cp /home/sjs3495/Omega_MutSel/trees/10.tre tree.tre
-cp /home/sjs3495/Omega_MutSel/cluster_scripts/run_bloom.py .
+cp /home/sjs3495/Omega_MutSel/cluster_scripts/run_np.py .
 cp /home/sjs3495/Omega_MutSel/np_scripts/np_codon_eq_freqs.txt .
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/functions_simandinf.py .
 
@@ -36,11 +37,10 @@ cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
 
 # Run
 module load python
-python run_bloom.py $SGE_TASK_ID tree.tre $SIMDIR 15
+python run_np.py $SGE_TASK_ID tree.tre $SIMDIR $CPU
 
 # Cleanup
 mkdir -p $RDIR
 cp params* $RDIR
 cp seqs* $RDIR
-cp codonFreqs* $RDIR
 rm -rf $WDIR

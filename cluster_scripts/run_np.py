@@ -63,7 +63,7 @@ assert(setupf == 0), "couldn't properly add in F61 (data) frequencies"
 # Run hyphy and save omegas, kappas (only sometimes returned, note), and omega errors along the way
 kcount = 0
 for kap in krun:
-    wtemp, ktemp = run_hyphy(seqfile, treefile, cpu, kap, fspecs)  
+    wtemp, ktemp = run_hyphy_np(seqfile, treefile, cpu, kap, fspecs)  
     kappas[kcount] = ktemp
     omegas[kcount] = wtemp
     omega_errors[kcount] = (derivedw - wtemp) / derivedw
@@ -71,7 +71,7 @@ for kap in krun:
 
 
 # Finally, save results
-outstring_params = rep + '\t' + str(seqlength) + '\t' + str(gc_content) + '\t' + str(entropy) + '\t' + str(derivedw)
+outstring_params = rep + '\t' + str(seqlength) + '\t' + str(entropy) + '\t' + str(derivedw)
 outf = open(paramfile, 'w')
 for f in fspecs:
     y =  fspecs.index(f)
