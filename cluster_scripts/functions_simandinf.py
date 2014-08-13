@@ -303,6 +303,46 @@ def run_hyphy(seqfile, treefile, cpu, kappa, fspecs):
 
 
 
+    
+def run_hyphy_np(seqfile, treefile, cpu, kappa, fspecs):
+    ''' Run global omega inference according to GY94. The M0 model. FOR THE NUCLEOPROTEIN FREQUENCIES ONLY!!
+        By default, conducts inferences for 7 sets of frequencies (equal, F61 site, F61 global, F3x4 site, F3x4 global, CF3x4 site, CF3x4 global) across a single kappa specification.
+        DO NOT CHANGE FILE NAMES. THEY ARE HARDCODED HERE AND IN THE HYPHY BATCHFILE.
+    '''
+    
+  
+    # Set up sequence file with tree
+    shutil.copy(seqfile, "temp.fasta")
+    setup_tree = subprocess.call("cat "+treefile+" >> temp.fasta", shell = True)
+    assert(setup_tree == 0), "couldn't add tree to hyphy infile"
+            
+        
+    # Set up kappa in the matrices file
+    if kappa != 'free':
+        sedkappa = "sed 's/k/"+str(kappa)+"/g' matrices_raw.mdl > matrices.mdl"
+        runsedkappa = subprocess.call(sedkappa, shell=True)
+        assert(runsedkappa == 0), "couldn't set up kappa"
+    else:
+        shutil.copy('matrices_raw.mdl', 'matrices.mdl')
+
+    # Run hyphy.
+    runhyphy = subprocess.call("./HYPHYMP globalDNDS_np.bf CPU="+cpu, shell = True)
+    assert (runhyphy == 0), "hyphy fail"
+    
+    # Retrieve omega, kappa MLEs from the hyout files Produces 7 output files, names of which are hardcoded!!
+    omegas = np.zeros(7)
+    kappas = np.zeros(7)
+    count = 0
+    for suffix in fspecs:
+        file = suffix + '_hyout.txt'  
+        mlw, mlk = parse_output_GY94(file)
+        omegas[count] = mlw
+        kappas[count] = mlk
+        count += 1
+    return omegas, kappas
+    
+    
+
 
 def array_to_hyphy_freq(f):
     ''' Convert codon frequencies to a hyphy frequency string. '''
@@ -349,6 +389,7 @@ def freqs_from_hyphy(seqfile):
 ######################################################################################################################################
 
 
+  
 flu_freqs = np.array( [ [0.05026, 0.031998, 0.03475, 0.031079, 0.032652, 0.042411, 0.055436, 0.033059, 0.036237, 0.067728, 0.184288, 0.032715, 0.050344, 0.031105, 0.079174, 0.051059, 0.061116, 0.040469, 0.021482, 0.032638], 
 [0.813244, 0.004401, 0.004275, 0.00822, 0.005181, 0.010455, 0.003611, 0.00497, 0.004473, 0.004717, 0.010084, 0.003533, 0.001871, 0.003969, 0.010729, 0.006173, 0.004888, 0.086727, 0.004268, 0.00421], 
 [0.070682, 0.001814, 0.003291, 0.003517, 0.071733, 0.003403, 0.029482, 0.03021, 0.003987, 0.310156, 0.014795, 0.041586, 0.004797, 0.015949, 0.025255, 0.209894, 0.026377, 0.013501, 0.017113, 0.102459], 

@@ -20,7 +20,7 @@ freqfile      = "codonFreqs" + str(rep)+".txt"
 paramfile     = "params"+str(rep)+".txt"
 
 
-seqlength = 500000
+seqlength = 50
 # from the NP paper, Bloom 2014 MBE.
 mu_dict = {'AG':2.4e-5, 'TC':2.4e-5, 'GA':2.3e-5, 'CT':2.3e-5, 'AC':9.0e-6, 'TG':9.0e-6, 'CA':9.4e-6, 'GT':9.4e-6, 'AT':3.0e-6, 'TA':3.0e-6, 'GC':1.9e-6, 'CG':1.9e-6}
 
@@ -58,15 +58,15 @@ print "Conducting ML inference with HyPhy"
 # Lists for storing values and printing strings
 krun = [1.0, 'free']
 kspecs = ['one', 'free'] # no kappa true here, since there's no kappa.
-fspecs = ['equal', 'true', 'f3x4', 'cf3x4'] # DO NOT CHANGE THIS LIST !!!!
-omegas = np.zeros([2,4])
-kappas = np.zeros([2,4])
-omega_errors = np.ones([2,4])
+fspecs = ['equal', 'f61_site', 'f61_global', 'f3x4_site', 'f3x4_global', 'cf3x4_site', 'cf3x4_global'] # DO NOT CHANGE THIS LIST !!!!
+omegas = np.zeros([2,7])
+kappas = np.zeros([2,7])
+omega_errors = np.ones([2,7])
 
 
 # First, set up F61 (data) frequency vector in the hyphy batchfile as this applies to all hyphy runs.
 hyf = array_to_hyphy_freq(codon_freqs_true)
-setuphyphyf = "sed -i 's/DATAFREQS/"+hyf+"/g' globalDNDS.bf"
+setuphyphyf = "sed -i 's/DATAFREQS/"+hyf+"/g' globalDNDS_np.bf"
 setupf = subprocess.call(setuphyphyf, shell = True)
 assert(setupf == 0), "couldn't properly add in F61 (data) frequencies"
 
