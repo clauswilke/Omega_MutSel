@@ -23,13 +23,14 @@ else:
     raise AssertionError(usage_error)
     
 
-# Outfile names
+# File names
 path = 'data/'
 cf_outfile      = path + mu_type + '_site_eqfreqs.txt'
 mean_cf_outfile = path + mu_type + '_mean_eqfreqs.txt'
 null_cf_outfile = path + mu_type + '_null_eqfreqs.txt'
-f3x4_outfile    = path + mu_type + '_f3x4.txt' 
-cf3x4_outfile   = path + mu_type + '_cf3x4.txt' 
+batch_outfile   = '../SelectionInference/hyphy/globalDNDS_' + mu_type + '.bf'
+raw_batchfile   = "globalDNDS_raw_exp.bf" # will be used to create the batch_outfile
+
 
 # np_prefs are those taken from Bloom 2014 paper (same as mu's above!). The np_prefs are directly from the paper's Supplementary_file_1.xls and refer to equilbrium amino acid propenisties. The best interpretation of these experimental propensities is metropolis.
 np_prefs = np.loadtxt(path + 'np_prefs.txt')
@@ -119,47 +120,92 @@ def create_temp_alignment(codon_freqs, seqfile):
     sfile.write('>taxon\n'+seq)
     sfile.close()
 
+def array_to_hyphy_freq(f):
+    ''' Convert a python/numpy list/array of codon frequencies to a hyphy frequency string to directly write into a batchfile. '''
+    hyphy_f = "{"
+    for freq in f:
+        hyphy_f += "{" + str(freq) + "},"
+    hyphy_f = hyphy_f[:-1]
+    hyphy_f += "};"
+    return hyphy_f
+    
+    
+def hyout_to_hyin(type):
+    ''' convert hyphy frequency output a string to give back to hyphy. hackish but ok...'''
+    f = open(type + '.txt', 'r')
+    raw = f.read()
+    f.close()
+    clean = raw.replace('{','').replace('}','')
+    return array_to_hyphy_freq( np.fromstring(clean, sep='\n')  )
+    
+
+def create_batchfile(basefile, outfile, f61, fnull, f3x4, cf3x4):
+    ''' sed in the frequency specifications to create an output batchfile from the base/raw batchfile framework.'''
+    cp_batch = subprocess.call("cp " + basefile + " " + outfile, shell=True)
+    assert(cp_batch == 0), "couldn't copy batchfile"
+    shutil.copy(basefile, outfile)
+    flist = ['f61', 'fnull', 'f3x4', 'cf3x4']
+    sedlist = ['F61', 'NULL', 'F3x4', 'CF3x4']
+    for i in range(4):
+        hyf = eval(flist[i])
+        setuphyphyf = "sed -i 's/INSERT"+sedlist[i]+"/"+hyf+"/g' " + outfile
+        setupf = subprocess.call(setuphyphyf, shell = True)
+        assert(setupf == 0), "couldn't properly add in frequencies"
+    
+
+    
+    
+    
 
 def main():
     # First, we determine the equilibrium frequencies of the system on a per site basis.
     # Second, we find the global frequencies. We additionally use HyPhy to find the global F3x4 and CF3x4 frequencies. These will be manually hard-coded into the hyphy files in SelectionInference/hyphy.
     # Third, we determine the "null" equilibrium frequencies. These are the codon frequencies which would be expected in the ABSENCE of seletion.
+    # Finally, we set up the hyphy batch file which makes use of much of these frequencies.
     
     # Site-wise equilibrium frequencies
-    print "Determine site-wise equilibrium frequencies"
+    print "Determine and save site-wise equilibrium frequencies"
     final_codon_freqs = np.zeros([nsites, 61])
     for i in range(nsites):
         print i
         final_codon_freqs[i] = get_eq_freqs(np_prefs[i], mudict)
+    np.savetxt(cf_outfile, final_codon_freqs)
     
-    # Determine global equilibrium frequencies. Also call HyPhy to retrieve F3x4, CF3x4 global frequencies.
-    print "Determining global"
+    # Determine global f61, f3x4, cf3x4
+    print "Determining global F61"
     global_freqs = np.mean(final_codon_freqs, axis=0)
-    print "Simulating"
+    print "Creating temporary alignment for hyphy frequency estimation"
     create_temp_alignment(global_freqs, "temp.fasta")
-    print "Determining F3x4, CF3x4 frequencies"
+    print "Determining global F3x4 and CF3x4 frequencies"
     run_hyphy = subprocess.call("HYPHYMP global_freqs.bf", shell = True)
     assert(run_hyphy == 0), "Hyphy fail"
-    os.remove("temp.fasta")
-    os.remove("messages.log")
-    
     
     # Determine freqs in absence of selection.
     print "Determining null frequencies"
     null_freqs = get_eq_freqs(np.ones(20) * 0.05 , mudict)
-   
     
-    # Save all to files
-    print "Saving to files"
-    shutil.move("f3x4.txt", f3x4_outfile)
-    shutil.move("cf3x4.txt", cf3x4_outfile)
-    np.savetxt(cf_outfile, final_codon_freqs)
-    np.savetxt(null_cf_outfile, null_freqs)
-    np.savetxt(mean_cf_outfile, np.mean(final_codon_freqs, axis=0))
+    # Create the hyphy batch file which will use much of this information
+    # Note that first we must make the strings to put into this batchfile
+    f61   = array_to_hyphy_freq(global_freqs)
+    fnull  = array_to_hyphy_freq(null_freqs)
+    f3x4  = hyout_to_hyin("f3x4")
+    cf3x4 = hyout_to_hyin("cf3x4")
+    create_batchfile(raw_batchfile, batch_outfile, f61, fnull, f3x4, cf3x4)
    
-   
-main() 
 
+
+
+   
+# Run and then cleanup.
+main() 
+os.remove("f3x4.txt")
+os.remove("cf3x4.txt")
+os.remove("temp.fasta")
+os.remove("messages.log")
+try:
+    os.remove("errors.log") # this file is not always created.
+except:
+    pass
 
 
 
