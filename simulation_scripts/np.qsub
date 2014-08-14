@@ -9,6 +9,9 @@
 #$ -pe serial 5
 
 CPU=5
+DATASET=np # np or yeast, for now
+BATCHFILE=globalDNDS_$DATASET.bf
+
 source ~/.bash_profile
 
 # Set up directories
@@ -28,16 +31,18 @@ cd $WDIR
 # Copy files
 cp /home/sjs3495/Omega_MutSel/trees/10.tre tree.tre
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/run_np.py .
-cp /home/sjs3495/Omega_MutSel/np_scripts/np_codon_eq_freqs.txt .
+cp /home/sjs3495/Omega_MutSel/np_scripts/$DATASET_codon_eqfreqs.txt .
 cp /home/sjs3495/Omega_MutSel/cluster_scripts/functions_simandinf.py .
 
 #Hyphy
 cp /home/sjs3495/bin/bin/HYPHYMP .
-cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
+cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/BATCHFILE .
+cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/GY94_Header.ibf .
+cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/matrices_raw.mdl .
 
 # Run
 module load python
-python run_np.py $SGE_TASK_ID tree.tre $SIMDIR $CPU
+python run_np.py $SGE_TASK_ID tree.tre $SIMDIR $CPU $DATASET $BATCHFILE
 
 # Cleanup
 mkdir -p $RDIR
