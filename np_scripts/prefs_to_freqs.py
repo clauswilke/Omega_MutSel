@@ -8,12 +8,14 @@ mu_type = sys.argv[1] # either np or yeast
 if mu_type == 'np':
     ### Mutation rates from Bloom (2014). "An Experimentally Determined Evolutionary Model Dramatically Improves Phylogenetic Fit." MBE. #### 
     mudict = {'AG':2.4e-5, 'TC':2.4e-5, 'GA':2.3e-5, 'CT':2.3e-5, 'AC':9.0e-6, 'TG':9.0e-6, 'CA':9.4e-6, 'GT':9.4e-6, 'AT':3.0e-6, 'TA':3.0e-6, 'GC':1.9e-6, 'CG':1.9e-6}
-    outfile = 'np_codon_eq_freqs.txt'
+    cf_outfile = 'np_codon_eq_freqs.txt'
+    mean_cf_outfile = 'np_mean.txt'
 elif mu_type == 'yeast':
     ### Mutation rates from Zhu et al. (2014). "Precise estimates of mutation rate and spectrum in yeast." PNAS. ####
     mu = 1.67e-10 # this is the mean per generation per nucleotide mutation rate. 
     mudict = {'AG':0.144/2*mu, 'TC':0.144/2*mu, 'GA':0.349/2*mu, 'CT':0.349/2*mu, 'AC':0.11/2*mu, 'TG':0.11/2*mu, 'CA':0.182/2*mu, 'GT':0.182/2*mu, 'AT':0.063/2*mu, 'TA':0.063/2*mu, 'GC':0.152/2*mu, 'CG':0.152/2*mu}
-    outfile = 'yeast_codon_eq_freqs.txt'
+    cf_outfile = 'yeast_codon_eq_freqs.txt'
+    mean_cf_outfile = 'yeast_mean.txt'
 
 # np_prefs are those taken from Bloom 2014 paper (same as mu's above!). The np_prefs are directly from the paper's Supplementary_file_1.xls and refer to equilbrium amino acid propenisties. The best interpretation of these experimental propensities is metropolis.
 np_prefs = np.loadtxt('np_prefs.txt')
@@ -34,6 +36,7 @@ def get_nuc_diff(source, target):
     return diff
 
 
+
 def build_matrix(amino_prop_dict, mu_dict):
     ''' metropolis only, as this matrix definition more suits experimental propensities. '''
     matrix = np.zeros([61,61])
@@ -51,12 +54,13 @@ def build_matrix(amino_prop_dict, mu_dict):
                     matrix[x][y] = mu_dict[diff] 
                 else:
                     matrix[x][y] = fy / fx * mu_dict[diff]        
-   
     # diagonal entries
     for i in range(61):
         matrix[i][i] = -1. * np.sum(matrix[i]) 
         assert( -1e-10 < np.sum(matrix[i]) < 1e-10 ), "diagonal fail"
     return matrix
+
+
 
 def get_eq_from_eig(m):   
     ''' get the equilibrium frequencies from the matrix. the eq freqs are the left eigenvector corresponding to eigenvalue of 0. 
@@ -81,19 +85,21 @@ def get_eq_from_eig(m):
     return max_v
 
 
-
-
-final_codon_freqs = np.zeros([498, 61]) # 498 sites with 61 equilibrium codon frequencies each.
-
-count = 0
-for site_prefs in np_prefs:
-    print count
-    amino_prefs_dict = dict(zip(amino_acids, site_prefs)) 
-    m = build_matrix(amino_prefs_dict, mudict)
-    cf = get_eq_from_eig(m) 
-    assert( -1e-8< abs(np.sum(cf)) - 1. < 1e-8 ), "codon frequencies do not sum to 1"
-    final_codon_freqs[count] = cf
-    count += 1
-
-np.savetxt(outfile, final_codon_freqs)
-    
+def main():
+    # matrix to contain final equilibrium frequencies, for each site (498 sites in NP)
+    final_codon_freqs = np.zeros([498, 61])
+    count = 0
+    for site_prefs in np_prefs:
+        print count
+        amino_prefs_dict = dict(zip(amino_acids, site_prefs)) 
+        m = build_matrix(amino_prefs_dict, mudict)
+        cf = get_eq_from_eig(m) 
+        assert( -1e-8 < abs(np.sum(cf)) - 1. < 1e-8 ), "codon frequencies do not sum to 1" 
+        final_codon_freqs[count] = cf
+        count += 1
+    # Save site-specific equilibrium frequencies in cf_outfile, and save global (average over all sites) equilibrium frequencies in cf_mean_outfile
+    np.savetxt(cf_outfile, final_codon_freqs)
+    np.savetxt(mean_cf_outfile, np.mean(final_codon_freqs, axis=0))
+   
+   
+main() 
