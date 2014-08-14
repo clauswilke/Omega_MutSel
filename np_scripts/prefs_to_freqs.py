@@ -24,16 +24,13 @@ else:
     
 
 # File names
-path = 'data/'
-cf_outfile      = path + mu_type + '_site_eqfreqs.txt'
-mean_cf_outfile = path + mu_type + '_mean_eqfreqs.txt'
-null_cf_outfile = path + mu_type + '_null_eqfreqs.txt'
-batch_outfile   = '../SelectionInference/hyphy/globalDNDS_' + mu_type + '.bf'
-raw_batchfile   = "globalDNDS_raw_exp.bf" # will be used to create the batch_outfile
+cf_outfile    = "../simulation_scripts/" + mu_type + "_codon_eqfreqs.txt"
+raw_batchfile = "globalDNDS_raw_exp.bf"
+batch_outfile = '../SelectionInference/hyphy/globalDNDS_' + mu_type + '.bf'
 
 
 # np_prefs are those taken from Bloom 2014 paper (same as mu's above!). The np_prefs are directly from the paper's Supplementary_file_1.xls and refer to equilbrium amino acid propenisties. The best interpretation of these experimental propensities is metropolis.
-np_prefs = np.loadtxt(path + 'np_prefs.txt')
+np_prefs = np.loadtxt('nucleoprotein_amino_preferences.txt')
 nsites = len(np_prefs)
 
 amino_acids  = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
