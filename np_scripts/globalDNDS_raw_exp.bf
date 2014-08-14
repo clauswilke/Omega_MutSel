@@ -62,7 +62,7 @@ UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn1 = (filt_data, Tree01);
 Optimize (paramValues, LikFn1);
-fprintf ("equal_hyout.txt", LikFn1);
+fprintf ("null_hyout.txt", LikFn1);
 
 ////////////// DATA FREQUENCIES, SITE //////////////
 global w;
