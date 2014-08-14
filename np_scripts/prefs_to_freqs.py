@@ -10,16 +10,18 @@ if mu_type == 'np':
     mudict = {'AG':2.4e-5, 'TC':2.4e-5, 'GA':2.3e-5, 'CT':2.3e-5, 'AC':9.0e-6, 'TG':9.0e-6, 'CA':9.4e-6, 'GT':9.4e-6, 'AT':3.0e-6, 'TA':3.0e-6, 'GC':1.9e-6, 'CG':1.9e-6}
     cf_outfile = 'np_codon_eq_freqs.txt'
     mean_cf_outfile = 'np_mean.txt'
+    null_cf_outfile = 'np_null.txt'
+    
 elif mu_type == 'yeast':
     ### Mutation rates from Zhu et al. (2014). "Precise estimates of mutation rate and spectrum in yeast." PNAS. ####
     mu = 1.67e-10 # this is the mean per generation per nucleotide mutation rate. 
     mudict = {'AG':0.144/2*mu, 'TC':0.144/2*mu, 'GA':0.349/2*mu, 'CT':0.349/2*mu, 'AC':0.11/2*mu, 'TG':0.11/2*mu, 'CA':0.182/2*mu, 'GT':0.182/2*mu, 'AT':0.063/2*mu, 'TA':0.063/2*mu, 'GC':0.152/2*mu, 'CG':0.152/2*mu}
     cf_outfile = 'yeast_codon_eq_freqs.txt'
     mean_cf_outfile = 'yeast_mean.txt'
+    null_cf_outfile = 'yeast_null.txt'
 
 # np_prefs are those taken from Bloom 2014 paper (same as mu's above!). The np_prefs are directly from the paper's Supplementary_file_1.xls and refer to equilbrium amino acid propenisties. The best interpretation of these experimental propensities is metropolis.
 np_prefs = np.loadtxt('np_prefs.txt')
-
 amino_acids  = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
 codon_dict   = {"AAA":"K", "AAC":"N", "AAG":"K", "AAT":"N", "ACA":"T", "ACC":"T", "ACG":"T", "ACT":"T", "AGA":"R", "AGC":"S", "AGG":"R", "AGT":"S", "ATA":"I", "ATC":"I", "ATG":"M", "ATT":"I", "CAA":"Q", "CAC":"H", "CAG":"Q", "CAT":"H", "CCA":"P", "CCC":"P", "CCG":"P", "CCT":"P", "CGA":"R", "CGC":"R", "CGG":"R", "CGT":"R", "CTA":"L", "CTC":"L", "CTG":"L", "CTT":"L", "GAA":"E", "GAC":"D", "GAG":"E", "GAT":"D", "GCA":"A", "GCC":"A", "GCG":"A", "GCT":"A", "GGA":"G", "GGC":"G", "GGG":"G", "GGT":"G", "GTA":"V", "GTC":"V", "GTG":"V", "GTT":"V", "TAC":"Y", "TAT":"Y", "TCA":"S", "TCC":"S", "TCG":"S", "TCT":"S", "TGC":"C", "TGG":"W", "TGT":"C", "TTA":"L", "TTC":"F", "TTG":"L", "TTT":"F"}
 codons       = ["AAA", "AAC", "AAG", "AAT", "ACA", "ACC", "ACG", "ACT", "AGA", "AGC", "AGG", "AGT", "ATA", "ATC", "ATG", "ATT", "CAA", "CAC", "CAG", "CAT", "CCA", "CCC", "CCG", "CCT", "CGA", "CGC", "CGG", "CGT", "CTA", "CTC", "CTG", "CTT", "GAA", "GAC", "GAG", "GAT", "GCA", "GCC", "GCG", "GCT", "GGA", "GGC", "GGG", "GGT", "GTA", "GTC", "GTG", "GTT", "TAC", "TAT", "TCA", "TCC", "TCG", "TCT", "TGC", "TGG", "TGT", "TTA", "TTC", "TTG", "TTT"]
@@ -86,7 +88,10 @@ def get_eq_from_eig(m):
 
 
 def main():
-    # matrix to contain final equilibrium frequencies, for each site (498 sites in NP)
+    # First, we determine the equilibrium frequencies of the system on a per site basis.
+    # Second, we determine the "null" equilibrium frequencies. These are the codon frequencies which would be expected in the ABSENCE of seletion.
+    
+    # matrix to contain final equilibrium frequencies, for each site (498 sites in NP). Includes selection, mutation
     final_codon_freqs = np.zeros([498, 61])
     count = 0
     for site_prefs in np_prefs:
@@ -97,8 +102,18 @@ def main():
         assert( -1e-8 < abs(np.sum(cf)) - 1. < 1e-8 ), "codon frequencies do not sum to 1" 
         final_codon_freqs[count] = cf
         count += 1
-    # Save site-specific equilibrium frequencies in cf_outfile, and save global (average over all sites) equilibrium frequencies in cf_mean_outfile
+    
+    # Determine freqs in absence of selection.
+    null_prefs = np.ones(20) * 0.05 # all amino acids have the same propensity in a no selection scenario
+    amino_prefs_dict = dict(zip(amino_acids, null_prefs))  
+    m = build_matrix(amino_prefs_dict, mudict)
+    null_freqs = get_eq_from_eig(m) 
+    assert( -1e-8 < abs(np.sum(null_freqs)) - 1. < 1e-8 ), "codon frequencies do not sum to 1" 
+    
+    
+    # Save all to files
     np.savetxt(cf_outfile, final_codon_freqs)
+    np.savetxt(null_cf_outfile, null_freqs)
     np.savetxt(mean_cf_outfile, np.mean(final_codon_freqs, axis=0))
    
    
