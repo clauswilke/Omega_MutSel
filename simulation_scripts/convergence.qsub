@@ -15,7 +15,7 @@ source ~/.bash_profile
 
 # Set up directories
 SIMDIR=/home/sjs3495/MutSel/Simulator/src
-SCRIPTDIR=/home/sjs3495/Omega_MutSel/cluster_scripts
+SCRIPTDIR=/home/sjs3495/Omega_MutSel/simulation_scripts
 WDIR=/share/WilkeLab/work/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
 RDIR=/home/sjs3495/$JOB_NAME
 
@@ -29,8 +29,8 @@ cd $WDIR
 
 # Copy files
 cp /home/sjs3495/Omega_MutSel/trees/10.tre tree.tre
-cp /home/sjs3495/Omega_MutSel/cluster_scripts/run_convergence.py .
-cp /home/sjs3495/Omega_MutSel/cluster_scripts/functions_simandinf.py .
+cp /home/sjs3495/Omega_MutSel/simulation_scripts/run_convergence.py .
+cp /home/sjs3495/Omega_MutSel/simulation_scripts/functions_simandinf.py .
 
 # hyphy
 cp /home/sjs3495/bin/bin/HYPHYMP .
