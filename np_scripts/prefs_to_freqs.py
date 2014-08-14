@@ -1,9 +1,11 @@
 import sys
+import subprocess
+import shutil
+import os 
 import numpy as np
 from scipy import linalg
 
-
-usage_error = "\n\n Usage: python np_prefs_to_freqs.py <mu_scheme>.\n mu_scheme can either be np or yeast."
+usage_error = "\n\n Usage: python prefs_to_freqs.py <mu_scheme>.\n mu_scheme can either be np or yeast."
 
 assert(len(sys.argv) == 2), usage_error
 
@@ -23,16 +25,19 @@ else:
 
 # Outfile names
 path = 'data/'
-cf_outfile      = path + mu_type + '_codon_eq_freqs.txt'
-mean_cf_outfile = path + mu_type + '_mean.txt'
-null_cf_outfile = path + mu_type + '_null.txt'
+cf_outfile      = path + mu_type + '_site_eqfreqs.txt'
+mean_cf_outfile = path + mu_type + '_mean_eqfreqs.txt'
+null_cf_outfile = path + mu_type + '_null_eqfreqs.txt'
+f3x4_outfile    = path + mu_type + '_f3x4.txt' 
+cf3x4_outfile   = path + mu_type + '_cf3x4.txt' 
 
 # np_prefs are those taken from Bloom 2014 paper (same as mu's above!). The np_prefs are directly from the paper's Supplementary_file_1.xls and refer to equilbrium amino acid propenisties. The best interpretation of these experimental propensities is metropolis.
 np_prefs = np.loadtxt(path + 'np_prefs.txt')
+nsites = len(np_prefs)
+
 amino_acids  = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
 codon_dict   = {"AAA":"K", "AAC":"N", "AAG":"K", "AAT":"N", "ACA":"T", "ACC":"T", "ACG":"T", "ACT":"T", "AGA":"R", "AGC":"S", "AGG":"R", "AGT":"S", "ATA":"I", "ATC":"I", "ATG":"M", "ATT":"I", "CAA":"Q", "CAC":"H", "CAG":"Q", "CAT":"H", "CCA":"P", "CCC":"P", "CCG":"P", "CCT":"P", "CGA":"R", "CGC":"R", "CGG":"R", "CGT":"R", "CTA":"L", "CTC":"L", "CTG":"L", "CTT":"L", "GAA":"E", "GAC":"D", "GAG":"E", "GAT":"D", "GCA":"A", "GCC":"A", "GCG":"A", "GCT":"A", "GGA":"G", "GGC":"G", "GGG":"G", "GGT":"G", "GTA":"V", "GTC":"V", "GTG":"V", "GTT":"V", "TAC":"Y", "TAT":"Y", "TCA":"S", "TCC":"S", "TCG":"S", "TCT":"S", "TGC":"C", "TGG":"W", "TGT":"C", "TTA":"L", "TTC":"F", "TTG":"L", "TTT":"F"}
 codons       = ["AAA", "AAC", "AAG", "AAT", "ACA", "ACC", "ACG", "ACT", "AGA", "AGC", "AGG", "AGT", "ATA", "ATC", "ATG", "ATT", "CAA", "CAC", "CAG", "CAT", "CCA", "CCC", "CCG", "CCT", "CGA", "CGC", "CGG", "CGT", "CTA", "CTC", "CTG", "CTT", "GAA", "GAC", "GAG", "GAT", "GCA", "GCC", "GCG", "GCT", "GGA", "GGC", "GGG", "GGT", "GTA", "GTC", "GTG", "GTT", "TAC", "TAT", "TCA", "TCC", "TCG", "TCT", "TGC", "TGG", "TGT", "TTA", "TTC", "TTG", "TTT"]
-
 
 
 
@@ -94,34 +99,71 @@ def get_eq_from_eig(m):
     return max_v
 
 
+def get_eq_freqs(amino_prefs, mu_dict):
+    amino_prefs_dict = dict(zip(amino_acids, amino_prefs)) 
+    m = build_matrix(amino_prefs_dict, mu_dict)
+    cf = get_eq_from_eig(m) 
+    assert( -1e-8 < abs(np.sum(cf)) - 1. < 1e-8 ), "codon frequencies do not sum to 1" 
+    return cf
+
+
+def create_temp_alignment(codon_freqs, seqfile):
+    ''' We just need to quick set up sequences so that HyPhy can read in an alignment to compute F3x4, CF3x4.
+        No actual simulation needed, just a large dataset with codons in proportion to global frequencies.
+    '''
+    size = 1e6
+    seq = ''
+    for i in range(61):
+        seq += codons[i] * int(round(codon_freqs[i] * size)) 
+    sfile = open(seqfile, 'w')
+    sfile.write('>taxon\n'+seq)
+    sfile.close()
+
+
 def main():
     # First, we determine the equilibrium frequencies of the system on a per site basis.
-    # Second, we determine the "null" equilibrium frequencies. These are the codon frequencies which would be expected in the ABSENCE of seletion.
+    # Second, we find the global frequencies. We additionally use HyPhy to find the global F3x4 and CF3x4 frequencies. These will be manually hard-coded into the hyphy files in SelectionInference/hyphy.
+    # Third, we determine the "null" equilibrium frequencies. These are the codon frequencies which would be expected in the ABSENCE of seletion.
     
-    # matrix to contain final equilibrium frequencies, for each site (498 sites in NP). Includes selection, mutation
-    final_codon_freqs = np.zeros([498, 61])
-    count = 0
-    for site_prefs in np_prefs:
-        print count
-        amino_prefs_dict = dict(zip(amino_acids, site_prefs)) 
-        m = build_matrix(amino_prefs_dict, mudict)
-        cf = get_eq_from_eig(m) 
-        assert( -1e-8 < abs(np.sum(cf)) - 1. < 1e-8 ), "codon frequencies do not sum to 1" 
-        final_codon_freqs[count] = cf
-        count += 1
+    # Site-wise equilibrium frequencies
+    print "Determine site-wise equilibrium frequencies"
+    final_codon_freqs = np.zeros([nsites, 61])
+    for i in range(nsites):
+        print i
+        final_codon_freqs[i] = get_eq_freqs(np_prefs[i], mudict)
+    
+    # Determine global equilibrium frequencies. Also call HyPhy to retrieve F3x4, CF3x4 global frequencies.
+    print "Determining global"
+    global_freqs = np.mean(final_codon_freqs, axis=0)
+    print "Simulating"
+    create_temp_alignment(global_freqs, "temp.fasta")
+    print "Determining F3x4, CF3x4 frequencies"
+    run_hyphy = subprocess.call("HYPHYMP global_freqs.bf", shell = True)
+    assert(run_hyphy == 0), "Hyphy fail"
+    os.remove("temp.fasta")
+    os.remove("messages.log")
+    
     
     # Determine freqs in absence of selection.
-    null_prefs = np.ones(20) * 0.05 # all amino acids have the same propensity in a no selection scenario
-    amino_prefs_dict = dict(zip(amino_acids, null_prefs))  
-    m = build_matrix(amino_prefs_dict, mudict)
-    null_freqs = get_eq_from_eig(m) 
-    assert( -1e-8 < abs(np.sum(null_freqs)) - 1. < 1e-8 ), "codon frequencies do not sum to 1" 
-    
+    print "Determining null frequencies"
+    null_freqs = get_eq_freqs(np.ones(20) * 0.05 , mudict)
+   
     
     # Save all to files
+    print "Saving to files"
+    shutil.move("f3x4.txt", f3x4_outfile)
+    shutil.move("cf3x4.txt", cf3x4_outfile)
     np.savetxt(cf_outfile, final_codon_freqs)
     np.savetxt(null_cf_outfile, null_freqs)
     np.savetxt(mean_cf_outfile, np.mean(final_codon_freqs, axis=0))
    
    
 main() 
+
+
+
+
+
+
+
+
