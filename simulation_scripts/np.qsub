@@ -1,16 +1,16 @@
 #!/bin/bash
-#$ -N nucleoprotein
+#$ -N np
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
 #$ -q wilke
 #$ -m beas
-#$ -t 1-498:1
+#$ -t 1-100:1
 #$ -pe serial 5
 
 CPU=5
-DATASET=np # np or yeast, for now
-BATCHFILE=globalDNDS_$DATASET.bf
+DATASET=$JOB_NAME   # np or yeast, for now. possibly add polio in near future.
+BATCHFILE=globalDNDS_${DATASET}.bf
 
 source ~/.bash_profile
 
@@ -31,12 +31,12 @@ cd $WDIR
 # Copy files
 cp /home/sjs3495/Omega_MutSel/trees/10.tre tree.tre
 cp /home/sjs3495/Omega_MutSel/simulation_scripts/run_np.py .
-cp /home/sjs3495/Omega_MutSel/np_scripts/$DATASET_codon_eqfreqs.txt .
+cp /home/sjs3495/Omega_MutSel/simulation_scripts/${DATASET}_codon_eqfreqs.txt .
 cp /home/sjs3495/Omega_MutSel/simulation_scripts/functions_simandinf.py .
 
 #Hyphy
 cp /home/sjs3495/bin/bin/HYPHYMP .
-cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/BATCHFILE .
+cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/$BATCHFILE .
 cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/GY94_Header.ibf .
 cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/matrices_raw.mdl .
 

@@ -16,6 +16,9 @@ batchfile = sys.argv[6]   # hyphy batchfile name
 sys.path.append(simdir)
 from functions_simandinf import *
 
+seqlength = 500000
+
+
 # output files
 seqfile   = "seqs"+str(rep)+".fasta"
 paramfile = "params"+str(rep)+".txt"
@@ -23,7 +26,7 @@ paramfile = "params"+str(rep)+".txt"
 # Set up mutation rates, frequencies, hyphy batchfile name based on the dataset specified
 if dataset == 'np':
     mu_dict = {'AG':2.4e-5, 'TC':2.4e-5, 'GA':2.3e-5, 'CT':2.3e-5, 'AC':9.0e-6, 'TG':9.0e-6, 'CA':9.4e-6, 'GT':9.4e-6, 'AT':3.0e-6, 'TA':3.0e-6, 'GC':1.9e-6, 'CG':1.9e-6}
-elif mu_type == 'yeast':
+elif dataset == 'yeast':
     mu = 1.67e-10 # this is the mean per generation per nucleotide mutation rate. 
     mu_dict = {'AG':0.144/2*mu, 'TC':0.144/2*mu, 'GA':0.349/2*mu, 'CT':0.349/2*mu, 'AC':0.11/2*mu, 'TG':0.11/2*mu, 'CA':0.182/2*mu, 'GT':0.182/2*mu, 'AT':0.063/2*mu, 'TA':0.063/2*mu, 'GC':0.152/2*mu, 'CG':0.152/2*mu}
 else:
@@ -41,7 +44,7 @@ entropy = calc_entropy(codon_freqs_true)
 
 # Simulate according to MutSel model along phylogeny
 print "Simulating"
-simulate(codon_freqs_true, seqfile, treefile, mu_dict, 500000)
+simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
 
 
 # Derive omega from selection coefficients (well, frequencies, but same deal)
@@ -56,7 +59,7 @@ print "Conducting ML inference with HyPhy"
 # Lists for storing values and printing strings
 krun = [1.0, 'free']
 kspecs = ['one', 'free'] # no kappa true here, since there's no kappa.
-fspecs = ['equal', 'fnull', 'f61_site', 'f61_global', 'f3x4_site', 'f3x4_global', 'cf3x4_site', 'cf3x4_global'] # DO NOT CHANGE THIS LIST !!!!
+fspecs = ['equal', 'null', 'f61_site', 'f61_global', 'f3x4_site', 'f3x4_global', 'cf3x4_site', 'cf3x4_global'] # DO NOT CHANGE THIS LIST !!!!
 omegas = np.zeros([2,8])
 kappas = np.zeros([2,8])
 omega_errors = np.ones([2,8])
