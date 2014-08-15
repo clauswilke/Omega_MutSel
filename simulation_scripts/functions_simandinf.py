@@ -346,3 +346,82 @@ def array_to_hyphy_freq(f):
 
 ######################################################################################################################################
 
+
+
+
+############################ COUNTING METHOD FUNCTIONS. NOTE THAT THESE USE PAML. ###############################
+def runpaml_yn00(seqfile):
+    ''' 
+        NOTE THESE ARGS NO LONGER USED SINCE THEY MADE NO DIFFERENCE AT ALL!!!! REALLY, I CHECKED THIS THOROUGHLY.
+        weight: * weighting pathways between codons (0/1)?
+        commonf3x4: * use one set of codon freqs for all pairs (0/1)? 
+    '''
+    
+    # Set up sequence file
+    setuppaml1 = "cp "+seqfile+" temp.fasta"
+    setup1 = subprocess.call(setuppaml1, shell = True)
+    assert(setup1 == 0), "couldn't create temp.fasta"
+
+    # Run paml
+    runpaml = subprocess.call("./yn00", shell=True)
+    assert (runpaml == 0), "paml fail"
+
+    # Grab paml output
+    return parsepaml_yn00("pamloutfile")
+
+
+
+def parsepaml_yn00(pamlfile):
+    ''' parsing paml outfiles is completely the worst. IMPORTANT: CODE HERE WILL WORK ONLY WHEN INPUT DATA HAS 2 SEQUENCES ONLY!!! 
+        There are 5 omega values to retrieve:
+            1. ng86
+            2. yn00
+            3. lwl85
+            4. lwl85m
+            5. lpb93
+    '''
+
+    paml = open(pamlfile, 'rU')
+    lines = paml.readlines()
+    paml.close()
+    count = 0
+    for line in lines:
+        find_ng86 = re.search("^Nei \& Gojobori 1986\. dN/dS \(dN, dS\)", line)
+        if find_ng86:
+            ng86_line = count + 5
+        
+        find_yn00 = re.search("Yang \& Nielsen \(2000\) method", line)
+        if find_yn00:
+            yn00_line = count + 8
+        
+        find_lpb93 = re.search('LPB93\:\s+dS =\s+\d+\.\d+\s+dN =\s+\d+\.\d+\s+w =\s+(\d+\.\d+)', line)
+        if find_lpb93:
+            assert(find_lpb93.group(1) is not None)
+            w_lpb93 = find_lpb93.group(1)
+        
+        find_lwl85 = re.search('LWL85\:\s+dS =\s+\d+\.\d+\s+dN =\s+\d+\.\d+\s+w =\s+(\d+\.\d+)', line)
+        if find_lwl85:
+            assert(find_lwl85.group(1) is not None)
+            w_lwl85 = find_lwl85.group(1)
+        
+        find_lwl85m = re.search('LWL85m\:\s+dS =  \d+\.\d+\s+dN =\s+\d+\.\d+\s+w =\s+(\d+\.\d+)', line)
+        if find_lwl85m:
+            assert(find_lwl85m.group(1) is not None)
+            w_lwl85m = find_lwl85m.group(1)
+            
+        else:
+            count += 1
+    
+    find_ng86 = re.search('\s+(\d\.\d+)\s+\(', lines[ng86_line])
+    assert(find_ng86.group(1) is not None)
+    w_ng86 = find_ng86.group(1)
+    
+    find_yn00 = re.search('^\s+\w+\s+\w+\s+\d+\.\d+\s+\d+\.\d+\s+\d+\.\d+\s+\d+\.\d+\s+(\d+\.\d+)', lines[yn00_line])
+    #assert(find_yn00.group(1) is not None)
+    try:
+        w_yn00 = find_yn00.group(1)
+    except:
+        w_yn00 = '5'
+    
+    w_list = [w_ng86, w_yn00, w_lwl85, w_lwl85m, w_lpb93]
+    return(w_list)
