@@ -1,12 +1,12 @@
 #!/bin/bash
-#$ -N siminf_bias
+#$ -N siminf
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
 #$ -q wilke
 #$ -m beas
 #$ -t 1-100:1
-#$ -pe serial 15
+#$ -pe serial 2
 
 
 BIAS=2   # 0=no codon bias. other number = the bias factor.
@@ -29,7 +29,7 @@ fi
 cd $WDIR
 
 # Copy files
-cp /home/sjs3495/Omega_MutSel/trees/10.tre tree.tre
+cp /home/sjs3495/Omega_MutSel/trees/4.tre tree.tre
 cp /home/sjs3495/Omega_MutSel/simulation_scripts/run_siminf.py .
 cp /home/sjs3495/Omega_MutSel/simulation_scripts/functions_simandinf.py .
 
