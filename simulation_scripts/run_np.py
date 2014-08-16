@@ -1,5 +1,5 @@
 # SJS. stephanie.spielman@gmail.com
-# Code for using Jesse Bloom's NP pref data, with mu schemes that are either np, yeast, maybe more!
+# Code for using Jesse Bloom's NP pref data, with mu schemes that are either np, yeast.
 
 ######## Input parameters ########
 import sys

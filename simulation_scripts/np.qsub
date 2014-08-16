@@ -5,7 +5,7 @@
 #$ -S /bin/bash
 #$ -q wilke
 #$ -m beas
-#$ -t 1-100:1
+#$ -t 1-498:1
 #$ -pe serial 5
 
 CPU=5
@@ -31,8 +31,8 @@ cd $WDIR
 # Copy files
 cp /home/sjs3495/Omega_MutSel/trees/10.tre tree.tre
 cp /home/sjs3495/Omega_MutSel/simulation_scripts/run_np.py .
-cp /home/sjs3495/Omega_MutSel/simulation_scripts/${DATASET}_codon_eqfreqs.txt .
 cp /home/sjs3495/Omega_MutSel/simulation_scripts/functions_simandinf.py .
+cp /home/sjs3495/Omega_MutSel/np_scripts/${DATASET}_codon_eqfreqs.txt .
 
 #Hyphy
 cp /home/sjs3495/bin/bin/HYPHYMP .
