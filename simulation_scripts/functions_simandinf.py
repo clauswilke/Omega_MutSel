@@ -23,7 +23,7 @@ amino_acids  = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P",
 codons=["AAA", "AAC", "AAG", "AAT", "ACA", "ACC", "ACG", "ACT", "AGA", "AGC", "AGG", "AGT", "ATA", "ATC", "ATG", "ATT", "CAA", "CAC", "CAG", "CAT", "CCA", "CCC", "CCG", "CCT", "CGA", "CGC", "CGG", "CGT", "CTA", "CTC", "CTG", "CTT", "GAA", "GAC", "GAG", "GAT", "GCA", "GCC", "GCG", "GCT", "GGA", "GGC", "GGG", "GGT", "GTA", "GTC", "GTG", "GTT", "TAC", "TAT", "TCA", "TCC", "TCG", "TCT", "TGC", "TGG", "TGT", "TTA", "TTC", "TTG", "TTT"]
 codon_dict = {"AAA":"K", "AAC":"N", "AAG":"K", "AAT":"N", "ACA":"T", "ACC":"T", "ACG":"T", "ACT":"T", "AGA":"R", "AGC":"S", "AGG":"R", "AGT":"S", "ATA":"I", "ATC":"I", "ATG":"M", "ATT":"I", "CAA":"Q", "CAC":"H", "CAG":"Q", "CAT":"H", "CCA":"P", "CCC":"P", "CCG":"P", "CCT":"P", "CGA":"R", "CGC":"R", "CGG":"R", "CGT":"R", "CTA":"L", "CTC":"L", "CTG":"L", "CTT":"L", "GAA":"E", "GAC":"D", "GAG":"E", "GAT":"D", "GCA":"A", "GCC":"A", "GCG":"A", "GCT":"A", "GGA":"G", "GGC":"G", "GGG":"G", "GGT":"G", "GTA":"V", "GTC":"V", "GTG":"V", "GTT":"V", "TAC":"Y", "TAT":"Y", "TCA":"S", "TCC":"S", "TCG":"S", "TCT":"S", "TGC":"C", "TGG":"W", "TGT":"C", "TTA":"L", "TTC":"F", "TTG":"L", "TTT":"F"}
 genetic_code = [["GCA", "GCC", "GCG", "GCT"], ["TGC","TGT"], ["GAC", "GAT"], ["GAA", "GAG"], ["TTC", "TTT"], ["GGA", "GGC", "GGG", "GGT"], ["CAC", "CAT"], ["ATA", "ATC", "ATT"], ["AAA", "AAG"], ["CTA", "CTC", "CTG", "CTT", "TTA", "TTG"], ["ATG"], ["AAC", "AAT"], ["CCA", "CCC", "CCG", "CCT"], ["CAA", "CAG"], ["AGA", "AGG", "CGA", "CGC", "CGG", "CGT"] , ["AGC", "AGT", "TCA", "TCC", "TCG", "TCT"], ["ACA", "ACC", "ACG", "ACT"], ["GTA", "GTC", "GTG", "GTT"], ["TGG"], ["TAC", "TAT"]]
-
+family_size = [4., 2., 2., 2., 2., 4., 2., 3., 2., 6., 1., 2., 4., 2., 6., 6., 4., 4., 1., 2.] # alphabetical according to amino acids.
 
 
 ######################################################################################################################################
@@ -50,31 +50,35 @@ def simulate(f, seqfile, tree, mu_dict, length):
 
 
 ################################### FUNCTIONS TO SET UP SCALED SEL COEFFS, CODON FREQUENCIES #########################################
-def set_codon_freqs(sd, freqfile, aafile, codonfile, bias):
-    ''' Returns equilibrium codon frequencies, entropy, and gc content. Also saves codon frequencies, aa coefficients, and codon coefficients to file. '''
+def set_codon_freqs(sd, freqfile, bias):
+    ''' Returns equilibrium codon frequencies, entropy, and gc content. Also saves codon frequencies to file. 
+        We simulate codon frequencies according a Boltzmann distribution (eg, SellaHirsh 2005, eq 7). Thus, we must simulate values for the exponent. We draw them from a normal distribution.
+        IMPORTANTLY, that expression (eq 7) for equilibrium frequencies applies only when the mutation matrix is symmetric.
         
-    # Draw amino acid ssc values and assign randomly to amino acids. NOTE: the sd argument is either the sd or it is the pre-determined amino acid selection coefficients.
-    if type(sd) is float:
-        aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
-        shuffle(aminos)  # To randomly assign coefficients, shuffle aminos acids.
-        aa_coeffs = dict(zip(aminos, draw_amino_coeffs(sd)))
-    elif type(sd) is dict:
-        aa_coeffs = sd
-
-    # Convert amino acid coefficients to codon coefficients
-    codon_coeffs = aa_to_codon_coeffs(aa_coeffs, bias)
-
-
-    # Convert codon coefficients to steady-state frequencies
-    codon_freqs = codon_coeffs_to_freqs(codon_coeffs)
-    codon_freqs_dict = dict(zip(codons, codon_freqs))
-            
-     
-    # Save frequencies and selection coeffs to file  
-    np.savetxt(freqfile, codon_freqs)
-    np.savetxt(aafile, [aa_coeffs[key] for key in sorted(aa_coeffs)])
-    np.savetxt(codonfile, [codon_coeffs[key] for key in sorted(codon_coeffs)])
+        We draw 20 exponents (amino acids) to determine amino acid equilbrium frequencies. We can then divide these frequencies up into codon frequencies, as follows.
+            Assume eq. freq of a codon in a given amino acid codon family is P, in the absense of codon bias.
+            We randomly select one codon to be preferred, and the rest are non-preferred. The preferred codon has a frequency
+            of P*(1+(k-1)\lambda) and the nonpreferred codons each have a frequency of P*(1-\lambda), where k=family size. 
+            \lambda=0 means no codon bias and \lambda=1 means complete codon bias (there exists only one preferred codon).
+    '''
+        
     
+    aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
+    shuffle(aminos)  # To randomly assign exponents, shuffle aminos acids.
+    aa_exps = dict(zip(aminos, np.random.normal(loc=0., scale=sd, size=20)))
+    
+    # Derive amino acid frequencies.  
+    aa_freqs = aa_exps_to_freqs(aa_exps)
+    
+    # Determine the bias-free codon frequencies. Note that there are only twenty values!!
+    raw_codon_freq = aa_freqs / family_size
+    
+    # Determine the real codon frequencies now
+    codon_freqs, codon_freqs_dict = calc_codon_freqs(raw_freqs, bias)
+            
+    # Save codon equilibrium frequencies to file  
+    np.savetxt(freqfile, codon_freqs)
+
     # Determine gc content
     fobj = UserFreqs(by = 'codon', freqs = codon_freqs_dict)
     nuc_freq = fobj.calcFreqs(type = 'nuc')
@@ -85,40 +89,43 @@ def set_codon_freqs(sd, freqfile, aafile, codonfile, bias):
 
     return codon_freqs, codon_freqs_dict, gc, entropy
     
-
-def draw_amino_coeffs(sd):
-    ssc_values = np.random.normal(loc=0., scale=sd, size=20) # note: default np fxn is mean=0, sd=1.
-    ssc_values[0] = 0.
-    return ssc_values
-
-
-def aa_to_codon_coeffs(aa_coeffs, bias):
-    ''' Assign amino acid selection coefficients to codons. Note that if bias=0, then there's no codon bias. '''
-    codon_coeffs = {}
-    for aa in aa_coeffs:
-        syn_codons = genetic_code[ amino_acids.index(aa) ]
+    
+   
+def aa_exps_to_freqs(aa_exps):
+    ''' We determine the Boltzmann amino acid frequencies from the exponents. '''
+    freqs = np.zeros(20)
+    count = 0
+    for aa in amino_acids:
+        freqs[count] = np.exp( aa_exps[aa] )
+        count += 1
+    return freqs /= np.sum(freqs)
+       
+    
+def calc_codon_freqs(raw_freqs, bias):
+    ''' Determine the codon frequencies. Argument raw_freqs is a list of what codon frequencies should be in absence of bias.
+        The bias term ranges from [0,1], where 0=no bias and 1=complete bias.
+    '''
+    codon_freqs_dict = {}
+    for i in range(20):       
+        syn_codons = genetic_code[ amino_acids[i] ]
         shuffle(syn_codons) # randomize otherwise the preferred will be the first one alphabetically
-        k = float(len(syn_codons) - 1.)
+        k = family_size[i]
         first=True
         for syn in syn_codons:
             if first:
-                codon_coeffs[syn] = aa_coeffs[aa] + bias
+                codon_freqs_dict[syn] = raw_freqs*(1. + (k-1.)*float(bias))
                 first=False
             else:
-                codon_coeffs[syn] = aa_coeffs[aa] - bias/k
-    return codon_coeffs
-
-
-
-def codon_coeffs_to_freqs(codon_coeffs):
+                codon_freqs_dict[syn] = raw_freqs*(1. - float(bias))
+    
+    # We need ordered codon frequencies
     codon_freqs = np.zeros(61)
-    count = 0
-    for codon in codons:
-        codon_freqs[count] = np.exp( codon_coeffs[codon] )
-        count += 1
-    codon_freqs /= np.sum(codon_freqs)                   
-    assert(np.sum(codon_freqs) - 1.0 < ZERO), "codon_freq doesn't sum to 1 in codon_coeffs_to_freqs"
-    return codon_freqs
+    for i in range(61):
+        codon_freqs[i] = codon_freqs_dict[codons[i]]
+        
+    return codon_freqs, codon_freqs_dict
+
+
     
 def calc_entropy(f):
     return -1. * np.sum ( f[f > ZERO] * np.log(f[f > ZERO]) )    
