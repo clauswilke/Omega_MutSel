@@ -132,10 +132,8 @@ def calc_entropy(f):
 
 ################################################# OMEGA DERIVATION FUNCTIONS #########################################################
 
-def derive_omega(codon_freqs_dict, mu_dict, bias):
-    ''' NOTE: bias=0 assumes dS = 1, which follows from a symmetric mutation rate and no codon bias (synonymous have same fitness). 
-        When bias is 0, then dS is also computed. Mutation matrix still symmetric though.
-    '''
+def derive_omega(codon_freqs_dict, mu_dict):
+    ''' By default, calculate dS. If no bias and symmetric mutation rates, it will be 1 anyways at virtually no computational cost... '''
     
     numer_dn = 0.; denom_dn = 0.;
     numer_ds = 0.; denom_ds = 0.;
@@ -147,18 +145,12 @@ def derive_omega(codon_freqs_dict, mu_dict, bias):
             numer_dn += rate
             denom_dn += sites
     
-            if bias:
-		rate, sites = calc_syn_paths(codon, codon_freqs_dict, mu_dict)
-                numer_ds += rate
-                denom_ds += sites
+            rate, sites = calc_syn_paths(codon, codon_freqs_dict, mu_dict)
+            numer_ds += rate
+            denom_ds += sites
     
-    if bias is False:
-        assert( denom_dn != 0. ), "Omega derivation indicates no evolution, maybe?"
-        return numer_dn/denom_dn
-        
-    else:
-        assert( denom_dn != 0. and denom_ds != 0.), "Omega derivation, with bias, indicates no evolution, maybe?"
-        return (numer_dn/denom_dn)/(numer_ds/denom_ds)
+    assert( denom_dn != 0. and denom_ds != 0.), "Omega derivation, with bias, indicates no evolution, maybe?"
+    return (numer_dn/denom_dn)/(numer_ds/denom_ds)
     
 
 
