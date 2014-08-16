@@ -47,9 +47,9 @@ print "Simulating"
 simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
 
 
-# Derive omega from selection coefficients (well, frequencies, but same deal)
-print "Deriving omega from selection coefficients"
-derivedw = derive_omega(codon_freqs_true_dict, mu_dict, bias=False)
+# Derive omega from eq freqs
+print "Deriving omega from equilibrium codon frequencies"
+derivedw = derive_omega(codon_freqs_true_dict, mu_dict)
 
 
 # Maximum likelihood omega inference across a variety of frequency, kappa specifications
