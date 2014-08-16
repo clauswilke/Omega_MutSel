@@ -1,10 +1,10 @@
 # SJS. stephanie.spielman@gmail.com
-# Code for using Jesse Bloom's NP pref data, with mu schemes that are either np, yeast.
+# Code for using Jesse Bloom's NP amino acid preferene data, with mutation rates either from NP (Bloom 2014) or yeast.
 
 ######## Input parameters ########
 import sys
 if (len(sys.argv) != 7):
-    print "\n\nUsage: python run_siminf.py <rep> <treefile> <simdir> <cpu> <dataset> <batchfile>\n."
+    print "\n\nUsage: python run_np.py <rep> <treefile> <simdir> <cpu> <dataset> <batchfile>\n."
     sys.exit()
 rep = sys.argv[1]         # which rep we're on, for saving files. needs to run from 1-498, since 498 sites.
 treefile = sys.argv[2]    # tree for simulation
@@ -26,9 +26,11 @@ paramfile = "params"+str(rep)+".txt"
 # Set up mutation rates, frequencies, hyphy batchfile name based on the dataset specified
 if dataset == 'np':
     mu_dict = {'AG':2.4e-5, 'TC':2.4e-5, 'GA':2.3e-5, 'CT':2.3e-5, 'AC':9.0e-6, 'TG':9.0e-6, 'CA':9.4e-6, 'GT':9.4e-6, 'AT':3.0e-6, 'TA':3.0e-6, 'GC':1.9e-6, 'CG':1.9e-6}
+    kappa = 4.034335
 elif dataset == 'yeast':
     mu = 1.67e-10 # this is the mean per generation per nucleotide mutation rate. 
     mu_dict = {'AG':0.144/2*mu, 'TC':0.144/2*mu, 'GA':0.349/2*mu, 'CT':0.349/2*mu, 'AC':0.11/2*mu, 'TG':0.11/2*mu, 'CA':0.182/2*mu, 'GT':0.182/2*mu, 'AT':0.063/2*mu, 'TA':0.063/2*mu, 'GC':0.152/2*mu, 'CG':0.152/2*mu}
+    kappa = 1.944773
 else:
     raise AssertionError("Dataset has to be np or yeast.")
 
@@ -58,11 +60,11 @@ print "Conducting ML inference with HyPhy"
 
 # Lists for storing values and printing strings
 krun = [1.0, 'free']
-kspecs = ['one', 'free'] # no kappa true here, since there's no kappa.
+kspecs = [kappa, 'one', 'free']
 fspecs = ['equal', 'null', 'f61_site', 'f61_global', 'f3x4_site', 'f3x4_global', 'cf3x4_site', 'cf3x4_global'] # DO NOT CHANGE THIS LIST !!!!
-omegas = np.zeros([2,8])
-kappas = np.zeros([2,8])
-omega_errors = np.ones([2,8])
+omegas = np.zeros([3,8])
+kappas = np.zeros([3,8])
+omega_errors = np.ones([3,8])
 
 
 # First, set up F61 (data) frequency vector in the hyphy batchfile as this applies to all hyphy runs.
