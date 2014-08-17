@@ -78,8 +78,9 @@ assert(setupf == 0), "couldn't properly add in sitewise F61 frequencies"
 for i in range(3):
     omegas[i], kappas[i] = run_hyphy_np(batchfile, seqfile, treefile, cpu, krun[i], fspecs)  
     if krun[i] != 'free':
-        kappas[i] = kappa
+        kappas[i] = krun[i]
     omega_errors[i] = (derivedw - omegas[i]) / derivedw
+
 
 # Finally, save results
 outstring_params = rep + '\t' + str(entropy) + '\t' + str(derivedw)
