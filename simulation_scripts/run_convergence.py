@@ -17,8 +17,6 @@ from functions_simandinf import *
 seqfile   = "seqs"+str(rep)+".fasta"
 freqfile  = "codonFreqs" + str(rep)+".txt"
 paramfile = "params"+str(rep)+".txt"
-amino_sscfile = "aminoCoeffs" + str(rep)+".txt"
-codon_sscfile = "codonCoeffs" + str(rep)+".txt"
 
 mu = 1e-6
 kappa = rn.uniform(1.0, 6.0)
@@ -37,7 +35,7 @@ seqlength = int( times * 10**expon )
 
 # Set up steady-state codon frequencies based on selection coefficients
 print "Deriving equilibrium codon frequencies"
-codon_freqs, codon_freqs_dict, gc_content, entropy = set_codon_freqs(sd, freqfile, amino_sscfile, codon_sscfile, 0.)
+codon_freqs, codon_freqs_dict, gc_content, entropy = set_codon_freqs(sd, freqfile, 0.)
 
 
 # Simulate according to MutSel model along phylogeny
@@ -46,7 +44,7 @@ simulate(codon_freqs, seqfile, treefile, mu_dict, seqlength)
 
 # Derive omega from selection coefficients (well, frequencies, but same deal)
 print "Deriving omega from selection coefficients"
-derivedw = derive_omega(codon_freqs_dict, mu_dict, False)
+derivedw = derive_omega(codon_freqs_dict, mu_dict)
 
 # ML
 print "Conducting ML inference with HyPhy"
