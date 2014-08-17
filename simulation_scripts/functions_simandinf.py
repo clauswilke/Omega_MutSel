@@ -309,7 +309,8 @@ def run_hyphy_np(batchfile, seqfile, treefile, cpu, kappa, fspecs):
         file = suffix + '_hyout.txt'  
         mlw, mlk = parse_output_GY94(file)
         omegas[count] = mlw
-        kappas[count] = mlk
+        if mlk is None:
+            kappas[count] = kappa
         count += 1
     return omegas, kappas
      
@@ -319,7 +320,7 @@ def parse_output_GY94(file):
     hylines = hyout.readlines()
     hyout.close()
     hyphy_w = None
-    hyphy_k = 1000 # so R will read column as numeric
+    hyphy_k = None
     for line in hylines:
         findw = re.search("^w=(\d+\.*\d*)", line)
         if findw:
