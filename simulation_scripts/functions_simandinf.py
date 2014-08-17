@@ -96,12 +96,9 @@ def aa_exps_to_freqs(aa_exps):
     freqs = np.zeros(20)
     count = 0
     for aa in amino_acids:
-        print aa, aa_exps[aa]
         freqs[count] = np.exp( aa_exps[aa] )
         count += 1
-    print freqs, np.sum(freqs)
     freqs /= np.sum(freqs)
-    print freqs, np.sum(freqs)    
     assert(-1.*ZERO < np.sum(freqs) - 1. < ZERO), "Bad amino acid frequencies."
     return freqs
        
@@ -122,14 +119,11 @@ def calc_codon_freqs(raw_freqs, bias):
                 first=False
             else:
                 codon_freqs_dict[syn] = raw_freqs[i]*(1. - float(bias))
-    print "1",codon_freqs_dict
-    print "2",codons[0]
-    print "3",codon_freqs_dict['AAA']
     # We need ordered codon frequencies
     codon_freqs = np.zeros(61)
     for i in range(61):
         codon_freqs[i] = codon_freqs_dict[codons[i]]
-    assert(np.sum(codon_freqs) == 1.), "Bad codon frequencies"  
+    assert(-1.*ZERO <  np.sum(codon_freqs) - 1. < ZERO), "Bad codon frequencies"  
     return codon_freqs, codon_freqs_dict
 
 
