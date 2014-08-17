@@ -6,9 +6,9 @@
 #$ -q wilke
 #$ -m beas
 #$ -t 1-498:1
-#$ -pe serial 5
+#$ -pe serial 2
 
-CPU=5
+CPU=2
 DATASET=$JOB_NAME   # np or yeast, for now. possibly add polio in near future.
 BATCHFILE=globalDNDS_${DATASET}.bf
 
@@ -29,7 +29,7 @@ fi
 cd $WDIR
 
 # Copy files
-cp /home/sjs3495/Omega_MutSel/trees/10.tre tree.tre
+cp /home/sjs3495/Omega_MutSel/trees/4.tre tree.tre
 cp /home/sjs3495/Omega_MutSel/simulation_scripts/run_np.py .
 cp /home/sjs3495/Omega_MutSel/simulation_scripts/functions_simandinf.py .
 cp /home/sjs3495/Omega_MutSel/np_scripts/${DATASET}_codon_eqfreqs.txt .

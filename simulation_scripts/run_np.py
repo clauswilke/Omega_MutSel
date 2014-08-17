@@ -59,8 +59,8 @@ print "Conducting ML inference with HyPhy"
 
 
 # Lists for storing values and printing strings
-krun = [1.0, 'free']
-kspecs = [kappa, 'one', 'free']
+krun = [kappa, 1.0, 'free']
+kspecs = ['true', 'one', 'free']
 fspecs = ['equal', 'null', 'f61_site', 'f61_global', 'f3x4_site', 'f3x4_global', 'cf3x4_site', 'cf3x4_global'] # DO NOT CHANGE THIS LIST !!!!
 omegas = np.zeros([3,8])
 kappas = np.zeros([3,8])
@@ -75,14 +75,11 @@ assert(setupf == 0), "couldn't properly add in sitewise F61 frequencies"
 
 
 # Run hyphy and save omegas, kappas (only sometimes returned, note), and omega errors along the way
-kcount = 0
-for kap in krun:
-    wtemp, ktemp = run_hyphy_np(batchfile, seqfile, treefile, cpu, kap, fspecs)  
-    kappas[kcount] = ktemp
-    omegas[kcount] = wtemp
-    omega_errors[kcount] = (derivedw - wtemp) / derivedw
-    kcount += 1
-
+for i in range(3):
+    omegas[i], kappas[i] = run_hyphy_np(batchfile, seqfile, treefile, cpu, krun[i], fspecs)  
+    if krun[i] != 'free':
+        kappas[i] = kappa
+    omega_errors[i] = (derivedw - omegas[i]) / derivedw
 
 # Finally, save results
 outstring_params = rep + '\t' + str(entropy) + '\t' + str(derivedw)
