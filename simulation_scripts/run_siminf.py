@@ -12,7 +12,7 @@ rep = sys.argv[1]         # which rep we're on, for saving files
 treefile = sys.argv[2]    # tree for simulation
 simdir = sys.argv[3]      # directory of simulation library
 cpu = sys.argv[4]         # hyphy can use
-bias = float(sys.argv[5]) # codon bias factor
+bias = float(sys.argv[5]) # codon bias, yes or no?
 sys.path.append(simdir)
 from functions_simandinf import *
 
@@ -20,52 +20,49 @@ from functions_simandinf import *
 # Set up output files and parameters
 seqfile       = "seqs"+str(rep)+".fasta"
 freqfile      = "codonFreqs" + str(rep)+".txt"
-amino_sscfile = "aminoCoeffs" + str(rep)+".txt"
-codon_sscfile = "codonCoeffs" + str(rep)+".txt"
 paramfile     = "params"+str(rep)+".txt"
 
 
 seqlength = 500000
+if bias != 0.:
+    bias = rn.uniform(0,1)
 mu = 1e-6
 kappa = rn.uniform(1.0, 6.0)
 sd = rn.uniform(0., 4.)
 mu_dict = {'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'AC': mu, 'CA':mu, 'GT':mu, 'TG':mu, 'AG': kappa*mu, 'GA':kappa*mu, 'CT':kappa*mu, 'TC':kappa*mu}
 
 
-# Set up steady-state codon frequencies based on selection coefficients
+# Derive equilibrium codon frequencies 
 print "Deriving equilibrium codon frequencies"
-codon_freqs_true, codon_freqs_true_dict, gc_content, entropy = set_codon_freqs(sd, freqfile, amino_sscfile, codon_sscfile, bias)
+codon_freqs_f61, codon_freqs_dict, gc_content, entropy = set_codon_freqs(sd, freqfile, bias)
 
 
-# Simulate according to MutSel model along phylogeny
+# Simulate according to BH98 MutSel model
 print "Simulating"
-simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
+simulate(codon_freqs_f61, seqfile, treefile, mu_dict, seqlength)
 
-
-# Derive omega from selection coefficients (well, frequencies, but same deal)
-print "Deriving omega from selection coefficients"
-derivedw = derive_omega(codon_freqs_true_dict, mu_dict, bias!=0.) # last argument as bool for function to know whether to compute dS.
+# Derive omega from equilibrium codon frequencies
+print "Deriving omega from equilibrium codon frequencies"
+derivedw = derive_omega(codon_freqs_dict, mu_dict)
 
 
 # Maximum likelihood omega inference across a variety of frequency, kappa specifications
 print "Conducting ML inference with HyPhy"
 
-
-
 # Lists for storing values and printing strings
 krun = [kappa, 1.0, 'free']
 kspecs = ['true', 'one', 'free']
-fspecs = ['equal', 'true', 'f3x4', 'cf3x4'] # DO NOT CHANGE THIS LIST !!!!
+fspecs = ['equal', 'f61', 'f3x4', 'cf3x4'] # DO NOT CHANGE THIS LIST !!!!
 omegas = np.zeros([3,4])
 kappas = np.zeros([3,4])
 omega_errors = np.ones([3,4])
 
 
 # First, set up F61 (data) frequency vector in the hyphy batchfile as this applies to all hyphy runs.
-hyf = array_to_hyphy_freq(codon_freqs_true)
+hyf = array_to_hyphy_freq(codon_freqs_f61)
 setuphyphyf = "sed -i 's/DATAFREQS/"+hyf+"/g' globalDNDS.bf"
 setupf = subprocess.call(setuphyphyf, shell = True)
-assert(setupf == 0), "couldn't properly add in F61 (data) frequencies"
+assert(setupf == 0), "couldn't properly add in F61 frequencies"
 
 
 # Run hyphy and save omegas, kappas (only sometimes returned, note), and omega errors along the way

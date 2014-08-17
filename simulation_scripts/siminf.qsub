@@ -1,5 +1,5 @@
 #!/bin/bash
-#$ -N siminf
+#$ -N bias
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
@@ -8,8 +8,8 @@
 #$ -t 1-100:1
 #$ -pe serial 2
 
-
-BIAS=2   # 0=no codon bias. other number = the bias factor.
+CPU=2
+BIAS=1  # 0=no bias, 1=yes bias.
 source ~/.bash_profile
 
 
@@ -39,13 +39,11 @@ cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
 
 # Run
 module load python
-python run_siminf.py $SGE_TASK_ID tree.tre $SIMDIR 15 $BIAS
+python run_siminf.py $SGE_TASK_ID tree.tre $SIMDIR $CPU $BIAS
 
 # Cleanup
 mkdir -p $RDIR
 cp params* $RDIR
 cp seqs* $RDIR
 cp codonFreqs* $RDIR
-cp aminoCoeffs* $RDIR
-cp codonCoeffs* $RDIR
 rm -rf $WDIR
