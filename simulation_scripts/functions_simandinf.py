@@ -99,7 +99,7 @@ def calc_codon_freqs_nobias(exps):
     
          
     
-def implement_bias(raw_freqs_dict, bias):
+def implement_bias(codon_freqs_dict, bias):
     ''' Implement codon bias. Argument raw_freqs_dict corresponds to what codon frequencies would be in *absence* of bias.
         The bias term ranges from [0,1], where 0=no bias and 1=complete bias.
     '''
