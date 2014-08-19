@@ -49,36 +49,30 @@ def simulate(f, seqfile, tree, mu_dict, length):
 ######################################################################################################################################
 
 
-################################### FUNCTIONS TO SET UP EQUILIBRIUM CODON FREQUENCIES #########################################
-def set_codon_freqs(lambda_, gamma, freqfile):
+################################### FUNCTIONS TO SET UP SCALED SEL COEFFS, CODON FREQUENCIES #########################################
+def set_codon_freqs(sd, freqfile, bias):
     ''' Returns equilibrium codon frequencies, entropy, and gc content. Also saves codon frequencies to file. 
+        We simulate codon frequencies according a Boltzmann distribution (eg, SellaHirsh 2005, eq 7). Thus, we must simulate values for the exponent. We draw them from a normal distribution.
+        IMPORTANTLY, that expression (eq 7) for equilibrium frequencies applies only when the mutation matrix is symmetric.
         
-        STRATEGY:
-            We begin by simulating steady-state amino frequencies according a Boltzmann distribution. See Ramsey et al. 2011, eq 9. 
-            We need two main things for this - amino acid rankings and lambda parameter, which is basically the strength of selection. 
-            Amino acid rankings are randomly assigned. We draw lambda ~ U(0,1.5), based on results from Ramsey et al.
-            Note that when lambda = 0 we have neutral evolution.
-        
-            We then divvy up these amino acid frequencies up into codon frequencies, as follows.
+        We draw 20 exponents to determine equilibrium codon frequencies. Each codon in an amino acid family is assigned the same exponent.
+        These equilibrium frequencies are those which would exist in the absense of bias. We implement codon bias as follows - 
             Assume eq. freq of a codon in a given amino acid codon family is P, in the absense of codon bias.
             We randomly select one codon to be preferred, and the rest are non-preferred. The preferred codon has a frequency
-            of P*(1+(k-1)\gamma) and the nonpreferred codons each have a frequency of P*(1-\gamma), where k=family size. 
-            \gamma=0 means no codon bias and \gamma=1 means complete codon bias (there exists only one preferred codon).
+            of P*(1+(k-1)\lambda) and the nonpreferred codons each have a frequency of P*(1-\lambda), where k=family size. 
+            \lambda=0 means no codon bias and \lambda=1 means complete codon bias (there exists only one preferred codon).
     '''
-        
+
+    # Determine equilibrium codon frequencies in the absense of codon bias
+    codon_freqs, codon_freqs_dict = calc_codon_freqs_nobias( np.random.normal(loc=0., scale=sd, size=20) )
     
-    aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
-    shuffle(aminos)  # Shuffle aminos acids, thus yielding a random ranking. An aa's index in the list "amino" is its rank.
+    # If needed, implement codon bias
+    if bias != 0.:
+        codon_freqs, codon_freqs_dict = implement_bias(codon_freqs_dict, bias)
     
-    # Derive amino acid frequencies, and immediately convert to "bias-free" codon frequencies. 
-    aa_freqs = calc_aa_freqs(aminos, lambda_) / family_size
-    
-    # Determine the real codon frequencies now
-    codon_freqs, codon_freqs_dict = calc_codon_freqs(aa_freqs, gamma)
-            
     # Save codon equilibrium frequencies to file  
     np.savetxt(freqfile, codon_freqs)
-
+    
     # Determine gc content
     fobj = UserFreqs(by = 'codon', freqs = codon_freqs_dict)
     nuc_freq = fobj.calcFreqs(type = 'nuc')
@@ -91,40 +85,44 @@ def set_codon_freqs(lambda_, gamma, freqfile):
     
     
    
-def calc_aa_freqs(aminos, lambda_):
-    ''' We determine the Boltzmann-distributed steady-state amino acid frequencies here (see Ramsey et al. 2011, equation 9).  '''
-    freqs = np.zeros(20)
-    count = 0
-    for aa in amino_acids:
-        freqs[count] = np.exp(-1. * lambda_ * aminos.index(aa) )
-        count += 1
-    freqs /= np.sum(freqs)
-    assert(-1.*ZERO < np.sum(freqs) - 1. < ZERO), "Bad amino acid frequencies."
-    return freqs
-       
+
+def calc_codon_freqs_nobias(exps):  
+    ''' Calculate the equilibrium (steady-state) codon frequencies in the absence of codon bias. In other words, all synonymous codons will have the same frequency. '''
+    codon_freqs = np.ones(61)
+    for i in range(20):   
+        for syn in genetic_code[i]:
+            codon_index = codons.index(syn)
+            codon_freqs[codon_index] = np.exp( exps[i] )
+    codon_freqs /= np.sum(codon_freqs)
+    assert(-1.*ZERO < np.sum(codon_freqs) - 1. < ZERO), "Bad no-bias codon frequencies."
+    return codon_freqs, dict(zip(codons, codon_freqs))
     
-def calc_codon_freqs(raw_freqs, bias):
-    ''' Determine the codon frequencies. Argument raw_freqs is a list of what codon frequencies should be in absence of bias.
+         
+    
+def implement_bias(raw_freqs_dict, bias):
+    ''' Implement codon bias. Argument raw_freqs_dict corresponds to what codon frequencies would be in *absence* of bias.
         The bias term ranges from [0,1], where 0=no bias and 1=complete bias.
     '''
-    codon_freqs_dict = {}
+    
     for i in range(20):       
         syn_codons = genetic_code[i]
-        shuffle(syn_codons) # randomize otherwise the preferred will be the first one alphabetically
+        shuffle(syn_codons) # randomize this, otherwise the preferred codon will always be the first one alphabetically
         k = family_size[i]
         first=True
         for syn in syn_codons:
             if first:
-                codon_freqs_dict[syn] = raw_freqs[i]*(1. + (k-1.)*float(bias))
+                codon_freqs_dict[syn] *= (1. + (k-1.)*float(bias))
                 first=False
             else:
-                codon_freqs_dict[syn] = raw_freqs[i]*(1. - float(bias))
-    # We need ordered codon frequencies
+                codon_freqs_dict[syn] *= (1. - float(bias))
+    
+    # Now need to convert this dictionary back to a list, properly ordered.
     codon_freqs = np.zeros(61)
     for i in range(61):
         codon_freqs[i] = codon_freqs_dict[codons[i]]
     assert(-1.*ZERO <  np.sum(codon_freqs) - 1. < ZERO), "Bad codon frequencies"  
     return codon_freqs, codon_freqs_dict
+
 
 
     
@@ -138,9 +136,9 @@ def calc_entropy(f):
 
     
 
-################################################# OMEGA DERIVATION FUNCTIONS #########################################################
+################################################# DN/DS DERIVATION FUNCTIONS #########################################################
 
-def derive_omega(codon_freqs_dict, mu_dict):
+def derive_dnds(codon_freqs_dict, mu_dict):
     ''' By default, calculate dS. If no bias and symmetric mutation rates, it will be 1 anyways at virtually no computational cost... '''
     
     numer_dn = 0.; denom_dn = 0.;
@@ -346,83 +344,3 @@ def array_to_hyphy_freq(f):
 
 
 ######################################################################################################################################
-
-
-
-
-############################ COUNTING METHOD FUNCTIONS. NOTE THAT THESE USE PAML. ###############################
-def runpaml_yn00(seqfile):
-    ''' 
-        NOTE THESE ARGS NO LONGER USED SINCE THEY MADE NO DIFFERENCE AT ALL!!!! REALLY, I CHECKED THIS THOROUGHLY.
-        weight: * weighting pathways between codons (0/1)?
-        commonf3x4: * use one set of codon freqs for all pairs (0/1)? 
-    '''
-    
-    # Set up sequence file
-    setuppaml1 = "cp "+seqfile+" temp.fasta"
-    setup1 = subprocess.call(setuppaml1, shell = True)
-    assert(setup1 == 0), "couldn't create temp.fasta"
-
-    # Run paml
-    runpaml = subprocess.call("./yn00", shell=True)
-    assert (runpaml == 0), "paml fail"
-
-    # Grab paml output
-    return parsepaml_yn00("pamloutfile")
-
-
-
-def parsepaml_yn00(pamlfile):
-    ''' parsing paml outfiles is completely the worst. IMPORTANT: CODE HERE WILL WORK ONLY WHEN INPUT DATA HAS 2 SEQUENCES ONLY!!! 
-        There are 5 omega values to retrieve:
-            1. ng86
-            2. yn00
-            3. lwl85
-            4. lwl85m
-            5. lpb93
-    '''
-
-    paml = open(pamlfile, 'rU')
-    lines = paml.readlines()
-    paml.close()
-    count = 0
-    for line in lines:
-        find_ng86 = re.search("^Nei \& Gojobori 1986\. dN/dS \(dN, dS\)", line)
-        if find_ng86:
-            ng86_line = count + 5
-        
-        find_yn00 = re.search("Yang \& Nielsen \(2000\) method", line)
-        if find_yn00:
-            yn00_line = count + 8
-        
-        find_lpb93 = re.search('LPB93\:\s+dS =\s+\d+\.\d+\s+dN =\s+\d+\.\d+\s+w =\s+(\d+\.\d+)', line)
-        if find_lpb93:
-            assert(find_lpb93.group(1) is not None)
-            w_lpb93 = find_lpb93.group(1)
-        
-        find_lwl85 = re.search('LWL85\:\s+dS =\s+\d+\.\d+\s+dN =\s+\d+\.\d+\s+w =\s+(\d+\.\d+)', line)
-        if find_lwl85:
-            assert(find_lwl85.group(1) is not None)
-            w_lwl85 = find_lwl85.group(1)
-        
-        find_lwl85m = re.search('LWL85m\:\s+dS =  \d+\.\d+\s+dN =\s+\d+\.\d+\s+w =\s+(\d+\.\d+)', line)
-        if find_lwl85m:
-            assert(find_lwl85m.group(1) is not None)
-            w_lwl85m = find_lwl85m.group(1)
-            
-        else:
-            count += 1
-    
-    find_ng86 = re.search('\s+(\d\.\d+)\s+\(', lines[ng86_line])
-    assert(find_ng86.group(1) is not None)
-    w_ng86 = find_ng86.group(1)
-    
-    find_yn00 = re.search('^\s+\w+\s+\w+\s+\d+\.\d+\s+\d+\.\d+\s+\d+\.\d+\s+\d+\.\d+\s+(\d+\.\d+)', lines[yn00_line])
-    #assert(find_yn00.group(1) is not None)
-    try:
-        w_yn00 = find_yn00.group(1)
-    except:
-        w_yn00 = '5'
-    
-    w_list = [w_ng86, w_yn00, w_lwl85, w_lwl85m, w_lpb93]
-    return(w_list)
