@@ -25,7 +25,7 @@ paramfile     = "params"+str(rep)+".txt"
 
 seqlength = 500000
 if bias != 0.:
-    bias = rn.uniform(0,1)
+    bias = rn.uniform(ZERO,1)
 mu = 1e-6
 kappa = rn.uniform(1.0, 6.0)
 sd = rn.uniform(0., 4.)
@@ -43,19 +43,19 @@ simulate(codon_freqs_f61, seqfile, treefile, mu_dict, seqlength)
 
 # Derive omega from equilibrium codon frequencies
 print "Deriving omega from equilibrium codon frequencies"
-derivedw = derive_omega(codon_freqs_dict, mu_dict)
+derivedw = derive_dnds(codon_freqs_dict, mu_dict)
 
 
 # Maximum likelihood omega inference across a variety of frequency, kappa specifications
 print "Conducting ML inference with HyPhy"
 
 # Lists for storing values and printing strings
-krun = [kappa, 1.0, 'free']
-kspecs = ['true', 'one', 'free']
+krun = [kappa]#, 1.0, 'free']
+kspecs = ['true']#, 'one', 'free']
 fspecs = ['equal', 'f61', 'f3x4', 'cf3x4'] # DO NOT CHANGE THIS LIST !!!!
-omegas = np.zeros([3,4])
-kappas = np.zeros([3,4])
-omega_errors = np.ones([3,4])
+omegas = np.zeros([1,4])
+kappas = np.zeros([1,4])
+omega_errors = np.ones([1,4])
 
 
 # First, set up F61 (data) frequency vector in the hyphy batchfile as this applies to all hyphy runs.
