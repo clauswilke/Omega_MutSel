@@ -49,32 +49,32 @@ def simulate(f, seqfile, tree, mu_dict, length):
 ######################################################################################################################################
 
 
-################################### FUNCTIONS TO SET UP SCALED SEL COEFFS, CODON FREQUENCIES #########################################
-def set_codon_freqs(sd, freqfile, bias):
+################################### FUNCTIONS TO SET UP EQUILIBRIUM CODON FREQUENCIES #########################################
+def set_codon_freqs(lambda_, gamma, freqfile):
     ''' Returns equilibrium codon frequencies, entropy, and gc content. Also saves codon frequencies to file. 
-        We simulate codon frequencies according a Boltzmann distribution (eg, SellaHirsh 2005, eq 7). Thus, we must simulate values for the exponent. We draw them from a normal distribution.
-        IMPORTANTLY, that expression (eq 7) for equilibrium frequencies applies only when the mutation matrix is symmetric.
         
-        We draw 20 exponents (amino acids) to determine amino acid equilbrium frequencies. We can then divide these frequencies up into codon frequencies, as follows.
+        STRATEGY:
+            We begin by simulating steady-state amino frequencies according a Boltzmann distribution. See Ramsey et al. 2011, eq 9. 
+            We need two main things for this - amino acid rankings and lambda parameter, which is basically the strength of selection. 
+            Amino acid rankings are randomly assigned. We draw lambda ~ U(0,1.5), based on results from Ramsey et al.
+            Note that when lambda = 0 we have neutral evolution.
+        
+            We then divvy up these amino acid frequencies up into codon frequencies, as follows.
             Assume eq. freq of a codon in a given amino acid codon family is P, in the absense of codon bias.
             We randomly select one codon to be preferred, and the rest are non-preferred. The preferred codon has a frequency
-            of P*(1+(k-1)\lambda) and the nonpreferred codons each have a frequency of P*(1-\lambda), where k=family size. 
-            \lambda=0 means no codon bias and \lambda=1 means complete codon bias (there exists only one preferred codon).
+            of P*(1+(k-1)\gamma) and the nonpreferred codons each have a frequency of P*(1-\gamma), where k=family size. 
+            \gamma=0 means no codon bias and \gamma=1 means complete codon bias (there exists only one preferred codon).
     '''
         
     
     aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
-    shuffle(aminos)  # To randomly assign exponents, shuffle aminos acids.
-    aa_exps = dict(zip(aminos, np.random.normal(loc=0., scale=sd, size=20)))
+    shuffle(aminos)  # Shuffle aminos acids, thus yielding a random ranking. An aa's index in the list "amino" is its rank.
     
-    # Derive amino acid frequencies.  
-    aa_freqs = aa_exps_to_freqs(aa_exps)
-    
-    # Determine the bias-free codon frequencies. Note that there are only twenty values!!
-    raw_freqs = aa_freqs / family_size
+    # Derive amino acid frequencies, and immediately convert to "bias-free" codon frequencies. 
+    aa_freqs = calc_aa_freqs(aminos, lambda_) / family_size
     
     # Determine the real codon frequencies now
-    codon_freqs, codon_freqs_dict = calc_codon_freqs(raw_freqs, bias)
+    codon_freqs, codon_freqs_dict = calc_codon_freqs(aa_freqs, gamma)
             
     # Save codon equilibrium frequencies to file  
     np.savetxt(freqfile, codon_freqs)
@@ -91,12 +91,12 @@ def set_codon_freqs(sd, freqfile, bias):
     
     
    
-def aa_exps_to_freqs(aa_exps):
-    ''' We determine the Boltzmann amino acid frequencies from the exponents. '''
+def calc_aa_freqs(aminos, lambda_):
+    ''' We determine the Boltzmann-distributed steady-state amino acid frequencies here (see Ramsey et al. 2011, equation 9).  '''
     freqs = np.zeros(20)
     count = 0
     for aa in amino_acids:
-        freqs[count] = np.exp( aa_exps[aa] )
+        freqs[count] = np.exp(-1. * lambda_ * aminos.index(aa) )
         count += 1
     freqs /= np.sum(freqs)
     assert(-1.*ZERO < np.sum(freqs) - 1. < ZERO), "Bad amino acid frequencies."
