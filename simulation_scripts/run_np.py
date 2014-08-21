@@ -51,7 +51,7 @@ simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
 
 # Derive omega from eq freqs
 print "Deriving omega from equilibrium codon frequencies"
-derivedw = derive_dnds(codon_freqs_true_dict, mu_dict)
+dnds = derive_dnds(codon_freqs_true_dict, mu_dict)
 
 
 # Maximum likelihood omega inference across a variety of frequency, kappa specifications
@@ -74,14 +74,15 @@ setupf = subprocess.call(setuphyphyf, shell = True)
 assert(setupf == 0), "couldn't properly add in sitewise F61 frequencies"
 
 
+
 # Run hyphy and save omegas, kappas (only sometimes returned, note), and omega errors along the way
-for i in range(3):
+for i in range(2):
     omegas[i], kappas[i] = run_hyphy_np(batchfile, seqfile, treefile, cpu, krun[i], fspecs)  
-    omega_errors[i] = (derivedw - omegas[i]) / derivedw
+    omega_errors[i] = (dnds - omegas[i]) / dnds
 
 
 # Finally, save results
-outstring_params = rep + '\t' + str(entropy) + '\t' + str(derivedw)
+outstring_params = rep + '\t' + str(entropy) + '\t' + str(dnds)
 outf = open(paramfile, 'w')
 for f in fspecs:
     y =  fspecs.index(f)
@@ -89,3 +90,8 @@ for f in fspecs:
         x = kspecs.index(k)
         outf.write( outstring_params + '\t' + f + '\t' + k + '\t' + str(omegas[x,y]) + '\t' + str(omega_errors[x,y]) + '\t' + str(kappas[x,y]) + '\n')
 outf.close()   
+
+
+
+
+
