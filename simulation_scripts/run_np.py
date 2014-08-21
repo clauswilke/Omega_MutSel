@@ -16,7 +16,7 @@ batchfile = sys.argv[6]   # hyphy batchfile name
 sys.path.append(simdir)
 from functions_simandinf import *
 
-seqlength = 500000
+seqlength = 500
 
 
 # output files
@@ -29,6 +29,10 @@ if dataset == 'np':
 elif dataset == 'yeast':
     mu = 1.67e-10 # this is the mean per generation per nucleotide mutation rate. 
     mu_dict = {'AG':0.144/2*mu, 'TC':0.144/2*mu, 'GA':0.349/2*mu, 'CT':0.349/2*mu, 'AC':0.11/2*mu, 'TG':0.11/2*mu, 'CA':0.182/2*mu, 'GT':0.182/2*mu, 'AT':0.063/2*mu, 'TA':0.063/2*mu, 'GC':0.152/2*mu, 'CG':0.152/2*mu}
+elif dataset == 'polio':
+    mu_dict = {'AG':2.495e-5, 'TC':6.886e-05, 'GA':1.259e-04, 'CT':2.602e-04, 'AC':1.721e-06, 'TG':1.177e-06, 'CA':9.072e-06, 'GT':1.472e-05, 'AT':3.812e-06, 'TA':3.981e-06, 'GC':6.301e-06, 'CG':1.633e-06}
+
+
 else:
     raise AssertionError("Dataset has to be np or yeast.")
 
