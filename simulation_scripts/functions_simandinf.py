@@ -309,6 +309,8 @@ def run_hyphy_np(batchfile, seqfile, treefile, cpu, kappa, fspecs):
         omegas[count] = mlw
         if mlk is None:
             kappas[count] = kappa
+	else:
+            kappas[count] = mlk
         count += 1
     return omegas, kappas
      

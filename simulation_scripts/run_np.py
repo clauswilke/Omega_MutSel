@@ -10,7 +10,7 @@ rep = sys.argv[1]         # which rep we're on, for saving files. needs to run f
 treefile = sys.argv[2]    # tree for simulation
 simdir = sys.argv[3]      # directory of simulation library
 cpu = sys.argv[4]         # hyphy can use
-dataset = sys.argv[5]     # either np or yeast. determines the mutation scheme and eq freqs
+dataset = sys.argv[5]     # either np, yeast, or polio. determines the mutation scheme and eq freqs
 batchfile = sys.argv[6]   # hyphy batchfile name
 
 sys.path.append(simdir)
@@ -29,8 +29,10 @@ if dataset == 'np':
 elif dataset == 'yeast':
     mu = 1.67e-10 # this is the mean per generation per nucleotide mutation rate. 
     mu_dict = {'AG':0.144/2*mu, 'TC':0.144/2*mu, 'GA':0.349/2*mu, 'CT':0.349/2*mu, 'AC':0.11/2*mu, 'TG':0.11/2*mu, 'CA':0.182/2*mu, 'GT':0.182/2*mu, 'AT':0.063/2*mu, 'TA':0.063/2*mu, 'GC':0.152/2*mu, 'CG':0.152/2*mu}
+elif dataset == 'polio':
+    mu_dict = {'AG':2.495e-5, 'TC':6.886e-05, 'GA':1.259e-04, 'CT':2.602e-04, 'AC':1.721e-06, 'TG':1.177e-06, 'CA':9.072e-06, 'GT':1.472e-05, 'AT':3.812e-06, 'TA':3.981e-06, 'GC':6.301e-06, 'CG':1.633e-06}
 else:
-    raise AssertionError("Dataset has to be np or yeast.")
+    raise AssertionError("Dataset has to be np, yeast, or polio.")
 
 
 
@@ -49,7 +51,7 @@ simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
 
 # Derive omega from eq freqs
 print "Deriving omega from equilibrium codon frequencies"
-derivedw = derive_omega(codon_freqs_true_dict, mu_dict)
+dnds = derive_dnds(codon_freqs_true_dict, mu_dict)
 
 
 # Maximum likelihood omega inference across a variety of frequency, kappa specifications
@@ -72,14 +74,15 @@ setupf = subprocess.call(setuphyphyf, shell = True)
 assert(setupf == 0), "couldn't properly add in sitewise F61 frequencies"
 
 
+
 # Run hyphy and save omegas, kappas (only sometimes returned, note), and omega errors along the way
-for i in range(3):
+for i in range(2):
     omegas[i], kappas[i] = run_hyphy_np(batchfile, seqfile, treefile, cpu, krun[i], fspecs)  
-    omega_errors[i] = (derivedw - omegas[i]) / derivedw
+    omega_errors[i] = (dnds - omegas[i]) / dnds
 
 
 # Finally, save results
-outstring_params = rep + '\t' + str(entropy) + '\t' + str(derivedw)
+outstring_params = rep + '\t' + str(entropy) + '\t' + str(dnds)
 outf = open(paramfile, 'w')
 for f in fspecs:
     y =  fspecs.index(f)
@@ -87,3 +90,8 @@ for f in fspecs:
         x = kspecs.index(k)
         outf.write( outstring_params + '\t' + f + '\t' + k + '\t' + str(omegas[x,y]) + '\t' + str(omega_errors[x,y]) + '\t' + str(kappas[x,y]) + '\n')
 outf.close()   
+
+
+
+
+
