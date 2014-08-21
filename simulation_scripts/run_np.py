@@ -16,7 +16,7 @@ batchfile = sys.argv[6]   # hyphy batchfile name
 sys.path.append(simdir)
 from functions_simandinf import *
 
-seqlength = 500
+seqlength = 500000
 
 
 # output files
