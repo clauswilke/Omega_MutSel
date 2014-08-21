@@ -32,7 +32,7 @@ cd $WDIR
 cp /home/sjs3495/Omega_MutSel/trees/4.tre tree.tre
 cp /home/sjs3495/Omega_MutSel/simulation_scripts/run_np.py .
 cp /home/sjs3495/Omega_MutSel/simulation_scripts/functions_simandinf.py .
-cp /home/sjs3495/Omega_MutSel/np_scripts/${DATASET}_codon_eqfreqs.txt .
+cp /home/sjs3495/Omega_MutSel/experimental_data/${DATASET}_codon_eqfreqs.txt .
 
 #Hyphy
 cp /home/sjs3495/bin/bin/HYPHYMP .
