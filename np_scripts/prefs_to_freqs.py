@@ -5,32 +5,36 @@ import os
 import numpy as np
 from scipy import linalg
 
-usage_error = "\n\n Usage: python prefs_to_freqs.py <mu_scheme>.\n mu_scheme can either be np or yeast."
+usage_error = "\n\n Usage: python prefs_to_freqs.py <mu_scheme>.\n mu_scheme can either be np, yeast, or polio."
 
 assert(len(sys.argv) == 2), usage_error
 
-mu_type = sys.argv[1] # either np or yeast
+mu_type = sys.argv[1] # either np, yeast, or polio
 if mu_type == 'np':
-    ### Mutation rates from Bloom (2014). "An Experimentally Determined Evolutionary Model Dramatically Improves Phylogenetic Fit." MBE. #### 
+    #### Mutation rates from Bloom (2014). "An Experimentally Determined Evolutionary Model Dramatically Improves Phylogenetic Fit." MBE. #### 
     mudict = {'AG':2.4e-5, 'TC':2.4e-5, 'GA':2.3e-5, 'CT':2.3e-5, 'AC':9.0e-6, 'TG':9.0e-6, 'CA':9.4e-6, 'GT':9.4e-6, 'AT':3.0e-6, 'TA':3.0e-6, 'GC':1.9e-6, 'CG':1.9e-6}
       
 elif mu_type == 'yeast':
-    ### Mutation rates from Zhu et al. (2014). "Precise estimates of mutation rate and spectrum in yeast." PNAS. ####
+    #### Mutation rates from Zhu et al. (2014). "Precise estimates of mutation rate and spectrum in yeast." PNAS. ####
     mu = 1.67e-10 # this is the mean per generation per nucleotide mutation rate. 
     mudict = {'AG':0.144/2*mu, 'TC':0.144/2*mu, 'GA':0.349/2*mu, 'CT':0.349/2*mu, 'AC':0.11/2*mu, 'TG':0.11/2*mu, 'CA':0.182/2*mu, 'GT':0.182/2*mu, 'AT':0.063/2*mu, 'TA':0.063/2*mu, 'GC':0.152/2*mu, 'CG':0.152/2*mu}
 
+elif mu_type == 'polio':
+    #### Mutation rates from Acevedo, Brodskey, and Andino (2014). "Mutational and fitness landscapes of an RNA virus revealed through population sequencing." Nature. ####
+    mudict = {'AG':2.495e-5, 'TC':6.886e-05, 'GA':1.259e-04, 'CT':2.602e-04, 'AC':1.721e-06, 'TG':1.177e-06, 'CA':9.072e-06, 'GT':1.472e-05, 'AT':3.812e-06, 'TA':3.981e-06, 'GC':6.301e-06, 'CG':1.633e-06}
 else:
     raise AssertionError(usage_error)
     
 
 # File names
-cf_outfile    = "../simulation_scripts/" + mu_type + "_codon_eqfreqs.txt"
+data_dir      = "../experimental_data/"
+cf_outfile    = data_dir + mu_type + "_codon_eqfreqs.txt"
 raw_batchfile = "globalDNDS_raw_exp.bf"
 batch_outfile = '../SelectionInference/hyphy/globalDNDS_' + mu_type + '.bf'
 
 
 # np_prefs are those taken from Bloom 2014 paper (same as mu's above!). The np_prefs are directly from the paper's Supplementary_file_1.xls and refer to equilbrium amino acid propenisties. The best interpretation of these experimental propensities is metropolis.
-np_prefs = np.loadtxt('nucleoprotein_amino_preferences.txt')
+np_prefs = np.loadtxt(data_dir + 'nucleoprotein_amino_preferences.txt')
 nsites = len(np_prefs)
 
 amino_acids  = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
