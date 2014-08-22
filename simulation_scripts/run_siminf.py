@@ -41,21 +41,21 @@ codon_freqs_f61, codon_freqs_dict, gc_content, entropy = set_codon_freqs(sd, fre
 print "Simulating"
 simulate(codon_freqs_f61, seqfile, treefile, mu_dict, seqlength)
 
-# Derive omega from equilibrium codon frequencies
-print "Deriving omega from equilibrium codon frequencies"
-derivedw = derive_dnds(codon_freqs_dict, mu_dict)
+# Derive dN/dS from equilibrium codon frequencies
+print "Deriving dN/dS from equilibrium codon frequencies"
+dnds = derive_dnds(codon_freqs_dict, mu_dict)
 
 
 # Maximum likelihood omega inference across a variety of frequency, kappa specifications
 print "Conducting ML inference with HyPhy"
 
 # Lists for storing values and printing strings
-krun = [kappa]#, 1.0, 'free']
-kspecs = ['true']#, 'one', 'free']
+krun = [kappa, 1.0, 'free']
+kspecs = ['true', 'one', 'free']
 fspecs = ['equal', 'f61', 'f3x4', 'cf3x4'] # DO NOT CHANGE THIS LIST !!!!
-omegas = np.zeros([1,4])
-kappas = np.zeros([1,4])
-omega_errors = np.ones([1,4])
+omegas = np.zeros([3,4])
+kappas = np.zeros([3,4])
+omega_errors = np.ones([3,4])
 
 
 # First, set up F61 (data) frequency vector in the hyphy batchfile as this applies to all hyphy runs.
@@ -71,12 +71,11 @@ for kap in krun:
     wtemp, ktemp = run_hyphy(seqfile, treefile, cpu, kap, fspecs)  
     kappas[kcount] = ktemp
     omegas[kcount] = wtemp
-    omega_errors[kcount] = (derivedw - wtemp) / derivedw
+    omega_errors[kcount] = (dnds - wtemp) / dnds
     kcount += 1
 
-
 # Finally, save results
-outstring_params = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(sd) + '\t' + str(bias) + '\t' + str(gc_content) + '\t' + str(entropy) + '\t' + str(derivedw)
+outstring_params = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(sd) + '\t' + str(bias) + '\t' + str(gc_content) + '\t' + str(entropy) + '\t' + str(dnds)
 outf = open(paramfile, 'w')
 for f in fspecs:
     y =  fspecs.index(f)

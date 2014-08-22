@@ -266,8 +266,11 @@ def run_hyphy(seqfile, treefile, cpu, kappa, fspecs):
     for suffix in fspecs:
         file = suffix + '_hyout.txt'  
         mlw, mlk = parse_output_GY94(file)
-        omegas[count] = mlw
-        kappas[count] = mlk
+	omegas[count] = mlw
+        if mlk is None:
+            kappas[count] = kappa
+	else:
+            kappas[count] = mlk
         count += 1
     return omegas, kappas
 
