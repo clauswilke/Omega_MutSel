@@ -25,7 +25,7 @@ paramfile     = "params"+str(rep)+".txt"
 
 seqlength = 500000
 if bias != 0.:
-    bias = rn.uniform(ZERO,1)
+    bias = rn.uniform(ZERO,2) # 2 is a good top threshold. dN/dS typically <=2 this way, otherwise it gets absurd. 
 mu = 1e-6
 kappa = rn.uniform(1.0, 6.0)
 sd = rn.uniform(0., 4.)
