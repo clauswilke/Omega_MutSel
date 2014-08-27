@@ -90,7 +90,10 @@ def set_codon_freqs(sd, freqfile, bias):
     return codon_freqs, codon_freqs_dict, gc, entropy
     
     
-   
+def draw_amino_coeffs(sd):
+    ssc_values = np.random.normal(loc = 0, scale = sd, size = 20)
+    ssc_values[0] = 0.
+    return ssc_values   
 
     
 def aa_to_codon_coeffs(aa_coeffs, lambda_):
