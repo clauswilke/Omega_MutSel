@@ -52,24 +52,30 @@ def simulate(f, seqfile, tree, mu_dict, length):
 ################################### FUNCTIONS TO SET UP SCALED SEL COEFFS, CODON FREQUENCIES #########################################
 def set_codon_freqs(sd, freqfile, bias):
     ''' Returns equilibrium codon frequencies, entropy, and gc content. Also saves codon frequencies to file. 
-        We simulate codon frequencies according a Boltzmann distribution (eg, SellaHirsh 2005, eq 7). Thus, we must simulate values for the exponent. We draw them from a normal distribution.
+        We simulate values for the amino acid scaled selection coefficients by drawing from N(0,x), where x~U(0,4). Note that x=0 means neutral evolution.
+        We convert these values to codon frequencies via SellaHirsh 2005, eq 7 (Boltzmann).
         IMPORTANTLY, that expression (eq 7) for equilibrium frequencies applies only when the mutation matrix is symmetric.
         
-        We draw 20 exponents to determine equilibrium codon frequencies. Each codon in an amino acid family is assigned the same exponent.
-        These equilibrium frequencies are those which would exist in the absense of bias. We implement codon bias as follows - 
-            Assume eq. freq of a codon in a given amino acid codon family is P, in the absense of codon bias.
-            We randomly select one codon to be preferred, and the rest are non-preferred. The preferred codon has a frequency
-            of P*(1+(k-1)\lambda) and the nonpreferred codons each have a frequency of P*(1-\lambda), where k=family size. 
+        We implement codon bias as follows - 
+            Assume ssc of a given amino acid codon family is P, in the absense of codon bias.
+            We randomly select one codon to be preferred, and the rest are non-preferred. 
+            The preferred codon will be assigned an ssc = P*(1+(k-1)\lambda).
+            All nonpreferred codons will be assigned an ssc = P*(1-\lambda), where k=family size. 
             \lambda=0 means no codon bias and \lambda=1 means complete codon bias (there exists only one preferred codon).
     '''
 
-    # Determine equilibrium codon frequencies in the absense of codon bias
-    codon_freqs, codon_freqs_dict = calc_codon_freqs_nobias( np.random.normal(loc=0., scale=sd, size=20) )
-    
-    # If needed, implement codon bias
-    if bias != 0.:
-        codon_freqs, codon_freqs_dict = implement_bias(codon_freqs_dict, bias)
-    
+    # Draw amino acid ssc values and assign randomly to amino acids.
+    aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
+    shuffle(aminos)  # To randomly assign coefficients, shuffle aminos acids.
+    aa_coeffs = dict(zip(aminos, draw_amino_coeffs(sd)))
+
+    # Convert amino acid coefficients to codon coefficients
+    codon_coeffs = aa_to_codon_coeffs(aa_coeffs, bias)
+
+    # Convert codon coefficients to steady-state frequencies
+    codon_freqs = codon_coeffs_to_freqs(codon_coeffs)
+    codon_freqs_dict = dict(zip(codons, codon_freqs))
+        
     # Save codon equilibrium frequencies to file  
     np.savetxt(freqfile, codon_freqs)
     
@@ -86,43 +92,32 @@ def set_codon_freqs(sd, freqfile, bias):
     
    
 
-def calc_codon_freqs_nobias(exps):  
-    ''' Calculate the equilibrium (steady-state) codon frequencies in the absence of codon bias. In other words, all synonymous codons will have the same frequency. '''
-    codon_freqs = np.ones(61)
-    for i in range(20):   
-        for syn in genetic_code[i]:
-            codon_index = codons.index(syn)
-            codon_freqs[codon_index] = np.exp( exps[i] )
-    codon_freqs /= np.sum(codon_freqs)
-    assert(-1.*ZERO < np.sum(codon_freqs) - 1. < ZERO), "Bad no-bias codon frequencies."
-    return codon_freqs, dict(zip(codons, codon_freqs))
     
-         
-    
-def implement_bias(codon_freqs_dict, bias):
-    ''' Implement codon bias. Argument raw_freqs_dict corresponds to what codon frequencies would be in *absence* of bias.
-        The bias term ranges from [0,1], where 0=no bias and 1=complete bias.
-    '''
-    
-    for i in range(20):       
-        syn_codons = genetic_code[i]
-        shuffle(syn_codons) # randomize this, otherwise the preferred codon will always be the first one alphabetically
-        k = family_size[i]
+def aa_to_codon_coeffs(aa_coeffs, lambda_):
+    ''' Assign amino acid selection coefficients to codon ssc values. lambda_ is the bias term. '''
+    codon_coeffs = {}
+    for aa in aa_coeffs:
+        syn_codons = genetic_code[ amino_acids.index(aa) ]
+        shuffle(syn_codons) # randomize otherwise the preferred will be the first one alphabetically
+        k = float(len(syn_codons) - 1.)
         first=True
         for syn in syn_codons:
             if first:
-                codon_freqs_dict[syn] *= (1. + (k-1.)*float(bias))
+                codon_coeffs[syn] = aa_coeffs[aa] + lambda_
                 first=False
             else:
-                codon_freqs_dict[syn] *= (1. - float(bias))
+                codon_coeffs[syn] = aa_coeffs[aa] - lambda_
+    return codon_coeffs         
     
-    # Now need to convert this dictionary back to a list, properly ordered.
+def codon_coeffs_to_freqs(codon_coeffs):
     codon_freqs = np.zeros(61)
-    for i in range(61):
-        codon_freqs[i] = codon_freqs_dict[codons[i]]
-    assert(-1.*ZERO <  np.sum(codon_freqs) - 1. < ZERO), "Bad codon frequencies"  
-    return codon_freqs, codon_freqs_dict
-
+    count = 0
+    for codon in codons:
+        codon_freqs[count] = np.exp( codon_coeffs[codon] )
+        count += 1
+    codon_freqs /= np.sum(codon_freqs)                   
+    assert(-1*ZERO < np.sum(codon_freqs) - 1.0 < ZERO), "codon_freq doesn't sum to 1 in codon_coeffs_to_freqs"
+    return codon_freqs    
 
 
     
