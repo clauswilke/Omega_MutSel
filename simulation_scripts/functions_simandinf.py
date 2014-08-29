@@ -307,7 +307,7 @@ def run_hyphy(seqfile, treefile, cpu, kappa, fspecs):
     
 def run_hyphy_np(batchfile, seqfile, treefile, cpu, kappa, fspecs):
     ''' Run global omega inference according to GY94. The M0 model. FOR THE NUCLEOPROTEIN FREQUENCIES ONLY!!
-        By default, conducts inferences for 8 sets of frequencies (equal, null, F61 site, F61 global, F3x4 site, F3x4 global, CF3x4 site, CF3x4 global) across a single kappa specification.
+        By default, conducts inferences for 5 sets of frequencies (equal, null, F61 global, F3x4 global, CF3x4 global) across a single kappa specification.
         DO NOT CHANGE FILE NAMES. THEY ARE HARDCODED HERE AND IN THE HYPHY BATCHFILE.
     '''
     
@@ -330,9 +330,9 @@ def run_hyphy_np(batchfile, seqfile, treefile, cpu, kappa, fspecs):
     runhyphy = subprocess.call("./HYPHYMP " + batchfile + " CPU="+cpu, shell = True)
     assert (runhyphy == 0), "hyphy fail"
     
-    # Retrieve omega, kappa MLEs from the hyout files Produces 8 output files, names of which are hardcoded!!
-    omegas = np.zeros(8)
-    kappas = np.zeros(8)
+    # Retrieve omega, kappa MLEs from the hyout files Produces 5 output files, names of which are hardcoded!!
+    omegas = np.zeros(5)
+    kappas = np.zeros(5)
     count = 0
     for suffix in fspecs:
         file = suffix + '_hyout.txt'  
