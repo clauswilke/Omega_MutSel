@@ -42,10 +42,40 @@ def simulate(f, seqfile, tree, mu_dict, length):
     model.params = params
     mat = mutSel_MatrixBuilder(model)
     model.Q = mat.buildQ()
+    
+    # Confirm, before simulating, that detailed balance is satisfied 
+    eigen_freqs = get_eq_from_eig(model.Q)
+    assert((f/eigen_freqs).all()  == 1), "Detailed balance not satisfied"
+    
     partitions = [(length, {"rootModel":model})]        
     myEvolver = Evolver(partitions, "rootModel" )
     myEvolver.simulate(my_tree)
     myEvolver.writeSequences(outfile = seqfile)
+
+def get_eq_from_eig(m):   
+    ''' get the equilibrium frequencies from the matrix. the eq freqs are the left eigenvector corresponding to eigenvalue of 0. 
+        Code here is largely taken from Bloom. See here - https://github.com/jbloom/phyloExpCM/blob/master/src/submatrix.py, specifically in the fxn StationaryStates
+    '''
+    (w, v) = linalg.eig(m, left=True, right=False)
+    max_i = 0
+    max_w = w[max_i]
+    for i in range(1, len(w)):
+        if w[i] > max_w:
+            max_w = w[i]
+            max_i = i
+    assert( abs(max_w) < 1e-10 ), "Maximum eigenvalue is not close to zero."
+    max_v = v[:,max_i]
+    max_v /= np.sum(max_v)
+    max_v = max_v.real # these are the stationary frequencies
+    # SOME SANITY CHECKS
+    assert np.allclose(np.zeros(61), np.dot(max_v, m)) # should be true since eigenvalue of zero
+    pi_inv = np.diag(1.0 / max_v)
+    s = np.dot(m, pi_inv)
+    assert np.allclose(m, np.dot(s, np.diag(max_v)), atol=1e-10, rtol=1e-5), "exchangeability and equilibrium does not recover matrix"
+    return max_v
+
+
+
 ######################################################################################################################################
 
 
