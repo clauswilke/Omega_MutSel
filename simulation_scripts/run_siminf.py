@@ -54,7 +54,7 @@ omegas = np.zeros(2)
 kappas = np.zeros(2)
 
 omegas[0], kappas[0] = run_hyphy_fequal(seqfile, treefile, cpu, kappa)  
-omegas[1], kappa[1] = run_hyphy_fequal(seqfile, treefile, cpu, "free")  
+omegas[1], kappas[1] = run_hyphy_fequal(seqfile, treefile, cpu, "free")  
 omega_errors = (dnds - omegas)/dnds
 
 
