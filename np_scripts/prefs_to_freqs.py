@@ -54,10 +54,10 @@ def get_nuc_diff(source, target):
 
 
 def build_matrix(amino_prop_dict, mu_dict):
-    ''' metropolis only, as this matrix definition more suits experimental propensities. '''
-    matrix = np.zeros([61,61])
+    ''' metropolis only, as this matrix definition more suits experimental propensities according to Bloom 2014. '''
+    matrix = np.ones([61,61])
     
-    # non-diagonal entries
+    # off-diagonal entries
     for x in range(61):
         source = codons[x]
         fx = amino_prop_dict[codon_dict[source]]
@@ -65,11 +65,12 @@ def build_matrix(amino_prop_dict, mu_dict):
             target = codons[y]
             fy = amino_prop_dict[codon_dict[target]]
             diff = get_nuc_diff(source, target)
-            if len(diff) == 2 and source != target:
-                if fy >= fx or codon_dict[source] == codon_dict[target]:
-                    matrix[x][y] = mu_dict[diff] 
-                else:
-                    matrix[x][y] = fy / fx * mu_dict[diff]        
+            if len(diff)==2:
+                if fx < fy:
+                    matrix[x][y] = fy / fx  
+                matrix[x][y] *= mu_dict[diff]
+            else:
+                matrix[x][y] = 0.      
     # diagonal entries
     for i in range(61):
         matrix[i][i] = -1. * np.sum(matrix[i]) 
@@ -105,7 +106,7 @@ def get_eq_freqs(amino_prefs, mu_dict):
     amino_prefs_dict = dict(zip(amino_acids, amino_prefs)) 
     m = build_matrix(amino_prefs_dict, mu_dict)
     cf = get_eq_from_eig(m) 
-    assert( -1e-8 < abs(np.sum(cf)) - 1. < 1e-8 ), "codon frequencies do not sum to 1" 
+    assert( -1e-10 < abs(np.sum(cf)) - 1. < 1e-10 ), "codon frequencies do not sum to 1" 
     return cf
 
 
