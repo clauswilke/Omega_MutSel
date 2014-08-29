@@ -248,8 +248,12 @@ def run_hyphy_fequal(seqfile, treefile, cpu, kappa):
     assert(setup_tree == 0), "couldn't add tree to hyphy infile"
             
     # Set up kappa in the matrices file
-    runsedkappa = subprocess.call("sed 's/k/"+str(kappa)+"/g' matrices_raw.mdl > matrices.mdl", shell=True)
-    assert(runsedkappa == 0), "couldn't set up kappa"
+    if kappa != 'free':
+        sedkappa = "sed 's/k/"+str(kappa)+"/g' matrices_raw.mdl > matrices.mdl"
+        runsedkappa = subprocess.call(sedkappa, shell=True)
+        assert(runsedkappa == 0), "couldn't set up kappa"
+    else:
+        shutil.copy('matrices_raw.mdl', 'matrices.mdl')
    
     # Run hyphy.
     runhyphy = subprocess.call( "./HYPHYMP globalDNDS_fequal.bf CPU="+cpu+" > hyout.txt", shell = True)
@@ -258,6 +262,7 @@ def run_hyphy_fequal(seqfile, treefile, cpu, kappa):
     w, k = parse_output_GY94("hyout.txt")
     if k is None:
         k = kappa
+    print w, k
     return w, k
     
 
