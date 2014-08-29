@@ -58,27 +58,16 @@ dnds = derive_dnds(codon_freqs_true_dict, mu_dict)
 print "Conducting ML inference with HyPhy"
 
 
-# Lists for storing values and printing strings
-krun = [1.0, 'free']
-kspecs = ['one', 'free'] # since no simulation, we have no true kappa.
-fspecs = ['equal', 'null', 'f61_site', 'f61_global', 'f3x4_site', 'f3x4_global', 'cf3x4_site', 'cf3x4_global'] # DO NOT CHANGE THIS LIST !!!!
-omegas = np.zeros([2,8])
-kappas = np.zeros([2,8])
-omega_errors = np.ones([2,8])
+# Lists for storing values and printing strings. 
+fspecs = ['equal', 'null', 'f61', 'f3x4', 'cf3x4']
+omegas = np.zeros(5)
+kappas = np.zeros(5)
+omega_errors = np.ones(5)
 
 
-# First, set up F61 (data) frequency vector in the hyphy batchfile as this applies to all hyphy runs.
-hyf = array_to_hyphy_freq(codon_freqs_true)
-setuphyphyf = "sed -i 's/DATAFREQS/"+hyf+"/g' " + batchfile
-setupf = subprocess.call(setuphyphyf, shell = True)
-assert(setupf == 0), "couldn't properly add in sitewise F61 frequencies"
-
-
-
-# Run hyphy and save omegas, kappas (only sometimes returned, note), and omega errors along the way
-for i in range(2):
-    omegas[i], kappas[i] = run_hyphy_np(batchfile, seqfile, treefile, cpu, krun[i], fspecs)  
-    omega_errors[i] = (dnds - omegas[i]) / dnds
+# Run hyphy and save omega, kappa, omega error. Note we only run free kappa, so just a single call to hyphy.
+omegas[i], kappas[i] = run_hyphy_np(batchfile, seqfile, treefile, cpu, 'free', fspecs)  
+omega_errors[i] = (dnds - omegas[i]) / dnds
 
 
 # Finally, save results
@@ -86,9 +75,7 @@ outstring_params = rep + '\t' + str(entropy) + '\t' + str(dnds)
 outf = open(paramfile, 'w')
 for f in fspecs:
     y =  fspecs.index(f)
-    for k in kspecs:
-        x = kspecs.index(k)
-        outf.write( outstring_params + '\t' + f + '\t' + k + '\t' + str(omegas[x,y]) + '\t' + str(omega_errors[x,y]) + '\t' + str(kappas[x,y]) + '\n')
+    outf.write( outstring_params + '\t' + f + '\t' + k + '\t' + str(omegas[y]) + '\t' + str(omega_errors[y]) + '\t' + str(kappas[y]) + '\n')
 outf.close()   
 
 
