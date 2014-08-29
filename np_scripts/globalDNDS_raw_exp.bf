@@ -1,6 +1,6 @@
 /* 
 Hyphy inference for an "experimental" dataset. Name of file indicates the mutation scheme.
-Run across 8 sets of equilibrium freqs: Fequal, Fnull, F61_site, F3x4_site, CF3x4_site, F61_global, F3x4_global, CF3x4_global. 
+Run across 5 sets of equilibrium freqs: Fequal, Fnull, F61, F3x4, CF3x4. 
 NOTE: Fnull refers to frequencies which would exist in the absence of natural selection. 
 */
 
@@ -30,22 +30,16 @@ Fequal_CodonFreqs = {{0.016393442623},{0.016393442623},{0.016393442623},{0.01639
 
 Fnull_CodonFreqs = INSERTNULL
 
-F61_CodonFreqs_site = DATAFREQS
+F61_CodonFreqs = INSERTF61
 
-F61_CodonFreqs_global = INSERTF61
+F3x4_CodonFreqs  = INSERTF3x4
 
-HarvestFrequencies(posFreqs,filt_data,3,1,1);
-F3x4_CodonFreqs_site = BuildCodonFrequencies(posFreqs);
-F3x4_CodonFreqs_global  = INSERTF3x4
-
-posFreqs_cf3x4 = CF3x4(posFreqs, "TAA,TAG,TGA");
-CF3x4_CodonFreqs_site = BuildCodonFrequencies(posFreqs_cf3x4);
-CF3x4_CodonFreqs_global = INSERTCF3x4
+CF3x4_CodonFreqs = INSERTCF3x4
 
 
 /* Optimize likelihoods for each frequency specification */
 
-////////////// EQUAL FREQUENCIES //////////////
+////////////// FEQUAL FREQUENCIES //////////////
 Model MyModel = (GY94, Fequal_CodonFreqs, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
@@ -64,29 +58,19 @@ LikelihoodFunction  LikFn1 = (filt_data, Tree01);
 Optimize (paramValues, LikFn1);
 fprintf ("null_hyout.txt", LikFn1);
 
-////////////// DATA FREQUENCIES, SITE //////////////
-global w;
-global k;
-global t;
-Model MyModel = (GY94, F61_CodonFreqs_site, 1);
-UseModel (USE_NO_MODEL);
-UseModel(MyModel);
-Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn2 = (filt_data, Tree01);
-Optimize (paramValues, LikFn2);
-fprintf ("f61_site_hyout.txt", LikFn2);
 
-////////////// DATA FREQUENCIES, GLOBAL //////////////
+
+////////////// F61 FREQUENCIES, GLOBAL //////////////
 global w;
 global k;
 global t;
-Model MyModel = (GY94, F61_CodonFreqs_global, 1);
+Model MyModel = (GY94, F61_CodonFreqs, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn3 = (filt_data, Tree01);
 Optimize (paramValues, LikFn3);
-fprintf ("f61_global_hyout.txt", LikFn3);
+fprintf ("f61_hyout.txt", LikFn3);
 
 
 
@@ -94,49 +78,25 @@ fprintf ("f61_global_hyout.txt", LikFn3);
 global w;
 global k;
 global t;
-Model MyModel = (GY94, F3x4_CodonFreqs_site, 1);
-UseModel (USE_NO_MODEL);
-UseModel(MyModel);
-Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn4 = (filt_data, Tree01);
-Optimize (paramValues, LikFn4);
-fprintf ("f3x4_site_hyout.txt", LikFn4);
-
-////////////// F3x4 FREQUENCIES //////////////
-global w;
-global k;
-global t;
-Model MyModel = (GY94, F3x4_CodonFreqs_global, 1);
+Model MyModel = (GY94, F3x4_CodonFreqs, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn5 = (filt_data, Tree01);
 Optimize (paramValues, LikFn5);
-fprintf ("f3x4_global_hyout.txt", LikFn5);
+fprintf ("f3x4_hyout.txt", LikFn5);
 
-
-////////////// CF3x4 FREQUENCIES //////////////
-global w;
-global k;
-global t;
-Model MyModel = (GY94, CF3x4_CodonFreqs_site, 1);
-UseModel (USE_NO_MODEL);
-UseModel(MyModel);
-Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn6 = (filt_data, Tree01);
-Optimize (paramValues, LikFn6);
-fprintf ("cf3x4_site_hyout.txt", LikFn6);
 
 
 ////////////// CF3x4 FREQUENCIES //////////////
 global w;
 global k;
 global t;
-Model MyModel = (GY94, CF3x4_CodonFreqs_global, 1);
+Model MyModel = (GY94, CF3x4_CodonFreqs, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn7 = (filt_data, Tree01);
 Optimize (paramValues, LikFn7);
-fprintf ("cf3x4_global_hyout.txt", LikFn7);
+fprintf ("cf3x4_hyout.txt", LikFn7);
 
