@@ -239,7 +239,7 @@ def calc_fixation_prob(fi, fj):
 
 
 #################################################### HYPHY FUNCTIONS #################################################################
-def run_hyphy_convergence(seqfile, treefile, cpu, kappa):
+def run_hyphy_fequal(seqfile, treefile, cpu, kappa):
     ''' Run hyphy with kappa as true value and equal frequencies, to demonstrate convergence. '''
     
     # Set up sequence file with tree
@@ -252,55 +252,15 @@ def run_hyphy_convergence(seqfile, treefile, cpu, kappa):
     assert(runsedkappa == 0), "couldn't set up kappa"
    
     # Run hyphy.
-    runhyphy = subprocess.call( "./HYPHYMP globalDNDS_equalfreq_truekappa.bf CPU="+cpu+" > hyout.txt", shell = True)
+    runhyphy = subprocess.call( "./HYPHYMP globalDNDS_fequal.bf CPU="+cpu+" > hyout.txt", shell = True)
     assert (runhyphy == 0), "hyphy fail"
     
     w, k = parse_output_GY94("hyout.txt")
-    return w
+    if k is None:
+        k = kappa
+    return w, k
     
-    
-    
-    
-    
-def run_hyphy(seqfile, treefile, cpu, kappa, fspecs):
-    ''' Run global omega inference according to GY94. The M0 model. 
-        By default, conducts inferences for 4 sets of frequencies (equal, F61, F3x4, CF3x4) across a single kappa specification.
-        DO NOT CHANGE FILE NAMES. THEY ARE HARDCODED HERE AND IN THE HYPHY BATCHFILE.
-    '''
-    
-  
-    # Set up sequence file with tree
-    shutil.copy(seqfile, "temp.fasta")
-    setup_tree = subprocess.call("cat "+treefile+" >> temp.fasta", shell = True)
-    assert(setup_tree == 0), "couldn't add tree to hyphy infile"
-            
-        
-    # Set up kappa in the matrices file
-    if kappa != 'free':
-        sedkappa = "sed 's/k/"+str(kappa)+"/g' matrices_raw.mdl > matrices.mdl"
-        runsedkappa = subprocess.call(sedkappa, shell=True)
-        assert(runsedkappa == 0), "couldn't set up kappa"
-    else:
-        shutil.copy('matrices_raw.mdl', 'matrices.mdl')
 
-    # Run hyphy.
-    runhyphy = subprocess.call("./HYPHYMP globalDNDS.bf CPU="+cpu, shell = True)
-    assert (runhyphy == 0), "hyphy fail"
-    
-    # Retrieve omega, kappa MLEs from the hyout files Produces 4 output files, named suffix = {equal_, f61_, f3x4_, cf3x4_} + hyout.txt 
-    omegas = np.zeros(4)
-    kappas = np.zeros(4)
-    count = 0
-    for suffix in fspecs:
-        file = suffix + '_hyout.txt'  
-        mlw, mlk = parse_output_GY94(file)
-	omegas[count] = mlw
-        if mlk is None:
-            kappas[count] = kappa
-	else:
-            kappas[count] = mlk
-        count += 1
-    return omegas, kappas
 
 
 

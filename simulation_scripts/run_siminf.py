@@ -37,49 +37,39 @@ print "Deriving equilibrium codon frequencies"
 codon_freqs_f61, codon_freqs_dict, gc_content, entropy = set_codon_freqs(sd, freqfile, bias)
 
 
-# Simulate according to BH98 MutSel model
+# Simulate according to HB98 MutSel model
 print "Simulating"
 simulate(codon_freqs_f61, seqfile, treefile, mu_dict, seqlength)
+
 
 # Derive dN/dS from equilibrium codon frequencies
 print "Deriving dN/dS from equilibrium codon frequencies"
 dnds = derive_dnds(codon_freqs_dict, mu_dict)
 
 
-# Maximum likelihood omega inference across a variety of frequency, kappa specifications
+# Maximum likelihood omega inference for kappa={true,free} and Fequal only.
 print "Conducting ML inference with HyPhy"
 
-# Lists for storing values and printing strings
-krun = [kappa, 1.0, 'free']
-kspecs = ['true', 'one', 'free']
-fspecs = ['equal', 'f61', 'f3x4', 'cf3x4'] # DO NOT CHANGE THIS LIST !!!!
-omegas = np.zeros([3,4])
-kappas = np.zeros([3,4])
-omega_errors = np.ones([3,4])
+omegas = np.zeros(2)
+kappas = np.zeros(2)
 
+omegas[0], kappas[0] = run_hyphy_fequal(seqfile, treefile, cpu, kappa)  
+omegas[1], kappa[1] = run_hyphy_fequal(seqfile, treefile, cpu, "free")  
+omega_errors = (dnds - omegas)/dnds
 
-# First, set up F61 (data) frequency vector in the hyphy batchfile as this applies to all hyphy runs.
-hyf = array_to_hyphy_freq(codon_freqs_f61)
-setuphyphyf = "sed -i 's/DATAFREQS/"+hyf+"/g' globalDNDS.bf"
-setupf = subprocess.call(setuphyphyf, shell = True)
-assert(setupf == 0), "couldn't properly add in F61 frequencies"
-
-
-# Run hyphy and save omegas, kappas (only sometimes returned, note), and omega errors along the way
-kcount = 0
-for kap in krun:
-    wtemp, ktemp = run_hyphy(seqfile, treefile, cpu, kap, fspecs)  
-    kappas[kcount] = ktemp
-    omegas[kcount] = wtemp
-    omega_errors[kcount] = (dnds - wtemp) / dnds
-    kcount += 1
 
 # Finally, save results
 outstring_params = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(sd) + '\t' + str(bias) + '\t' + str(gc_content) + '\t' + str(entropy) + '\t' + str(dnds)
 outf = open(paramfile, 'w')
-for f in fspecs:
-    y =  fspecs.index(f)
-    for k in kspecs:
-        x = kspecs.index(k)
-        outf.write( outstring_params + '\t' + f + '\t' + k + '\t' + str(omegas[x,y]) + '\t' + str(omega_errors[x,y]) + '\t' + str(kappas[x,y]) + '\n')
+for k in range(2):
+    x = kspecs.index(k)
+    outf.write( outstring_params + '\t' + f + '\t' + k + '\t' + str(omegas[x]) + '\t' + str(omega_errors[x]) + '\t' + str(kappas[x]) + '\n')
 outf.close()   
+
+
+
+
+
+
+
+
