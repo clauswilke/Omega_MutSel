@@ -44,16 +44,16 @@ simulate(codon_freqs, seqfile, treefile, mu_dict, seqlength)
 
 # Derive omega from selection coefficients (well, frequencies, but same deal)
 print "Deriving omega from selection coefficients"
-derivedw = derive_omega(codon_freqs_dict, mu_dict)
+dnds = derive_omega(codon_freqs_dict, mu_dict)
 
 # ML
 print "Conducting ML inference with HyPhy"
-mlw = run_hyphy_convergence(seqfile, treefile, cpu, kappa)
-err = (derivedw - mlw) / derivedw
+mlw, k = run_hyphy_fequal(seqfile, treefile, cpu, kappa)
+err = (dnds - mlw) / derivedw
 
 # Save
 outf = open(paramfile,'w')
-outf.write(rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(sd) + '\t' + str(derivedw) + '\t' + str(mlw) + '\t' + str(err) + '\n')
+outf.write(rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(sd) + '\t' + str(dnds) + '\t' + str(mlw) + '\t' + str(err) + '\n')
 outf.close()
 
 
