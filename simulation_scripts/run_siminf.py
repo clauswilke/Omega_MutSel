@@ -50,20 +50,21 @@ dnds = derive_dnds(codon_freqs_dict, mu_dict)
 # Maximum likelihood omega inference for kappa={true,free} and Fequal only.
 print "Conducting ML inference with HyPhy"
 
+kprint = ['free', 'true']
+kvals  = ['free', kappa]
 omegas = np.zeros(2)
 kappas = np.zeros(2)
-
-omegas[0], kappas[0] = run_hyphy_fequal(seqfile, treefile, cpu, kappa)  
-omegas[1], kappas[1] = run_hyphy_fequal(seqfile, treefile, cpu, "free")  
-omega_errors = (dnds - omegas)/dnds
+for k in range(2):
+    omegas[k], kappas[k] = run_hyphy_fequal(seqfile, treefile, cpu, kvals[k])  
+    omegas[k], kappas[k] = run_hyphy_fequal(seqfile, treefile, cpu, kvals[k])  
+    omega_errors = (dnds - omegas)/dnds
 
 
 # Finally, save results
 outstring_params = rep + '\t' + str(seqlength) + '\t' + str(mu) + '\t' + str(kappa) + '\t' + str(sd) + '\t' + str(bias) + '\t' + str(gc_content) + '\t' + str(entropy) + '\t' + str(dnds)
 outf = open(paramfile, 'w')
 for k in range(2):
-    x = kspecs.index(k)
-    outf.write( outstring_params + '\t' + f + '\t' + k + '\t' + str(omegas[x]) + '\t' + str(omega_errors[x]) + '\t' + str(kappas[x]) + '\n')
+    outf.write( outstring_params + '\t' + kprint[k] + '\t' + str(omegas[k]) + '\t' + str(omega_errors[k]) + '\t' + str(kappas[k]) + '\n')
 outf.close()   
 
 
