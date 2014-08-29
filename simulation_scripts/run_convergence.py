@@ -42,14 +42,14 @@ codon_freqs, codon_freqs_dict, gc_content, entropy = set_codon_freqs(sd, freqfil
 print "Simulating"
 simulate(codon_freqs, seqfile, treefile, mu_dict, seqlength)
 
-# Derive omega from selection coefficients (well, frequencies, but same deal)
-print "Deriving omega from selection coefficients"
-dnds = derive_omega(codon_freqs_dict, mu_dict)
+# Derive dN/dS from selection coefficients (well, frequencies, but same deal)
+print "Deriving dN/dS from selection coefficients"
+dnds = derive_dnds(codon_freqs_dict, mu_dict)
 
 # ML
 print "Conducting ML inference with HyPhy"
 mlw, k = run_hyphy_fequal(seqfile, treefile, cpu, kappa)
-err = (dnds - mlw) / derivedw
+err = (dnds - mlw) / dnds
 
 # Save
 outf = open(paramfile,'w')
