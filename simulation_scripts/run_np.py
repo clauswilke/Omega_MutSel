@@ -66,8 +66,8 @@ omega_errors = np.ones(5)
 
 
 # Run hyphy and save omega, kappa, omega error. Note we only run free kappa, so just a single call to hyphy.
-omegas[i], kappas[i] = run_hyphy_np(batchfile, seqfile, treefile, cpu, 'free', fspecs)  
-omega_errors[i] = (dnds - omegas[i]) / dnds
+omegas, kappas = run_hyphy_np(batchfile, seqfile, treefile, cpu, 'free', fspecs)  
+omega_errors = (dnds - omegas) / dnds
 
 
 # Finally, save results
@@ -75,7 +75,7 @@ outstring_params = rep + '\t' + str(entropy) + '\t' + str(dnds)
 outf = open(paramfile, 'w')
 for f in fspecs:
     y =  fspecs.index(f)
-    outf.write( outstring_params + '\t' + f + '\t' + k + '\t' + str(omegas[y]) + '\t' + str(omega_errors[y]) + '\t' + str(kappas[y]) + '\n')
+    outf.write( outstring_params + '\t' + f + '\t' +  str(omegas[y]) + '\t' + str(omega_errors[y]) + '\t' + str(kappas[y]) + '\n')
 outf.close()   
 
 
