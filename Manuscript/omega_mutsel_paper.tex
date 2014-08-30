@@ -20,7 +20,7 @@
 \title{The relationship between dN/dS and scaled selection coefficients}
 
 \author{Stephanie J. Spielman\affil{1}{Department of Integrative Biology, Center for Computational Biology and Bioinformatics, and Institute of Cellular and Molecular Biology.
-		The University of Texas at Austin, Austin, TX 78712, USA.}
+		The University of Texas at Austin, Austin, TX 78712, USA.} 
 	\and
 	Claus O. Wilke\affil{1}{}}
 
@@ -28,10 +28,8 @@
 \contributor{Submitted to Proceedings of the National Academy of Sciences
 	of the United States of America}
 \maketitle
-
-
-
-\newpage
+\begin{article}
+	
 \begin{abstract}
 Two models which investigate strength of selection in protein-coding sequences are mechanistic codon models and mutsel models. We have measures of dN/dS and amino acid/codon ``propensities", which correspond to equilibrium frequencies. Are they the same? Are they different? We don't know! But now we do. And they're the same. This approach is really nice because it allows us to uncover properties of these metrics previously unidentified, etc. We found that codon-level models and metrics do not play nicely with amino-acid level models, and we found some interesting behaviors of the M0 model. Our study represents a very useful strategy - benchmarking and investigating model behavior be examining the intersection/relationship between distinct approaches.
   
@@ -141,7 +139,7 @@ To validate the mathematical relationship between stationary codon frequencies a
 
 The relationship between $dN/dS$ measurements is shown in Figure~\ref{reg_conv}A (for simulations with no codon bias) and Figure~\ref{reg_conv}B (for simulations with codon bias). It is clear that $dN/dS$ values derived using codon frequencies agree nearly perfectly with those inferred using standard maximum likelihood methods, and fitness differences among synonymous codons do not influence this robust relationship. Additionally, in Figure~\ref{reg_conv}C, we demonstrate convergence of $dN/dS$ estimates as the size of the data set, represented by simulated alignment length, increases. Taken together, these results demonstrate that MutSel model parameters fully encapsulate information regarding $dN/dS$, and that the results from MutSel and mechanistic codon models are in complete agreement.
 
-The $\omega$ MLEs reported in Figure~\ref{reg_conv} were obtained by fixing the $\kappa$ parameter to its true, simulated value in the M0 model's instantaneous rate matrix. We additionally performed all $\omega$ inferences while allowing $\kappa$ to be a free parameter of the model, and we that the $\omega$ MLEs computed for each $\kappa$ parameterization were in near perfect agreement, yielding $r^2=0.997$ for alignments without codon bias, and $r^2=0.992$ for alignments with codon bias (Figure~\ref{fig:omega_ktruefree}). Moreover, we found that the correlation between $\kappa$ MLEs and the true $\kappa$ value, for likelihood inferences which considered $\kappa$ a free parameter, was somewhat weaker, with $r^2=0.5$ for alignments without codon bias, and $r^2=0.44$ for alignments with codon bias (Figure~\ref{fig:kappa_regs}). However, these moderate correlation strengths were strongly influenced by the presence of a few outlying points, so the relationship between $\kappa$ MLEs and true $\kappa$ was actually quite strong. Thus, the mechanistic codon modeling framework appears to be extremely robust to estimating both $\omega$ and $\kappa$.  
+The $\omega$ MLEs reported in Figure~\ref{reg_conv} were obtained by fixing the $\kappa$ parameter to its true, simulated value in the M0 model's instantaneous rate matrix. We additionally performed all $\omega$ inferences while allowing $\kappa$ to be a free parameter of the model, and we that the $\omega$ MLEs computed for each $\kappa$ parameterization were in near perfect agreement, yielding $r^2=0.997$ for alignments without codon bias, and $r^2=0.992$ for alignments with codon bias (Figure S1). Moreover, we found that the correlation between $\kappa$ MLEs and the true $\kappa$ value, for likelihood inferences which considered $\kappa$ a free parameter, was somewhat weaker, with $r^2=0.5$ for alignments without codon bias, and $r^2=0.44$ for alignments with codon bias (Figure S2). However, these moderate correlation strengths were strongly influenced by the presence of a few outlying points, so the relationship between $\kappa$ MLEs and true $\kappa$ was actually quite strong. Thus, the mechanistic codon modeling framework appears to be extremely robust to estimating both $\omega$ and $\kappa$.  
 
 Moreover, the strength of selection pressure scales fairly well with $dN/dS$. Figure~\ref{stddev_dnds} displays the relationship between $dN/dS$ and the standard deviation, $\sigma^2$, of the distribution of amino acid selection coefficients. Higher values of $\sigma^2$ indicate larger fitness differences among amino acids, ultimately leading to stronger selection pressure acting on nonsynonymous substitutions. Figure~\ref{stddev_dnds} demonstrates that when fitness differences among amino acids are very high, $dN/dS$ takes on lower values, properly reflecting stronger purifying selection. As expected, this trend is more robust for alignments without codon bias (Figure~\ref{stddev_dnds}A, $r^2 = 0.83$) than for alignments with codon bias (Figure~\ref{stddev_dnds}B, $r^2 = 0.45$). This weakened relationship emerges from the fact that fitness differences among synonymous codons obscure the underlying amino acid fitness differences. Thus, while a significant negative correlation remains, the codon bias generates increased noise.
 
@@ -155,7 +153,7 @@ Results reported in the previous subsection were obtained using fully-simulated 
 We again computed $dN/dS$ using equations \eqref{eq:f_ij}--\eqref{eq:dS} for each resulting set of equilibrium codon frequencies, and simulated alignments according to equation \eqref{eq:HBmatrix}. We inferred $\omega$ MLEs using the M0 mechanistic codon model  according to five different codon frequency model parameterizations. These parameterizations included Fequal \cite{Yang2006} and the common frequency estimators F3x4 \cite{MuseGaut1994}, CF3x4 \cite{Pond2010}, and F61 \cite{GoldmanYang1994}. The estimators F3x4 and CF3x4 approximate codon frequencies using positional nucleotide frequencies, and the F61 estimator simply uses an alignment's empirical codon frequencies. Additionally, we inferred $\omega$ using a fifth frequency parameterization which consisted of the codon frequencies that would arise strictly from mutational processes, in the absence of natural selection. We term this parameterization "Ftrue," as its values take on those intended for this parameter \cite{GoldmanYang1994,MuseGaut1994,YN00,Yang2006}.
 
 
-Figure~\ref{nyp_bias_r2} shows the resulting relationships between $dN/dS$ and $\omega$ MLEs for each set of mutation rates (NP, yeast and polio), across M0 model codon frequency parameterizations (Figure~\ref{fig:nyp_regressions} contains regression plots for all simulated data sets and frequency parameterizations). Figure~\ref{nyp_bias_r2}A displays the bias, or systematic deviation from a 1:1 relationship, between $dN/dS$ and $\omega$, and Figure~\ref{nyp_bias_r2}B displays $r^2$ values between $dN/dS$ and $\omega$. Note that a bias of 0 would indicate a perfect correlation between $dN/dS$ and $\omega$ MLEs. The numeric values for bias and $r^2$ terms can be found in Table S1.
+Figure~\ref{nyp_bias_r2} shows the resulting relationships between $dN/dS$ and $\omega$ MLEs for each set of mutation rates (NP, yeast and polio), across M0 model codon frequency parameterizations (Figure S3 and Tables S1-2 contains regression plots and numerical data for all simulated data sets and frequency parameterizations). Figure~\ref{nyp_bias_r2}A displays the bias, or systematic deviation from a 1:1 relationship, between $dN/dS$ and $\omega$, and Figure~\ref{nyp_bias_r2}B displays $r^2$ values between $dN/dS$ and $\omega$. Note that a bias of 0 would indicate a perfect correlation between $dN/dS$ and $\omega$ MLEs. The numeric values for bias and $r^2$ terms can be found in Table S1.
 
 Overall, Figure~\ref{nyp_bias_r2} reveals a clear trend where the relationship between $dN/dS$ and $\omega$ decreases in accuracy and strength as mutation rates become increasingly asymmetric for all codon frequency parameterizations. Across all frequency parameterizations, $\omega$ inferences on alignments with NP mutation rates have the least amount of bias, followed by yeast and finally polio mutation rates, and a parallel trend exists for the correlation strengths. Strikingly, even though the Ftrue parameterization takes on the exact values intended for this parameter, does not outperform the other frequency parameterizations, but rather features the same general trend of decreasing accuracy with increasing mutational asymmetry. Instead, it seems as though the Fequal parameterization yields the most accurate $\omega$ MLEs; it features the least amount of bias, and has very high correlations for both NP and yeast mutation rates. Although Fequal features a lower $r^2$ for polio mutation rates than do the estimators F61, F3x4, and CF3x4, the relative strength of the $r^2 $ values for these three estimators is misleading. Instead, their relatively higher bias levels demonstrate that these estimators systematically underestimate $dN/dS$. Taken together, these results suggest that the codon frequency parameters in mechanistic codon models do not adequately account for nucleotide compositional bias. 
 
@@ -207,30 +205,38 @@ This work was supported by the army and by NIH.
 \end{acknowledgments}
 
 
-\clearpage
-\newpage
-\bibliographystyle{pnas}
-\bibliography{bibliography}	
 
+\bibliographystyle{pnas}
+\bibliography{bibliography}
+
+
+\end{article}
 \clearpage
 \newpage	
 
 \begin{figure*}[H]
-\centerline{\includegraphics[width=8in]{figures/MainText/regression_convergence.pdf}}
+\centerline{\includegraphics[width=18.7cm]{figures/MainText/regression_convergence.pdf}}
 \caption{\label{reg_conv} Relationship works exceedingly well. Left panel shows 100 points, each of which corresponds to single simulation. Note that here the ml inference is shown for equal codon frequency specs and kappa fixed to true value (a similar plot for free kappa is shown in suppfigs, but results are qualitatively identical.) Right panels shows convergence of omega values as data set size (represented as simulated alignment length) increases. The y-axis indicates relative error of the ML $dN/dS$ estimates, and the x-axis indicates sequence length on a log-scale. As the sequence length, or the data set size, increases, the two $dN/dS$ estimates converge to the same value. note that convergence data was generated using the same approach as for the no codon bias data set, except by varying the alignment size.}
 \end{figure*}
 
 
 \bigskip
+\bigskip
+\bigskip
+\bigskip
+
 \begin{figure}[H]
-\centerline{\includegraphics[width=6in]{figures/MainText/sd_vs_dnds.pdf}}
+\centerline{\includegraphics[width=8.7cm]{figures/MainText/sd_vs_dnds.pdf}}
 \caption{\label{stddev_dnds} strength of selection scales well with dnds but the strength of the relationship diminishes with codon bias as synonymous now have frequency differences, so dnds is less of a reliable indicator of selection strength.}
 \end{figure}
 
-
 \bigskip
+\bigskip
+\bigskip
+\bigskip
+
 \begin{figure}[H]
-\centerline{\includegraphics[width=6in]{figures/MainText/nyp_bias_r2.pdf}}
+\centerline{\includegraphics[width=8.7cm]{figures/MainText/nyp_bias_r2.pdf}}
 \caption{\label{nyp_bias_r2} Global outperform, obviously. Clear that the null is probably the best bet. The question is, how well to commonly used estimators approximate this null specification? Decently, but clearly F3x4 and CF3x4 do better than F61. Also, Fequal does reasonably well, but it gets noisy as the asymmetry in mutation rates grows.}
 \end{figure}
 
