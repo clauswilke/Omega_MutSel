@@ -3,13 +3,12 @@
 
 import sys
 # Input parameters and global stuff
-if (len(sys.argv) != 5):
-    print "\n\nUsage: python run_convergence.py <rep> <treefile> <simdir> <cpu> \n."
+if (len(sys.argv) != 4):
+    print "\n\nUsage: python run_convergence.py <rep> <simdir> <cpu> \n."
     sys.exit()
 rep = sys.argv[1]
-treefile = sys.argv[2]
-simdir = sys.argv[3]
-cpu = sys.argv[4]
+simdir = sys.argv[2]
+cpu = sys.argv[3]
 sys.path.append(simdir)
 from functions_simandinf import *
 
@@ -17,6 +16,7 @@ from functions_simandinf import *
 seqfile   = "seqs"+str(rep)+".fasta"
 freqfile  = "codonFreqs" + str(rep)+".txt"
 paramfile = "params"+str(rep)+".txt"
+treefile = 'tree.tre'
 
 mu = 1e-6
 kappa = rn.uniform(1.0, 6.0)
@@ -32,6 +32,8 @@ else:
 seqlength = int( times * 10**expon )
 
 
+# Create treefile
+write_treefile(treefile)
 
 # Set up steady-state codon frequencies based on selection coefficients
 print "Deriving equilibrium codon frequencies"

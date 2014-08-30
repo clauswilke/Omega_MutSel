@@ -3,20 +3,20 @@
 
 ######## Input parameters ########
 import sys
-if (len(sys.argv) != 7):
-    print "\n\nUsage: python run_np.py <rep> <treefile> <simdir> <cpu> <dataset> <batchfile>\n."
+if (len(sys.argv) != 6):
+    print "\n\nUsage: python run_np.py <rep> <simdir> <cpu> <dataset> <batchfile>\n."
     sys.exit()
 rep = sys.argv[1]         # which rep we're on, for saving files. needs to run from 1-498, since 498 sites.
-treefile = sys.argv[2]    # tree for simulation
-simdir = sys.argv[3]      # directory of simulation library
-cpu = sys.argv[4]         # hyphy can use
-dataset = sys.argv[5]     # either np, yeast, or polio. determines the mutation scheme and eq freqs
-batchfile = sys.argv[6]   # hyphy batchfile name
+simdir = sys.argv[2]      # directory of simulation library
+cpu = sys.argv[3]         # hyphy can use
+dataset = sys.argv[4]     # either np, yeast, or polio. determines the mutation scheme and eq freqs
+batchfile = sys.argv[5]   # hyphy batchfile name
 
 sys.path.append(simdir)
 from functions_simandinf import *
 
 seqlength = 500000
+treefile = 'tree.tre'
 
 
 # output files
@@ -35,7 +35,8 @@ else:
     raise AssertionError("Dataset has to be np, yeast, or polio.")
 
 
-
+# Create treefile
+write_treefile(treefile)
 
 # Read in equilibrium frequencies and determine entropy
 eq_codon_freqs = np.loadtxt(dataset + "_codon_eqfreqs.txt")

@@ -5,14 +5,13 @@
 
 ######## Input parameters ########
 import sys
-if (len(sys.argv) != 6):
-    print "\n\nUsage: python run_siminf.py <rep> <treefile> <simdir> <cpu> <bias>\n."
+if (len(sys.argv) != 5):
+    print "\n\nUsage: python run_siminf.py <rep> <simdir> <cpu> <bias>\n."
     sys.exit()
 rep = sys.argv[1]         # which rep we're on, for saving files
-treefile = sys.argv[2]    # tree for simulation
-simdir = sys.argv[3]      # directory of simulation library
-cpu = sys.argv[4]         # hyphy can use
-bias = float(sys.argv[5]) # codon bias, yes or no?
+simdir = sys.argv[2]      # directory of simulation library
+cpu = sys.argv[3]         # hyphy can use
+bias = float(sys.argv[4]) # codon bias, yes or no?
 sys.path.append(simdir)
 from functions_simandinf import *
 
@@ -21,8 +20,7 @@ from functions_simandinf import *
 seqfile       = "seqs"+str(rep)+".fasta"
 freqfile      = "codonFreqs" + str(rep)+".txt"
 paramfile     = "params"+str(rep)+".txt"
-
-
+treefile = 'tree.tre'
 seqlength = 500000
 if bias != 0.:
     bias = rn.uniform(ZERO,2) # 2 is a good top threshold. dN/dS typically <=2 this way, otherwise it gets absurd. 
@@ -31,6 +29,8 @@ kappa = rn.uniform(1.0, 6.0)
 sd = rn.uniform(0., 4.)
 mu_dict = {'AT': mu, 'TA':mu, 'CG': mu, 'GC':mu, 'AC': mu, 'CA':mu, 'GT':mu, 'TG':mu, 'AG': kappa*mu, 'GA':kappa*mu, 'CT':kappa*mu, 'TC':kappa*mu}
 
+# Create treefile
+write_treefile(treefile)
 
 # Derive equilibrium codon frequencies 
 print "Deriving equilibrium codon frequencies"

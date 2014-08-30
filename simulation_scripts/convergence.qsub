@@ -28,7 +28,6 @@ fi
 cd $WDIR
 
 # Copy files
-cp /home/sjs3495/Omega_MutSel/trees/4.tre tree.tre
 cp /home/sjs3495/Omega_MutSel/simulation_scripts/run_convergence.py .
 cp /home/sjs3495/Omega_MutSel/simulation_scripts/functions_simandinf.py .
 
@@ -38,7 +37,7 @@ cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
 
 # Run
 module load python
-python run_convergence.py $SGE_TASK_ID tree.tre $SIMDIR $CPU
+python run_convergence.py $SGE_TASK_ID $SIMDIR $CPU
 
 # Cleanup
 mkdir -p $RDIR
