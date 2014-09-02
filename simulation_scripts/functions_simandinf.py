@@ -216,7 +216,7 @@ def calc_syn_paths(source, cfreqs, mu_dict):
     for target in codons:
         diff = get_nuc_diff(source, target) # only consider single nucleotide differences since are calculating instantaneous.
         if codon_dict[source] == codon_dict[target] and cfreqs[target] > ZERO and len(diff) == 2:
-            rate  += calc_fixation_prob( source_freq, cfreqs[target] ) * mu_dict[diff]
+            rate  += calc_fixation_prob( source_freq, cfreqs[target], mu_dict[diff], mu_dict[diff[1]+diff[0]] ) * mu_dict[diff]
             sites += mu_dict[diff]
     rate  *= source_freq
     sites *= source_freq
@@ -231,14 +231,14 @@ def get_nuc_diff(source, target):
     return diff
 
     
-def calc_fixation_prob(fi, fj):
-    ''' fi is source and fj is target '''
-    if fi == fj:
-        return 1.
-    elif fi == 0. or fj == 0.:
+def calc_fixation_prob(pi, pj, mu_ij, mu_ji):
+    if pi == pj:
+        return mu_ij.
+    elif pi == 0. or pj == 0.:
         return 0.
     else:
-        return (np.log(fj) - np.log(fi)) / (1 - fi/fj)    
+        pi_mu = (pi_j*mu_ji)/(pi_i*mu_ij)
+        return np.log(pi_mu)/(1. - 1./pi_mu) * mu_ij
 ######################################################################################################################################
 
 
