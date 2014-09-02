@@ -181,46 +181,38 @@ def derive_dnds(codon_freqs_dict, mu_dict):
     for codon in codon_freqs_dict:
         if codon_freqs_dict[codon] > ZERO:  
         
-            rate, sites = calc_nonsyn_paths(codon, codon_freqs_dict, mu_dict)
+            rate, sites = calc_paths(codon, codon_freqs_dict, mu_dict, 'nonsyn')
             numer_dn += rate
             denom_dn += sites
     
-            rate, sites = calc_syn_paths(codon, codon_freqs_dict, mu_dict)
+            rate, sites = calc_paths(codon, codon_freqs_dict, mu_dict, 'syn')
             numer_ds += rate
             denom_ds += sites
     
     assert( denom_dn != 0. and denom_ds != 0.), "Omega derivation, with bias, indicates no evolution, maybe?"
+    print "NEW, dn, ds", numer_dn/denom_dn, numer_ds/denom_ds
     return (numer_dn/denom_dn)/(numer_ds/denom_ds)
     
 
 
      
-def calc_nonsyn_paths(source, cfreqs, mu_dict):
+def calc_paths(source, cfreqs, mu_dict, type):
+    ''' type is either syn or nonsyn '''
     rate = 0.
     sites = 0.
     source_freq = cfreqs[source]
     for target in codons:
         diff = get_nuc_diff(source, target) # only consider single nucleotide differences since are calculating instantaneous.
-        if codon_dict[source] != codon_dict[target] and cfreqs[target] > ZERO and len(diff) == 2:
-            rate  += calc_fixation_prob( source_freq, cfreqs[target] ) * mu_dict[diff]
-            sites += mu_dict[diff]
+        if (type == 'nonsyn' and codon_dict[source] != codon_dict[target]) or (type == 'syn' and codon_dict[source] == codon_dict[target]):
+            if cfreqs[target] > ZERO and len(diff) == 2:
+                rate  += calc_subst_prob( source_freq, cfreqs[target], mu_dict[diff], mu_dict[diff[1]+diff[0]] )
+                sites += mu_dict[diff]
+        else:
+            continue
     rate  *= source_freq
     sites *= source_freq
     return rate, sites
-    
 
-def calc_syn_paths(source, cfreqs, mu_dict):
-    rate = 0.
-    sites = 0.
-    source_freq = cfreqs[source]
-    for target in codons:
-        diff = get_nuc_diff(source, target) # only consider single nucleotide differences since are calculating instantaneous.
-        if codon_dict[source] == codon_dict[target] and cfreqs[target] > ZERO and len(diff) == 2:
-            rate  += calc_fixation_prob( source_freq, cfreqs[target], mu_dict[diff], mu_dict[diff[1]+diff[0]] ) * mu_dict[diff]
-            sites += mu_dict[diff]
-    rate  *= source_freq
-    sites *= source_freq
-    return rate, sites
 
 
 def get_nuc_diff(source, target):
@@ -231,14 +223,15 @@ def get_nuc_diff(source, target):
     return diff
 
     
-def calc_fixation_prob(pi, pj, mu_ij, mu_ji):
-    if pi == pj:
-        return mu_ij.
-    elif pi == 0. or pj == 0.:
+def calc_subst_prob(pi, pj, mu_ij, mu_ji):
+    if pi == 0. or pj == 0.:
         return 0.
     else:
-        pi_mu = (pi_j*mu_ji)/(pi_i*mu_ij)
-        return np.log(pi_mu)/(1. - 1./pi_mu) * mu_ij
+        ratio = (pj*mu_ji)/(pi*mu_ij)
+        if ratio == 1.:
+            return mu_ij
+        else:
+            return np.log(ratio)/(1. - 1./ratio) * mu_ij
 ######################################################################################################################################
 
 
