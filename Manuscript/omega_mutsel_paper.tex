@@ -47,15 +47,16 @@ This robust relationship allows us to uncover certain properties and limitations
 		
 \subsection*{Theoretical model.}
 
-We model sequence evolution as a continuous-time Markov process \cite{Yang2006} under the assumptions of a fixed effective population size $N_e$ and constant selection pressure over time. This process is governed by the $61 \times 61$ transition matrix $P(t) = e^{Qt}$, where the corresponding instantaneous rate matrix $Q$ gives the instantaneous substitution probabilities between all 61 sense codons. We further assume that only single nucleotide changes occur instantaneously. We adopt the Halpern-Bruno \cite{HalpernBruno1998,YangNielsen2008,Thorne2012} MutSel modeling framework, which models the evolutionary process with explicit population genetics theory. The probability of fixation from codon $i$ to codon $j$ is given by 
+We model sequence evolution as a continuous-time Markov process \cite{Yang2006} under the assumptions of a fixed effective population size $N_e$ and constant selection pressure over time. This process is governed by the $61 \times 61$ transition matrix $P(t) = e^{Qt}$, where the corresponding instantaneous rate matrix $Q$ gives the instantaneous substitution probabilities between all 61 sense codons. We further assume that only single nucleotide changes occur instantaneously. We adopt the Halpern-Bruno \cite{HalpernBruno1998,YangNielsen2008,Tamurietal2012,Thorne2012} MutSel modeling framework, which models the evolutionary process with explicit population genetics theory. 
+
+To being, let $f_i$ be the fitness of codon $i$, and thus the selection coefficient acting on a mutation from codon $i$ to codon $j$ is $s_{ij} = f_j - f_i$ \cite{SellaHirsh2005,YangNielsen2008}. The fixation probability for a mutation from codon $i$ to codon $j$ is given by 
 \begin{equation}\label{eq:pfix}
-P_\text{fix}(i \rightarrow j) = \frac{2s_{ij}}{1 - e^{-2N_es_{ij}}} \approx \frac{1}{N_e}\frac{2N_es_{ij}}{1 - e^{-2N_es_{ij}}} , 
-\end{equation} 
-where $s_{ij}$ is the selection coefficient acting on a mutation from codon $i$ to codon $j$ \cite{Kimura1962,HalpernBruno1998,YangNielsen2008}. With $S_{ij} = 2N_es_{ij}$ as the scaled selection coefficient, the instantaneous substitution probability from codon $i$ to codon $j$ is 
+P_\text{fix}(i \rightarrow j) = \frac{2s_{ij}}{1 - e^{-2N_es_{ij}}} \approx \frac{1}{N_e}\frac{2N_es_{ij}}{1 - e^{-2N_es_{ij}}} 
+\end{equation} \cite{Kimura1962,HalpernBruno1998,YangNielsen2008}. We further define $S_{ij} = 2N_es_{ij}$ as the scaled selection coefficient for this mutation. The instantaneous substitution probability from codon $i$ to codon $j$ is  
 \begin{equation}\label{eq:Q_ji}
 Q_{ji} = N_e\mu_{ij}P_\text{fix}(i \rightarrow j) = \mu_{ij}\frac{S_{ij}}{1 - e^{-S_{ij}}}
 \end{equation} 
-\cite{HalpernBruno1998,SellaHirsh2005}. Under detailed balance, we have 
+\cite{HalpernBruno1998,SellaHirsh2005}. Given detailed balance (reversibility), we have 
 \begin{equation}\label{eq:DB}
 Q_{ji}p_i = Q_{ij}p_j,
 \end{equation} 
@@ -96,17 +97,17 @@ where ${\cal S}_i$ is the set of codons that are synonymous to codon $i$ and dif
 				
 \subsection*{dN/dS accurately reflects selection strength.}
 
-Using the theoretical framework established in equations \eqref{eq:pfix} - \eqref{eq:dS}, we can examine the relationship between the $dN/dS$ values corresponding to different distributions of scaled selection coefficients. To this end, we generated 200 distinct distributions of amino acid scaled selection coefficients $S_a$. For each set of selection coefficients, we fixed one coefficient to 0 and drew the remaining 19 values from a normal distribution $\mathcal{N}(0,\sigma^2)$, where $\sigma^2 \sim \mathcal{U}(0,4)$. Here, $\sigma^2$ effectively represents the strength of natural selection; higher $\sigma^2$ correspond to larger fitness difference among amino acids, prompting selection to act more strongly against nonsynonymous changes. In other words, high $\sigma^2$ values indicate strong purifying selection, while lower values indicate weaker purifying selection. We additionally note that these $S_a$ values correspond to the relative amino acid fitness parameters as inferred by currently available MutSel inference methods \cite{Tamurietal2014,RodrigueLartillot2014}. 
+Using the theoretical framework established in equations \eqref{eq:pfix} - \eqref{eq:dS}, we can examine the relationship between the $dN/dS$ values corresponding to different distributions of scaled selection coefficients. To this end, we generated 200 distinct distributions of amino acid fitness values $f_a$. We drew these 20 amino acid fitness values from a normal distribution $\mathcal{N}(0,\sigma^2)$, where $\sigma^2 \sim \mathcal{U}(0,4)$. Here, $\sigma^2$ effectively represents the strength of natural selection; higher $\sigma^2$ correspond to larger fitness difference among amino acids, prompting selection to act more strongly against nonsynonymous changes. In other words, high $\sigma^2$ values indicate strong purifying selection, while lower values indicate weaker purifying selection. We additionally note that these amino acid fitness quantities correspond to the amino acid propensity parameters estimated by currently available MutSel inference methods \cite{RodrigueLartillot2014,Tamuri2014}/
 
-We then converted each distribution of amino acid scaled selection coefficients to a corresponding set of codon scaled selection coefficients. For 100 of the distributions, we assumed that synonymous changes were neutral, and thus we directly assigned each codon the scaled selection coefficients $S_i = S_a$. For the other 100 sets of amino acid coefficients, we allowed synonymous codons to have different fitness values. In these circumstances, we randomly selected a preferred codon for each amino acid, and we assigned the preferred codon the scaled selection coefficient of $S_i = S_a + \lambda$ and all non-preferred codons the scaled selection coefficient $S_i = S_a - \lambda$ where $\lambda \sim \mathcal{U}(0,2)$. We drew a unique $\lambda$ value for each set of coefficients. We refer to first set of codon selection coefficients as ``no codon bias," and the second set as ``codon bias."
+We then converted each distribution of amino acid fitnesses to a corresponding set of codon fitnesses. For 100 of the distributions, we assumed that synonymous changes were neutral, and thus we directly assigned each codon the same fitness $f_i = f_a$. For the other 100 sets of fitnesses, we allowed synonymous codons to have different fitness values. In these circumstances, we randomly selected a preferred codon for each amino acid, and we assigned the preferred codon the fitness of $f_i = f_a + \lambda$ and all non-preferred codons the fitness $f_i = f_a - \lambda$. We drew a unique $\lambda$ for each fitness distribution from $\mathcal{U}[0,2]$. We refer to first set of codon selection coefficients as ``no codon bias," and the second set as ``codon bias." 
 
-Finally, we computed $dN/dS$, using equations \eqref{eq:pfix} - \eqref{eq:dS}, for each distribution of codon selection coefficients. For these computations, we assumed an underlying mutation nucleotide rate of $\mu_{xy} = 10^{-6}$, and we additionally incorporated transition-transversion bias, $\kappa$; we drew a unique $\kappa$ value for each set of selection coefficients from $\mathcal{U}(1,6)$.
+Finally, using equations \eqref{eq:pfix} - \eqref{eq:dS}, we computed $dN/dS$ for each distribution of codon fitnesses. For these calculations, we also need to select mutation rates. We set the mutation rate for transitions as $\mu\kappa$, and the rate for all transversions as $\mu$. We use the value $\mu = 10^{-6}$ for all $dN/dS$ calculations, and we draw a  unique value for $\kappa$ from $\mathcal{U}[1,6]$ for each set of codon fitnesses.
 
-We found that $dN/dS$ values scale excellently with the standard deviation of the distribution of amino-acid scaled selection coefficients (Figure~\ref{stddev_dnds}). As Figure~\ref{stddev_dnds} demonstrates, $dN/dS$ and $\sigma^2$ are strongly negatively correlated; when fitness differences among amino acids are very high, $dN/dS$ takes on lower values, properly reflecting stronger purifying selection. Furthermore, as expected, this trend is much stronger for alignments without codon bias (Figure~\ref{stddev_dnds}A, $r^2 = 0.83$) than for alignments with codon bias (Figure~\ref{stddev_dnds}B, $r^2 = 0.45$). The weakened relationship for alignments with codon bias emerges from the fact that fitness differences among synonymous codons will obscure underlying amino acid fitness differences. Even so, the presence of codon bias does not remove the significant negative correlation between $dN/dS$ and selection strength.
+We found that $dN/dS$ values scale excellently with the variance ($\sigma^2$) of the distribution of amino-acid scaled selection coefficients (Figure~\ref{stddev_dnds}). As Figure~\ref{dnds_variance} demonstrates, $dN/dS$ and $\sigma^2$ are strongly negatively correlated; when fitness differences among amino acids are very high, $dN/dS$ takes on lower values, properly reflecting stronger purifying selection. Furthermore, as expected, this trend is much stronger for alignments without codon bias (Figure~\ref{dnds_variance}A, $r^2 = 0.83$) than for alignments with codon bias (Figure~\ref{dnds_variance}B, $r^2 = 0.45$). The weakened relationship for alignments with codon bias emerges from the fact that fitness differences among synonymous codons will obscure underlying amino acid fitness differences. Even so, the presence of codon bias does not remove the significant negative correlation between $dN/dS$ and selection strength.
 		
-Importantly, Figure~\ref{stddev_dnds}A demonstrates that, in the limiting case when $\sigma^2$ approaches 0, and thus all codons have virtually the same fitness, $dN/dS$ converges to 1. More precisely, the largest $dN/dS$ value recovered for alignments without codon bias was 0.997, and this alignment featured a $\sigma^2 = 0.08$. This result properly reflects the case of neutral evolution. In fact, in \textbf{PROOF}, we prove that, when synonymous changes are neutral and mutation is symmetric (i.e.\ $\mu_{xy} = \mu_{yx}$), $dN/dS$ is necessarily always less than or equal to 1. We have also proven that, when synonymous changes are neutral and mutation rates are symmetric, $dN/dS$ as calculated from scaled selection coefficients will always be less than 1. This proof formalizes the MutSel model underlying assumption that selection pressure is constant over the phylogeny and confirms that MutSel models are inherently unable to describe positive, diversifying selection. Although this proof assumes symmetric nucleotide mutation rates, we do not expect that deviations from this assumption will have dramatic effects on $dN/dS$ estimates. Therefore, we conclude that the MutSel framework is an inappropriate model when positive selection is expected, as the model may yield spurious and misleading results. 
+Importantly, Figure~\ref{dnds_variance}A demonstrates that, in the limiting case when $\sigma^2$ approaches 0, and thus all codons have virtually the same fitness, $dN/dS$ converges to 1. More precisely, the largest $dN/dS$ value recovered for alignments without codon bias was 0.997, and this alignment featured a $\sigma^2 = 0.08$. This result properly reflects the case of neutral evolution. In fact, in \textbf{PROOF}, we prove that, when synonymous changes are neutral and mutation is symmetric (i.e.\ $\mu_{xy} = \mu_{yx}$), $dN/dS$ is necessarily always less than or equal to 1. We have also proven that, when synonymous changes are neutral and mutation rates are symmetric, $dN/dS$ as calculated from scaled selection coefficients will always be less than 1. This proof formalizes the MutSel model underlying assumption that selection pressure is constant over the phylogeny and confirms that MutSel models are inherently unable to describe positive, diversifying selection. Although this proof assumes symmetric nucleotide mutation rates, we do not expect that deviations from this assumption will have dramatic effects on $dN/dS$ estimates. Therefore, we conclude that the MutSel framework is an inappropriate model when positive selection is expected, as the model may yield spurious and misleading results. 
 
-However, this restriction of $dN/dS < 1$ does not hold when synonymous changes are not neutral, as seen in Figure~\ref{stddev_dnds}B. In other words, even though the underlying evolutionary model assumes constant selection pressure over time and therefore no positive selection is occuring, $dN/dS$ can readily be greater than 1. Furthermore, we find that it is theoretically possible to achieve arbitrarily high $dN/dS$ values when there are fitness differences among synonymous codons; in the most extreme case of codon bias, where only a single codon per amino acid is selectively tolerated, the number of synonymous sites $L_\text{S} = 0$, and thus the value for $dN/dS$ approaches infinity. Given that the MutSel model framework assumes an overarching regime of purifying selection, this finding might seem paradoxical. However, the logical argument that $dN/dS > 1$ represents positive, diversifying selection assumes that the rate of synonymous change may be used as a neutral benchmark, an assumption which codon bias clearly violates. Thus, in theory, what is classically termed positive selection can result simply from strong synonymous fitness differences. 	
+However, this restriction of $dN/dS < 1$ does not hold when synonymous changes are not neutral, as seen in Figure~\ref{dnds_variance}B. In other words, even though the underlying evolutionary model assumes constant selection pressure over time and therefore no positive selection is occuring, $dN/dS$ can readily be greater than 1. Furthermore, we find that it is theoretically possible to achieve arbitrarily high $dN/dS$ values when there are fitness differences among synonymous codons; in the most extreme case of codon bias, where only a single codon per amino acid is selectively tolerated, the number of synonymous sites $L_\text{S} = 0$, and thus the value for $dN/dS$ approaches infinity. Given that the MutSel model framework assumes an overarching regime of purifying selection, this finding might seem paradoxical. However, the logical argument that $dN/dS > 1$ represents positive, diversifying selection assumes that the rate of synonymous change may be used as a neutral benchmark, an assumption which codon bias clearly violates. Thus, in theory, what is classically termed positive selection can result simply from strong synonymous fitness differences. 	
 		
 		
 
@@ -115,15 +116,13 @@ However, this restriction of $dN/dS < 1$ does not hold when synonymous changes a
 An important application of the relationship we have established between $dN/dS$ and selection coefficients is to use it to see how different modeling frameworks relate to one another. Typically, we assess model performance by simulating data under simple circumstances which adhere to the model's underlying assumptions. While this is a valuable, it's not all we can do. For instance, that Holder study was able to identify unknown limitations in phylogenetic methods. 
 
 Therefore, we conducted simulations to see how our math performs relative to widely used inference methods.
-We performed several simulations according to a MutSel model. We used the M0 model \cite{NielsenYang1998}, as implemented in the HyPhy batch language \cite{KosakovskyPondetal2005} to infer $dN/dS$ from resulting alignments, and compared these values to those calc'd with equations 1-9. We found excellent agreement between $dN/dS$ values, for simulated alignments with an without codon bias alike.
+We performed several simulations according to a MutSel model. We used the M0 model \cite{NielsenYang1998}, as implemented in the HyPhy batch language \cite{KosakovskyPondetal2005} to infer $dN/dS$ from resulting alignments, and compared these values to those calc'd with equations 1-9. We found excellent agreement between $dN/dS$ values, for simulated alignments with an without codon bias alike. Throughout, we use $dN/dS$ to refer to values calculated using equations, and $\omega$ to refer to the ML estimate of $dN/dS$ inferred by the M0 model.
 
 The relationship between $dN/dS$ measurements is shown in Figure~\ref{reg_conv}A-B. It is clear that $dN/dS$ values computed from scaled selection coefficient agree nearly perfectly with $\omega$ MLEs inferred from the M0 model, and the presence of codon bias does not influence this robust relationship. Additionally, in Figure~\ref{reg_conv}C, we demonstrate that $\omega$ converges to the true $dN/dS$ value as the size of the data set, represented by simulated alignment length, increases. Taken together, these results demonstrate that MutSel model parameters fully encapsulate information regarding $dN/dS$, and that the results from MutSel and MC models are in complete agreement.
 
 We numerically verify the accuracy of our $dN/dS$ values, which in turn means that scaled selection coefficients and $dN/dS$ models are in complete agreement. In other words, the information for $dN/dS$ is fully contained within MutSel model parameters. Implies that both models yield consistent information. However, it would not be possible to go the other way around I think.
 
-
-\textbf{WRITE PARAGRAPH IN SINGLE SENTENCE: We obtained all $\omega$ MLEs reported in Figure~\ref{reg_conv} by fixing the $\kappa$ parameter in the M0 model's instantaneous rate matrix to its true, simulated value. However, in real sequence analyses, $\kappa$ is typically a free parameter. Therefore, to investigate whether M0 produces accurate $\omega$ estimates while simultaneously estimating $\kappa$, we additionally performed all $\omega$ inferences with $\kappa$ as a free parameter. The resulting $\omega$ MLEs computed for both $\kappa$ parameterizations are in near perfect agreement, yielding $r^2=0.997$ for alignments without codon bias, and $r^2=0.992$ alignments with codon bias (Figure S1). In other words, the M0 model yielded virtually identical $\omega$ MLEs for both $\kappa$ parameterizations. We also find that the correlation between $\kappa$ MLEs and the true $\kappa$ value, was somewhat weaker, with $r^2=0.5$ for alignments without codon bias, and $r^2=0.44$ for alignments with codon bias (Figure S2). These moderate correlation strengths were strongly influenced by the presence of a few outlying points, so the relationship between $\kappa$ MLEs and true $\kappa$ values was actually quite strong. Thus, the MC modeling framework appears to be extremely robust to estimating both $\omega$ and $\kappa$.}
-
+However, these data sets were not entirely realistic. Therefore, we can do it again but with Jesse Bloom's data. 
 
 
 \subsection*{Incorporation of asymmetric mutation rates reveals bias in MC models.}
@@ -207,8 +206,8 @@ In sum, we have garnered several important insights into the behavior of MC and 
 \vspace{2cm}
 	
 \begin{figure}[htbp]
-	\centerline{\includegraphics[width=8.7cm]{figures/MainText/sd_vs_dnds.pdf}}
-	\caption{\label{stddev_dnds} $dN/dS$ decreases in proportion to amino-acid level selection strength. $dN/dS$ is plotted against the $\sigma^2 $ of the simulated distribution of amino-acid scaled selection coefficients. Higher values of $\sigma^2$ indicate larger fitness differences among amino acids, whereas the limiting value of $\sigma^2 = 0$ means that all amino acids have the same fitness. (A) Simulations which assigned equal fitness values to synonymous codons ($r^2=0.83$). (B) Simulations which allowed different fitness values among synonymous codons ($r^2=0.45$).}
+	\centerline{\includegraphics[width=8.7cm]{figures/MainText/dnds_variance.pdf}}
+	\caption{\label{dnds_variance} $dN/dS$ decreases in proportion to amino-acid level selection strength. $dN/dS$ is plotted against the $\sigma^2 $ of the simulated distribution of amino-acid scaled selection coefficients. Higher values of $\sigma^2$ indicate larger fitness differences among amino acids, whereas the limiting value of $\sigma^2 = 0$ means that all amino acids have the same fitness. (A) Synonymous codons have equal fitness values ($r^2=0.83$). (B) Synonymous codons have different fitness values ($r^2=0.45$). Importantly, (B), but not (A) shows $dN/dS$ values greater than 1, in spite of the steady-state evolutionary process.}
 \end{figure}
 		
 		
@@ -216,7 +215,7 @@ In sum, we have garnered several important insights into the behavior of MC and 
 		
 \begin{figure*}[htbp]
 	\centerline{\includegraphics[width=18.7cm]{figures/MainText/regression_convergence.pdf}}
-	\caption{\label{reg_conv} Regressions between $dN/dS$ values as calculated from scaled selection coefficients and as inferred using the M0 mechanistic codon model. Each point corresponds to a single simulated alignment. All $\omega$ values shown here were inferred by parameterizing the M0 model with $\kappa$ fixed to its true, simulated value as well as the Fequal codon frequency specification \cite{Yang2006}. The red line in panels (A-B) is the $x=y$ line. (A) Simulations which assigned equal fitness values to synonymous codons ($r^2=0.9995$). (B) Simulations which allowed different fitness values among synonymous codons ($r^2=0.9993$). (C) Convergence of $\omega$ MLEs to the true $dN/dS$ value. The y-axis indicates the relative error of the maximum likelihood $dN/dS$ estimate, and the x-axis indicates the number of positions in the simulated alignment. As the number of positions, and hence the size of the data set, increases, the maximum likelihood estimates converge to the $dN/dS$ values calculated using equations \eqref{eq:pi_i}-\eqref{eq:dS}. The red line in panel (C) is the line $y=0$, indicating no error.}
+	\caption{\label{reg_conv} Regressions between $dN/dS$ values as calculated from scaled selection coefficients and as inferred using the M0 mechanistic codon model. Each point corresponds to a single simulated alignment. All $\omega$ values shown here were inferred by parameterizing the M0 model with $\kappa$ fixed to its true, simulated value as well as the Fequal codon frequency specification \cite{Yang2006}. The red line in panels (A-B) is the $x=y$ line. (A) Synonymous codons have equal fitness ($r^2=0.997$). (B) Synonymous codons have different fitness values ($r^2=0.992$). (C) Convergence of $\omega$ MLEs to the true $dN/dS$ value. The y-axis indicates the relative error of the maximum likelihood $dN/dS$ estimate, and the x-axis indicates the number of positions in the simulated alignment. As the number of positions, and hence the size of the data set, increases, the maximum likelihood estimates converge to the $dN/dS$ values calculated using equations \eqref{eq:pi_i}-\eqref{eq:dS}. The red line in panel (C) is the line $y=0$, indicating no error.}
 \end{figure*}
 	
 \vspace{2cm}
@@ -231,23 +230,9 @@ In sum, we have garnered several important insights into the behavior of MC and 
 
 	
 \section{Supplementary Information}
-	
-\vspace{2cm}
-	
-\includegraphics[width=5.5in]{figures/SI/omega_kappafree_kappatrue.pdf}
-\noindent Figure S1. $\omega$ MLEs inferred using the M0 model, where the $\kappa$ parameter in the model's instantaneous rate matrix was either fixed to its true value (x-axis) or allowed to be a free parameter of the model (y-axis). Each point represents a single simulated alignment, and the red lines correspond to $x=y$. All inferences were conducted using the Fequal codon frequency parameterization. There is excellent agreement between $\omega$ estimates for both types $\kappa$ parameterizations.
 
-	
-\vspace{2cm}
-	
-\includegraphics[width=5.5in]{figures/SI/kappa_regressions.pdf}
-\noindent Figure S2. $\kappa$ MLEs are plotted against the true, simulated $\kappa$ values. Each point represents a single simulated alignment, and the red lines correspond to $x=y$. All inferences were conducted using the Fequal codon frequency parameterization. With the exception of a few outlying points, the M0 model yields very accurate $\kappa$ estimates (A) Simulations which assigned equal fitness values to synonymous codons. (B) Simulations which allowed different fitness values among synonymous codons.
-	
-	
-\clearpage
-\newpage
+
 \begin{landscape}
-	
 \includegraphics[width=9.25in]{figures/SI/nyp_fspecs_full.pdf}
 \noindent Figure S3. Regression plots for $\omega$ MLEs versus $dN/dS$ values computed from scaled selection coefficients, for each set of nucleotide mutation rates and all M0 codon frequency parameterizations. Each point represents a single simulated alignment, and the red lines correspond to $x=y$. (A) Simulations which assigned equal fitness values to synonymous codons. (B) Simulations which allowed different fitness values among synonymous codons.
 \end{landscape}
@@ -263,9 +248,9 @@ In sum, we have garnered several important insights into the behavior of MC and 
 		\cline{2-6}\noalign{\medskip}
 		Mutation rate & Ftrue & Fequal & F61 & F3x4 & CF3x4 \\
 		\hline\noalign{\smallskip}
-		NP & -0.0097 & -0.011 & 0.02 & -0.0063 & -0.0084 \\
-		Yeast & -0.072 & 0.029 & -0.056 & -0.066 & -0.073 \\
-		Polio & -0.12 & -0.082 & -0.16 & -0.18 & -0.17 \\
+		NP & -0.00971 & -0.0107 & 0.02 & -0.0063 & -0.0084 \\
+		Yeast & -0.0782 & 0.0226 & -0.0625 & -0.0718 & -0.0794 \\
+		Polio & -0.0931 & -0.0534 & -0.130 & -0.156 & -0.143 \\
 		\noalign{\smallskip}\hline\noalign{\smallskip}
 	\end{tabular}
 \end{table}	
@@ -280,9 +265,9 @@ In sum, we have garnered several important insights into the behavior of MC and 
 		\cline{2-6}\noalign{\medskip}
 		Mutation rate & Ftrue & Fequal & F61 & F3x4 & CF3x4 \\
 		\hline\noalign{\smallskip}
-		NP & 0.988 & 0.986 & 0.902 & 0.975 & 0.986 \\
-		Yeast & 0.740 & 0.877 & 0.850 & 0.820 & 0.848 \\
-		Polio & 0.537 & 0.519 & 0.659 & 0.671 & 0.641 \\
+		NP & 0.988 & 0.986 & 0.902 & 0.976 & 0.986 \\
+		Yeast & 0.938 & 0.777 & 0.904 & 0.878 & 0.912 \\
+		Polio & 0.737 & 0.291 & 0.770 & 0.800 & 0.776 \\
 		\noalign{\smallskip}\hline\noalign{\smallskip}
 	\end{tabular}
 \end{table}	
