@@ -85,7 +85,7 @@ def get_eq_from_eig(m):
 ######################################################################################################################################
 
 
-################################### FUNCTIONS TO SET UP SCALED SEL COEFFS, CODON FREQUENCIES #########################################
+################################### FUNCTIONS TO SET UP SCALED SEL fitness, CODON FREQUENCIES #########################################
 def set_codon_freqs(sd, freqfile, bias):
     ''' Returns equilibrium codon frequencies, entropy, and gc content. Also saves codon frequencies to file. 
         We simulate values for the amino acid scaled selection coefficients by drawing from N(0,x), where x~U(0,4). Note that x=0 means neutral evolution.
@@ -103,13 +103,13 @@ def set_codon_freqs(sd, freqfile, bias):
     # Draw amino acid ssc values and assign randomly to amino acids.
     aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
     shuffle(aminos)  # To randomly assign coefficients, shuffle aminos acids.
-    aa_coeffs = dict(zip(aminos, draw_amino_coeffs(sd)))
+    aa_fitness = dict(zip(aminos, draw_amino_fitness(np.random.normal(loc = 0, scale = sd, size = 20))))
 
     # Convert amino acid coefficients to codon coefficients
-    codon_coeffs = aa_to_codon_coeffs(aa_coeffs, bias)
+    codon_fitness = aa_to_codon_fitness(aa_fitness, bias)
 
     # Convert codon coefficients to steady-state frequencies
-    codon_freqs = codon_coeffs_to_freqs(codon_coeffs)
+    codon_freqs = codon_fitness_to_freqs(codon_fitness)
     codon_freqs_dict = dict(zip(codons, codon_freqs))
         
     # Save codon equilibrium frequencies to file  
@@ -125,37 +125,32 @@ def set_codon_freqs(sd, freqfile, bias):
 
     return codon_freqs, codon_freqs_dict, gc, entropy
     
-    
-def draw_amino_coeffs(sd):
-    ssc_values = np.random.normal(loc = 0, scale = sd, size = 20)
-    ssc_values[0] = 0.
-    return ssc_values   
 
     
-def aa_to_codon_coeffs(aa_coeffs, lambda_):
+def aa_to_codon_fitness(aa_fitness, lambda_):
     ''' Assign amino acid selection coefficients to codon ssc values. lambda_ is the bias term. '''
-    codon_coeffs = {}
-    for aa in aa_coeffs:
+    codon_fitness = {}
+    for aa in aa_fitness:
         syn_codons = genetic_code[ amino_acids.index(aa) ]
         shuffle(syn_codons) # randomize otherwise the preferred will be the first one alphabetically
         k = float(len(syn_codons) - 1.)
         first=True
         for syn in syn_codons:
             if first:
-                codon_coeffs[syn] = aa_coeffs[aa] + lambda_
+                codon_fitness[syn] = aa_fitness[aa] + lambda_
                 first=False
             else:
-                codon_coeffs[syn] = aa_coeffs[aa] - lambda_
-    return codon_coeffs         
+                codon_fitness[syn] = aa_fitness[aa] - lambda_
+    return codon_fitness         
     
-def codon_coeffs_to_freqs(codon_coeffs):
+def codon_fitness_to_freqs(codon_fitness):
     codon_freqs = np.zeros(61)
     count = 0
     for codon in codons:
-        codon_freqs[count] = np.exp( codon_coeffs[codon] )
+        codon_freqs[count] = np.exp( codon_fitness[codon] )
         count += 1
     codon_freqs /= np.sum(codon_freqs)                   
-    assert(-1*ZERO < np.sum(codon_freqs) - 1.0 < ZERO), "codon_freq doesn't sum to 1 in codon_coeffs_to_freqs"
+    assert(-1*ZERO < np.sum(codon_freqs) - 1.0 < ZERO), "codon_freq doesn't sum to 1 in codon_fitness_to_freqs"
     return codon_freqs    
 
 
