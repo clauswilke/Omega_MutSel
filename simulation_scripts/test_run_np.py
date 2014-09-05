@@ -15,7 +15,7 @@ batchfile = sys.argv[5]   # hyphy batchfile name
 sys.path.append(simdir)
 from functions_simandinf import *
 
-seqlength = 500
+seqlength = 500000
 treefile = 'tree.tre'
 
 
@@ -64,7 +64,8 @@ dnds = derive_dnds(codon_freqs_true_dict, mu_dict)
 # Run hyphy and save omega, kappa, omega error. Note we only run free kappa, so just a single call to hyphy.
 for pi in nuc_freqs:
     sed_pi = "sed -i 's/"+pi+"/"+nuc_freqs[pi]+"/g' matrices_raw.mdl"
-    assert(sed_pi == 0), "sed_pi didn't work"
+    run_sed = subprocess.call(sed_pi, shell=True)
+    assert(run_sed == 0), "sed_pi didn't work"
 shutil.copy('matrices_raw.mdl', 'matrices.mdl')
 shutil.copy(seqfile, "temp.fasta")
 setup_tree = subprocess.call("cat "+treefile+" >> temp.fasta", shell = True)
@@ -77,9 +78,7 @@ error = (dnds - w)/dnds
 # Finally, save results
 outstring_params = rep + '\t' + str(entropy) + '\t' + str(dnds)
 outf = open(paramfile, 'w')
-for f in fspecs:
-    y =  fspecs.index(f)
-    outf.write( outstring_params + '\t' + f + '\t' +  str(w) + '\t' + str(error) + '\t' + str(kappa) + '\n')
+outf.write( outstring_params + '\t' +  str(w) + '\t' + str(error) + '\t' + str(k) + '\n')
 outf.close()   
 
 
