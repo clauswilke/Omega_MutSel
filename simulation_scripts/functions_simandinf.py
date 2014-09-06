@@ -72,13 +72,23 @@ def get_eq_from_eig(m):
     assert( abs(max_w) < 1e-10 ), "Maximum eigenvalue is not close to zero."
     max_v = v[:,max_i]
     max_v /= np.sum(max_v)
-    max_v = max_v.real # these are the stationary frequencies
+    eq_freqs = max_v.real # these are the stationary frequencies
+    
     # SOME SANITY CHECKS
-    assert np.allclose(np.zeros(61), np.dot(max_v, m)) # should be true since eigenvalue of zero
-    pi_inv = np.diag(1.0 / max_v)
+    assert np.allclose(np.zeros(61), np.dot(eq_freqs, m)) # should be true since eigenvalue of zero
+    pi_inv = np.diag(1.0 / eq_freqs)
     s = np.dot(m, pi_inv)
-    assert np.allclose(m, np.dot(s, np.diag(max_v)), atol=1e-10, rtol=1e-5), "exchangeability and equilibrium does not recover matrix"
-    return max_v
+    assert np.allclose(m, np.dot(s, np.diag(eq_freqs)), atol=1e-10, rtol=1e-5), "exchangeability and equilibrium does not recover matrix"
+    
+    # And for some impressive overkill, double check pi_i*q_ij = pi_j*q_ji
+    for i in range(61):
+        pi_i = eq_freqs[i]
+        for j in range(61):
+            pi_j = eq_freqs[j]
+            forward  = pi_i * m[i][j] 
+            backward = pi_j * m[j][i]
+            assert(-1e-8 < (forward - backward) < 1e-8), "Detailed balance violated."    
+    return eq_freqs
 
 
 
