@@ -42,9 +42,9 @@ Model MyModel = (GY94, Fequal, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn = (filt_data, Tree01);
-Optimize (paramValues, LikFn);
-fprintf ("fequal_hyout.txt", LikFn);
+LikelihoodFunction  LikFn1 = (filt_data, Tree01);
+Optimize (paramValues, LikFn1);
+fprintf ("fequal_hyout.txt", LikFn1);
 
 
 ////////////// TRUE FREQUENCIES //////////////
@@ -52,7 +52,7 @@ Model MyModel = (GY94, Ftrue, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn1 = (filt_data, Tree01);
+LikelihoodFunction  LikFn2 = (filt_data, Tree01);
 Optimize (paramValues, LikFn2);
 fprintf ("ftrue_hyout.txt", LikFn2);
 
