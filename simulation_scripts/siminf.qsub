@@ -28,13 +28,14 @@ then
 fi
 cd $WDIR
 
-# Copy files
+# Copy scripts
 cp /home/sjs3495/Omega_MutSel/simulation_scripts/run_siminf.py .
 cp /home/sjs3495/Omega_MutSel/simulation_scripts/functions_simandinf.py .
 
-#Hyphy
+# Copy Hyphy executable, files
 cp /home/sjs3495/bin/bin/HYPHYMP .
-cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/* .
+cp /home/sjs3495/Omega_MutSel/hyphy_files/GY94.mdl .
+cp /home/sjs3495/Omega_MutSel/hyphy_files/globalDNDS_fequal.bf .
 
 # Run
 module load python
