@@ -1,5 +1,5 @@
 #!/bin/bash
-#$ -N np
+#$ -N polio
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
@@ -36,6 +36,7 @@ cp /home/sjs3495/Omega_MutSel/experimental_data/${DATASET}_codon_eqfreqs.txt .
 
 # Copy hyphy executable, files
 cp /home/sjs3495/bin/bin/HYPHYMP .
+cp /home/sjs3495/Omega_MutSel/hyphy_files/GY94.mdl .
 cp /home/sjs3495/Omega_MutSel/hyphy_files/$BATCHFILE batchfile.bf
 cp /home/sjs3495/Omega_MutSel/hyphy_files/$FNUCFILE fnuc.mdl
 
