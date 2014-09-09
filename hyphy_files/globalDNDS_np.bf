@@ -13,8 +13,8 @@ global t;
 
 LIKELIHOOD_FUNCTION_OUTPUT = 1;
 RANDOM_STARTING_PERTURBATIONS = 1;
-#include "matrices.mdl"; // Basic GY94 rate matrix
-#include "fnuc.mdl";     // Custom Fnuc matrix for this run
+#include "GY94.mdl"; // Basic GY94 rate matrix
+#include "fnuc.mdl"; // Custom Fnuc matrix for this run
 
 /* Read in the data */
 DataSet	raw_data = ReadDataFile("temp.fasta");

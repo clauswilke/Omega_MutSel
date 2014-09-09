@@ -37,7 +37,7 @@ data_dir      = "../experimental_data/"
 cf_outfile    = data_dir + mu_type + "_codon_eqfreqs.txt"
 raw_batchfile = "globalDNDS_raw_exp.bf"
 batch_outfile = '../hyphy_files/globalDNDS_' + mu_type + '.bf'
-fnuc_outfile  = '../hyphy_files/Fnuc_' + mu_type + '.mdl'
+fnuc_outfile  = '../hyphy_files/fnuc_' + mu_type + '.mdl'
 
 
 def get_nuc_diff(source, target, grab_position = False):
