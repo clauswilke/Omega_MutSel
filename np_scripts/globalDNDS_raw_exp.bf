@@ -1,7 +1,9 @@
-/* 
+/* SJS 9/9/14.
 Hyphy inference for an "experimental" dataset. Name of file indicates the mutation scheme.
-Run across 5 sets of equilibrium freqs: Fequal, Fnull, F61, F3x4, CF3x4. 
-NOTE: Fnull refers to frequencies which would exist in the absence of natural selection. 
+Run across 5 sets of equilibrium freqs: Fequal, Ftrue, F61, F3x4, Fnuc. 
+Note the following: 
+ - Ftrue refers to codon frequencies which would exist in the absence of natural selection. 
+ - Fnuc is not so much a frequency parameterization, but actually a new model.
 */
 
 
@@ -11,10 +13,8 @@ global t;
 
 LIKELIHOOD_FUNCTION_OUTPUT = 1;
 RANDOM_STARTING_PERTURBATIONS = 1;
-
-/* Include relevant functions */
-#include "matrices.mdl"; //rate matrices
-#include "GY94_Header.ibf";
+#include "matrices.mdl"; // Basic GY94 rate matrix
+#include "fnuc.mdl";     // Custom Fnuc matrix for this run
 
 /* Read in the data */
 DataSet	raw_data = ReadDataFile("temp.fasta");
@@ -23,40 +23,38 @@ DataSet	raw_data = ReadDataFile("temp.fasta");
 DataSetFilter   filt_data = CreateFilter(raw_data,3,"", "","TAA,TAG,TGA");
 
 
-
 /* Set up frequencies. MANY OF THESE WERE HARD-CODED IN WHEN THIS FILE WAS CREATED!!!*/
 
-Fequal_CodonFreqs = {{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623}};
+Fequal = {{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623}};
 
-Fnull_CodonFreqs = INSERTNULL
+Ftrue = INSERTTRUE
 
-F61_CodonFreqs = INSERTF61
+F61 = INSERTF61
 
-F3x4_CodonFreqs  = INSERTF3x4
+F3x4 = INSERTF3x4
 
-CF3x4_CodonFreqs = INSERTCF3x4
 
 
 /* Optimize likelihoods for each frequency specification */
 
 ////////////// FEQUAL FREQUENCIES //////////////
-Model MyModel = (GY94, Fequal_CodonFreqs, 1);
+Model MyModel = (GY94, Fequal, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn = (filt_data, Tree01);
 Optimize (paramValues, LikFn);
-fprintf ("equal_hyout.txt", LikFn);
+fprintf ("fequal_hyout.txt", LikFn);
 
 
-////////////// NULL FREQUENCIES //////////////
-Model MyModel = (GY94, Fnull_CodonFreqs, 1);
+////////////// TRUE FREQUENCIES //////////////
+Model MyModel = (GY94, Ftrue, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn1 = (filt_data, Tree01);
-Optimize (paramValues, LikFn1);
-fprintf ("null_hyout.txt", LikFn1);
+Optimize (paramValues, LikFn2);
+fprintf ("ftrue_hyout.txt", LikFn2);
 
 
 
@@ -64,7 +62,7 @@ fprintf ("null_hyout.txt", LikFn1);
 global w;
 global k;
 global t;
-Model MyModel = (GY94, F61_CodonFreqs, 1);
+Model MyModel = (GY94, F61, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
@@ -78,25 +76,26 @@ fprintf ("f61_hyout.txt", LikFn3);
 global w;
 global k;
 global t;
-Model MyModel = (GY94, F3x4_CodonFreqs, 1);
+Model MyModel = (GY94, F3x4, 1);
+UseModel (USE_NO_MODEL);
+UseModel(MyModel);
+Tree    Tree01 = DATAFILE_TREE;
+LikelihoodFunction  LikFn4 = (filt_data, Tree01);
+Optimize (paramValues, LikFn4);
+fprintf ("f3x4_hyout.txt", LikFn4);
+
+
+
+////////////// Fnuc MODEL //////////////
+global w;
+global k;
+global t;
+Fones =  {{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1}};
+Model MyModel = (GY94_Fnuc, Fones, 0); // Using 0 as last argument means that the matrix will *not* be multipled by frequencies, but just in case it is, we provide Fones (all entries are 1, so multiplication is basically..not)
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn5 = (filt_data, Tree01);
 Optimize (paramValues, LikFn5);
-fprintf ("f3x4_hyout.txt", LikFn5);
-
-
-
-////////////// CF3x4 FREQUENCIES //////////////
-global w;
-global k;
-global t;
-Model MyModel = (GY94, CF3x4_CodonFreqs, 1);
-UseModel (USE_NO_MODEL);
-UseModel(MyModel);
-Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn7 = (filt_data, Tree01);
-Optimize (paramValues, LikFn7);
-fprintf ("cf3x4_hyout.txt", LikFn7);
+fprintf ("fnuc_hyout.txt", LikFn5);
 
