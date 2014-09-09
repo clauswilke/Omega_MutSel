@@ -11,6 +11,7 @@
 CPU=2
 DATASET=$JOB_NAME   # np or yeast, for now. possibly add polio in near future.
 BATCHFILE=globalDNDS_${DATASET}.bf
+FNUCFILE=Fnuc_${DATASET}.mdl
 
 source ~/.bash_profile
 
@@ -28,20 +29,19 @@ then
 fi
 cd $WDIR
 
-# Copy files
-cp /home/sjs3495/Omega_MutSel/simulation_scripts/run_np.py .
+# Copy scripts, data files
+cp /home/sjs3495/Omega_MutSel/simulation_scripts/run_nyp.py .
 cp /home/sjs3495/Omega_MutSel/simulation_scripts/functions_simandinf.py .
 cp /home/sjs3495/Omega_MutSel/experimental_data/${DATASET}_codon_eqfreqs.txt .
 
-#Hyphy
+# Copy hyphy executable, files
 cp /home/sjs3495/bin/bin/HYPHYMP .
-cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/$BATCHFILE .
-cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/GY94_Header.ibf .
-cp /home/sjs3495/Omega_MutSel/SelectionInference/hyphy/matrices_raw.mdl .
+cp /home/sjs3495/Omega_MutSel/hyphy_files/$BATCHFILE batchfile.bf
+cp /home/sjs3495/Omega_MutSel/hyphy_files/$FNUCFILE fnuc.mdl
 
 # Run
 module load python
-python run_np.py $SGE_TASK_ID $SIMDIR $CPU $DATASET $BATCHFILE
+python run_nyp.py $SGE_TASK_ID $SIMDIR $CPU $DATASET
 
 # Cleanup
 mkdir -p $RDIR

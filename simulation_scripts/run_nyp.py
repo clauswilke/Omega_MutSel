@@ -3,20 +3,20 @@
 
 ######## Input parameters ########
 import sys
-if (len(sys.argv) != 6):
-    print "\n\nUsage: python run_np.py <rep> <simdir> <cpu> <dataset> <batchfile>\n."
+if (len(sys.argv) != 5):
+    print "\n\nUsage: python run_np.py <rep> <simdir> <cpu> <dataset> \n."
     sys.exit()
 rep = sys.argv[1]         # which rep we're on, for saving files. needs to run from 1-498, since 498 sites.
 simdir = sys.argv[2]      # directory of simulation library
 cpu = sys.argv[3]         # hyphy can use
 dataset = sys.argv[4]     # either np, yeast, or polio. determines the mutation scheme and eq freqs
-batchfile = sys.argv[5]   # hyphy batchfile name
 
 sys.path.append(simdir)
 from functions_simandinf import *
 
 seqlength = 500000
 treefile = 'tree.tre'
+batchfile = 'batchfile.bf'
 
 
 # output files
@@ -60,14 +60,14 @@ print "Conducting ML inference with HyPhy"
 
 
 # Lists for storing values and printing strings. 
-fspecs = ['equal', 'null', 'f61', 'f3x4', 'cf3x4']
+fspecs = ['fequal', 'ftrue', 'f61', 'f3x4', 'fnuc']
 omegas = np.zeros(5)
 kappas = np.zeros(5)
 omega_errors = np.ones(5)
 
 
 # Run hyphy and save omega, kappa, omega error. Note we only run free kappa, so just a single call to hyphy.
-omegas, kappas = run_hyphy_np(batchfile, seqfile, treefile, cpu, 'free', fspecs)  
+omegas, kappas = run_hyphy_nyp(batchfile, seqfile, treefile, cpu, fspecs)  
 omega_errors = (dnds - omegas) / dnds
 
 

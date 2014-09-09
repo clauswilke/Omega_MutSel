@@ -272,26 +272,16 @@ def run_hyphy_fequal(seqfile, treefile, cpu, kappa):
 
 
     
-def run_hyphy_np(batchfile, seqfile, treefile, cpu, kappa, fspecs):
+def run_hyphy_nyp(batchfile, seqfile, treefile, cpu, fspecs):
     ''' Run global omega inference according to GY94. The M0 model. FOR THE NUCLEOPROTEIN FREQUENCIES ONLY!!
-        By default, conducts inferences for 5 sets of frequencies (equal, null, F61 global, F3x4 global, CF3x4 global) across a single kappa specification.
+        By default, conducts inferences for 4 sets of codon frequencies (Fequal, Ftrue, F61, F3x4) as well as the "new" Fnuc model across a single kappa specification.
         DO NOT CHANGE FILE NAMES. THEY ARE HARDCODED HERE AND IN THE HYPHY BATCHFILE.
     '''
-    
-  
+
     # Set up sequence file with tree
     shutil.copy(seqfile, "temp.fasta")
     setup_tree = subprocess.call("cat "+treefile+" >> temp.fasta", shell = True)
     assert(setup_tree == 0), "couldn't add tree to hyphy infile"
-            
-        
-    # Set up kappa in the matrices file
-    if kappa != 'free':
-        sedkappa = "sed 's/k/"+str(kappa)+"/g' matrices_raw.mdl > matrices.mdl"
-        runsedkappa = subprocess.call(sedkappa, shell=True)
-        assert(runsedkappa == 0), "couldn't set up kappa"
-    else:
-        shutil.copy('matrices_raw.mdl', 'matrices.mdl')
 
     # Run hyphy.
     runhyphy = subprocess.call("./HYPHYMP " + batchfile + " CPU="+cpu, shell = True)
@@ -303,12 +293,7 @@ def run_hyphy_np(batchfile, seqfile, treefile, cpu, kappa, fspecs):
     count = 0
     for suffix in fspecs:
         file = suffix + '_hyout.txt'  
-        mlw, mlk = parse_output_GY94(file)
-        omegas[count] = mlw
-        if mlk is None:
-            kappas[count] = kappa
-	else:
-            kappas[count] = mlk
+        omegas[count], kappas[count] = parse_output_GY94(file)
         count += 1
     return omegas, kappas
      
