@@ -46,8 +46,8 @@ entropy = calc_entropy(codon_freqs_true)
 
 
 # Simulate according to MutSel model along phylogeny
-#print "Simulating"
-#simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
+print "Simulating"
+simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
 
 
 # Derive omega from eq freqs
