@@ -273,8 +273,7 @@ def run_hyphy_fequal(seqfile, treefile, cpu, kappa):
 
     
 def run_hyphy_nyp(batchfile, seqfile, treefile, cpu, fspecs):
-    ''' Run global omega inference according to GY94. The M0 model. FOR THE NUCLEOPROTEIN FREQUENCIES ONLY!!
-        By default, conducts inferences for 4 sets of codon frequencies (Fequal, Ftrue, F61, F3x4) as well as the "new" Fnuc model across a single kappa specification.
+    ''' Run global omega inference according to GY94 and GY94_Fnuc. To be used with experimental datasets that use NP, yeast, and polio (hence, nyp) mutation rates.
         DO NOT CHANGE FILE NAMES. THEY ARE HARDCODED HERE AND IN THE HYPHY BATCHFILE.
     '''
 
@@ -287,9 +286,9 @@ def run_hyphy_nyp(batchfile, seqfile, treefile, cpu, fspecs):
     runhyphy = subprocess.call("./HYPHYMP " + batchfile + " CPU="+cpu, shell = True)
     assert (runhyphy == 0), "hyphy fail"
     
-    # Retrieve omega, kappa MLEs from the hyout files Produces 5 output files, names of which are hardcoded!!
-    omegas = np.zeros(5)
-    kappas = np.zeros(5)
+    # Retrieve omega, kappa MLEs from the hyout files, names of which are hardcoded!!
+    omegas = np.zeros(len(fspecs))
+    kappas = np.zeros(len(fspecs))
     count = 0
     for suffix in fspecs:
         file = suffix + '_hyout.txt'  
@@ -311,20 +310,9 @@ def parse_output_GY94(file):
         findk = re.search("^k=(\d+\.*\d*)", line)
         if findk:
             hyphy_k = float(findk.group(1))
-    assert(hyphy_w is not None)
+    assert(hyphy_w is not None), "Couldn't retrieve omega from hyphy output file."
+    assert(hyphy_k is not None), "Couldn't retrieve kappa from hyphy output file."
     return hyphy_w, hyphy_k
-
-
-def array_to_hyphy_freq(f):
-    ''' Convert codon frequencies to a hyphy frequency string. '''
-    hyphy_f = "{"
-    for freq in f:
-        hyphy_f += "{"
-        hyphy_f += str(freq)
-        hyphy_f += "},"
-    hyphy_f = hyphy_f[:-1]
-    hyphy_f += "};"
-    return hyphy_f
 
 
 

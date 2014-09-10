@@ -12,32 +12,32 @@ purines     = ["A", "G"]
 pyrims      = ["C", "T"]
 
 
-usage_error = "\n\n Usage: python prefs_to_freqs.py <mu_scheme>.\n mu_scheme can either be np, yeast, or polio."
-assert(len(sys.argv) == 2), usage_error
+def parse_input(arguments):
+    usage_error = "\n\n Usage: python prefs_to_freqs.py <mu_scheme> <compute_preference_frequencies>.\n mu_scheme can either be np, yeast, or polio. The second argument is optional (provide 0 or 1 for false, true though.)"
+    assert(len(arguments) == 2 or len(arguments) == 3), usage_error
 
-mu_type = sys.argv[1] # either np, yeast, or polio
-if mu_type == 'np':
+    mu_type = arguments[1] # either np, yeast, or polio
     #### Mutation rates from Bloom (2014). "An Experimentally Determined Evolutionary Model Dramatically Improves Phylogenetic Fit." MBE. #### 
-    mudict = {'AG':2.4e-5, 'TC':2.4e-5, 'GA':2.3e-5, 'CT':2.3e-5, 'AC':9.0e-6, 'TG':9.0e-6, 'CA':9.4e-6, 'GT':9.4e-6, 'AT':3.0e-6, 'TA':3.0e-6, 'GC':1.9e-6, 'CG':1.9e-6}
-      
-elif mu_type == 'yeast':
-    #### Mutation rates from Zhu et al. (2014). "Precise estimates of mutation rate and spectrum in yeast." PNAS. ####
-    mu = 1.67e-10 # this is the mean per generation per nucleotide mutation rate. 
-    mudict = {'AG':0.144/2*mu, 'TC':0.144/2*mu, 'GA':0.349/2*mu, 'CT':0.349/2*mu, 'AC':0.11/2*mu, 'TG':0.11/2*mu, 'CA':0.182/2*mu, 'GT':0.182/2*mu, 'AT':0.063/2*mu, 'TA':0.063/2*mu, 'GC':0.152/2*mu, 'CG':0.152/2*mu}
-
-elif mu_type == 'polio':
-    #### Mutation rates from Acevedo, Brodskey, and Andino (2014). "Mutational and fitness landscapes of an RNA virus revealed through population sequencing." Nature. ####
-    mudict = {'AG':2.495e-5, 'TC':6.886e-05, 'GA':1.259e-04, 'CT':2.602e-04, 'AC':1.721e-06, 'TG':1.177e-06, 'CA':9.072e-06, 'GT':1.472e-05, 'AT':3.812e-06, 'TA':3.981e-06, 'GC':6.301e-06, 'CG':1.633e-06}
-else:
-    raise AssertionError(usage_error)
+    if mu_type == 'np':
+        mudict = {'AG':2.4e-5, 'TC':2.4e-5, 'GA':2.3e-5, 'CT':2.3e-5, 'AC':9.0e-6, 'TG':9.0e-6, 'CA':9.4e-6, 'GT':9.4e-6, 'AT':3.0e-6, 'TA':3.0e-6, 'GC':1.9e-6, 'CG':1.9e-6}
     
+    #### Mutation rates from Zhu et al. (2014). "Precise estimates of mutation rate and spectrum in yeast." PNAS. ####
+    elif mu_type == 'yeast':
+        mu = 1.67e-10 # this is the mean per generation per nucleotide mutation rate. 
+        mudict = {'AG':0.144/2*mu, 'TC':0.144/2*mu, 'GA':0.349/2*mu, 'CT':0.349/2*mu, 'AC':0.11/2*mu, 'TG':0.11/2*mu, 'CA':0.182/2*mu, 'GT':0.182/2*mu, 'AT':0.063/2*mu, 'TA':0.063/2*mu, 'GC':0.152/2*mu, 'CG':0.152/2*mu}
 
-# File directories and names
-data_dir      = "../experimental_data/"
-cf_outfile    = data_dir + mu_type + "_codon_eqfreqs.txt"
-raw_batchfile = "globalDNDS_raw_exp.bf"
-batch_outfile = '../hyphy_files/globalDNDS_' + mu_type + '.bf'
-fnuc_outfile  = '../hyphy_files/fnuc_' + mu_type + '.mdl'
+    #### Mutation rates from Acevedo, Brodskey, and Andino (2014). "Mutational and fitness landscapes of an RNA virus revealed through population sequencing." Nature. ####
+    elif mu_type == 'polio':
+        mudict = {'AG':2.495e-5, 'TC':6.886e-05, 'GA':1.259e-04, 'CT':2.602e-04, 'AC':1.721e-06, 'TG':1.177e-06, 'CA':9.072e-06, 'GT':1.472e-05, 'AT':3.812e-06, 'TA':3.981e-06, 'GC':6.301e-06, 'CG':1.633e-06}
+    else:
+        raise AssertionError(usage_error)
+    
+    try:
+        compute_freqs_from_prefs = bool(int(arguments[2]))
+    except:
+        compute_freqs_from_prefs = True
+    
+    return mu_type, mudict, compute_freqs_from_prefs
 
 
 def get_nuc_diff(source, target, grab_position = False):
@@ -154,7 +154,7 @@ def is_TI(source, target):
     else:
         return False
 
-def build_fnuc_matrix(pos_nuc_freqs, f3x4_freqs, outfile):
+def build_fnuc_matrix(pos_nuc_freqs, f3x4_freqs, matrix_name, outfile):
     ''' From the codon frequencies, compute Fnuc, described below.
         A given matrix element represents codon i -> codon j.
         Let P_i be the source codon. F3x4 means we can write this as P_i = (\pi_l \pi_n \pi_m) / C , where C=1-\sum(\pi_stop). .
@@ -166,7 +166,7 @@ def build_fnuc_matrix(pos_nuc_freqs, f3x4_freqs, outfile):
     '''  
     
 
-    fnuc_hyphy_matrix = 'GY94_Fnuc = {61, 61, \n'
+    fnuc_hyphy_matrix = matrix_name + ' = {61, 61, \n'
     
     for i in range(61):
         source = codons[i]
@@ -197,7 +197,7 @@ def build_fnuc_matrix(pos_nuc_freqs, f3x4_freqs, outfile):
             
                 fnuc_hyphy_matrix += element
     
-    fnuc_hyphy_matrix += '};'
+    fnuc_hyphy_matrix += '};\n\n\n'
     outf = open(outfile, 'w')
     outf.write(fnuc_hyphy_matrix)
     outf.close()     
@@ -216,17 +216,18 @@ def array_to_hyphy_freq(f):
     return hyphy_f
     
     
+    
 
-def create_batchfile(basefile, outfile, f61, ftrue, f3x4):
+def create_batchfile(basefile, outfile, f61_data, f61_true, f3x4_data, f3x4_true):
     ''' sed in the frequency specifications to create an output batchfile from the base/raw batchfile framework.'''
     cp_batch = subprocess.call("cp " + basefile + " " + outfile, shell=True)
     assert(cp_batch == 0), "couldn't copy batchfile"
     shutil.copy(basefile, outfile)
-    flist = ['f61', 'ftrue', 'f3x4']
-    sedlist = ['F61', 'FTRUE', 'F3x4']
-    for i in range(3):
+    flist = ['f61_data', 'f61_true', 'f3x4_data', 'f3x4_true']
+    for i in range( len(flist) ):
         hyf = eval(flist[i])
-        setuphyphyf = "sed -i 's/INSERT"+sedlist[i]+"/"+hyf+"/g' " + outfile
+        insert = flist[i].upper()
+        setuphyphyf = "sed -i 's/INSERT_"+insert+"/"+hyf+"/g' " + outfile
         setupf = subprocess.call(setuphyphyf, shell = True)
         assert(setupf == 0), "couldn't properly add in frequencies"
 
@@ -235,40 +236,65 @@ def create_batchfile(basefile, outfile, f61, ftrue, f3x4):
 
 def main():
     # First, we determine the equilibrium frequencies of the system on a per site basis. As we use amino acid preference data, we assign all synonymous codons the same fitness.
-    # Second, we find the global F61, F3x4, and Ftrue frequencies. Note that Ftrue are the codon frequencies expected in the absence of selection.
-    # Third, we create the Fnuc matrix (see its functions for details on what this means), and we save it to a file.
-    # Finally, we set up the hyphy batch file which makes use of these frequencies.
+    # Second, we find the global F61 and F3x4 frequencies, as well as the Fnuc matrix. These use the average dataset frequencies.
+    # Third, we find the so-called "true" (absence of selection) F61, F3x4, and Fnuc parameterizations.
+    # Finally, we set up the hyphy batch file which makes use of these frequencies. Note that the Fnuc matrices are saved to a separate matrix file, and are not placed directly into the hyphy batchfiles.
     
-    # Load amino acid preference data
+    # Parse input arguments and set up input/outfile files accordingly
+    dataset, mudict, compute = parse_input(sys.argv)    
+    data_dir      = "../experimental_data/"
+    cf_outfile    = data_dir + dataset + "_codon_eqfreqs.txt"
+    raw_batchfile = "globalDNDS_raw_exp.bf"
+    batch_outfile = '../hyphy_files/globalDNDS_' + dataset + '.bf'
+    fnuc_outfile  = '../hyphy_files/fnuc_' + dataset + '.mdl'
+    
+    # Load amino acid preference data, if compute is True
     # np_prefs are those taken from Bloom 2014 MBE paper. The np_prefs are directly from the paper's Supplementary_file_1.xls and refer to equilbrium amino acid propenisties. The best interpretation of these experimental propensities is metropolis.
-    np_prefs = np.loadtxt(data_dir + 'nucleoprotein_amino_preferences.txt')
-    nsites = len(np_prefs)
+    if compute:
+        np_prefs = np.loadtxt(data_dir + 'nucleoprotein_amino_preferences.txt')
+        nsites = len(np_prefs)
     
-    # Site-wise equilibrium frequencies
-    print "Calculating and saving site-wise equilibrium frequencies"
-    final_codon_freqs = np.zeros([nsites, 61])
-    for i in range(nsites):
-        print i
-        final_codon_freqs[i] = get_eq_freqs(np_prefs[i], mudict)
-    np.savetxt(cf_outfile, final_codon_freqs)
+        # Site-wise equilibrium frequencies
+        print "Calculating and saving site-wise equilibrium frequencies"
+        final_codon_freqs = np.zeros([nsites, 61])
+        for i in range(nsites):
+            print i
+            final_codon_freqs[i] = get_eq_freqs(np_prefs[i], mudict)
+        np.savetxt(cf_outfile, final_codon_freqs)
+    else:
+        print "Loading equilibrium frequency data"
+        final_codon_freqs = np.loadtxt(cf_outfile)
 
-    print "Calculating F61"
-    f61_freqs = np.mean(final_codon_freqs, axis=0)
-    f61 = array_to_hyphy_freq(f61_freqs)
+    # Calculate frequency parameterizations using the global data set.
+    print "Calculating F61, data"
+    f61_freqs_data = np.mean(final_codon_freqs, axis=0)
+    f61_data = array_to_hyphy_freq(f61_freqs_data)
     
-    print "Calculating F3x4"
-    pos_nuc_freqs = codon_to_pos_nuc(f61_freqs)
-    f3x4_freqs = calc_f3x4_freqs(pos_nuc_freqs)
-    f3x4  = array_to_hyphy_freq(f3x4_freqs)
+    print "Calculating F3x4, data"
+    pos_nuc_freqs_data = codon_to_pos_nuc(f61_freqs_data)
+    f3x4_freqs_data = calc_f3x4_freqs(pos_nuc_freqs_data)
+    f3x4_data  = array_to_hyphy_freq(f3x4_freqs_data)
     
-    print "Calculating Ftrue"
-    ftrue = array_to_hyphy_freq( get_eq_freqs(np.ones(20) * 0.05 , mudict) )
+    print "Building the GY94-Fnuc matrix, data"
+    build_fnuc_matrix(pos_nuc_freqs_data, f3x4_freqs_data, "GY94_Fnuc_data", fnuc_outfile)
     
-    print "Building the GY94-Fnuc matrix"
-    build_fnuc_matrix(pos_nuc_freqs, f3x4_freqs, fnuc_outfile)
     
-    print "Creating HyPhy batchfile with custom F61, F3x4, and Ftrue frequencies."
-    create_batchfile(raw_batchfile, batch_outfile, f61, ftrue, f3x4)
+    
+    # Calculate frequency parameterizations using frequencies in absence of selection.
+    print "Calculating F61, true"
+    f61_freqs_true =  get_eq_freqs(np.ones(20) * 0.05 , mudict)
+    f61_true = array_to_hyphy_freq(f61_freqs_true)
+    
+    print "Calculating F3x4, true"
+    pos_nuc_freqs_true = codon_to_pos_nuc(f61_freqs_true)
+    f3x4_freqs_true = calc_f3x4_freqs(pos_nuc_freqs_true)
+    f3x4_true  = array_to_hyphy_freq(f3x4_freqs_true)
+    
+    print "Building the GY94-Fnuc matrix, true"
+    build_fnuc_matrix(pos_nuc_freqs_true, f3x4_freqs_true, "GY94_Fnuc_true", fnuc_outfile)
+    
+    print "Creating HyPhy batchfile."
+    create_batchfile(raw_batchfile, batch_outfile, f61_data, f61_true, f3x4_data, f3x4_true)
     
 main() 
 

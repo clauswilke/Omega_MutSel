@@ -55,18 +55,9 @@ print "Deriving omega from equilibrium codon frequencies"
 dnds = derive_dnds(codon_freqs_true_dict, mu_dict)
 
 
-# Maximum likelihood omega inference across a variety of frequency, kappa specifications
+# Maximum likelihood omega inference across a variety of frequency specifications.
 print "Conducting ML inference with HyPhy"
-
-
-# Lists for storing values and printing strings. 
-fspecs = ['fequal', 'ftrue', 'f61', 'f3x4', 'fnuc']
-omegas = np.zeros(5)
-kappas = np.zeros(5)
-omega_errors = np.ones(5)
-
-
-# Run hyphy and save omega, kappa, omega error. Note we only run free kappa, so just a single call to hyphy.
+fspecs = ['fequal', 'f61_true', 'f61_data', 'f3x4_true', 'f3x4_data', 'fnuc_true', 'fnuc_data']
 omegas, kappas = run_hyphy_nyp(batchfile, seqfile, treefile, cpu, fspecs)  
 omega_errors = (dnds - omegas) / dnds
 
