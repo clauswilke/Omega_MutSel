@@ -154,7 +154,7 @@ def is_TI(source, target):
     else:
         return False
 
-def build_fnuc_matrix(pos_nuc_freqs, f3x4_freqs, matrix_name, outfile):
+def build_fnuc_matrix(pos_nuc_freqs, f3x4_freqs, matrix_name):
     ''' From the codon frequencies, compute Fnuc, described below.
         A given matrix element represents codon i -> codon j.
         Let P_i be the source codon. F3x4 means we can write this as P_i = (\pi_l \pi_n \pi_m) / C , where C=1-\sum(\pi_stop). .
@@ -197,13 +197,9 @@ def build_fnuc_matrix(pos_nuc_freqs, f3x4_freqs, matrix_name, outfile):
             
                 fnuc_hyphy_matrix += element
     
-    fnuc_hyphy_matrix += '};\n\n\n'
-    outf = open(outfile, 'w')
-    outf.write(fnuc_hyphy_matrix)
-    outf.close()     
+    fnuc_hyphy_matrix += '};'
     
-    
-    return f3x4_freqs
+    return fnuc_hyphy_matrix
 
 
 def array_to_hyphy_freq(f):
@@ -276,7 +272,7 @@ def main():
     f3x4_data  = array_to_hyphy_freq(f3x4_freqs_data)
     
     print "Building the GY94-Fnuc matrix, data"
-    build_fnuc_matrix(pos_nuc_freqs_data, f3x4_freqs_data, "GY94_Fnuc_data", fnuc_outfile)
+    fnuc_data = build_fnuc_matrix(pos_nuc_freqs_data, f3x4_freqs_data, "GY94_Fnuc_data")
     
     
     
@@ -291,16 +287,21 @@ def main():
     f3x4_true  = array_to_hyphy_freq(f3x4_freqs_true)
     
     print "Building the GY94-Fnuc matrix, true"
-    build_fnuc_matrix(pos_nuc_freqs_true, f3x4_freqs_true, "GY94_Fnuc_true", fnuc_outfile)
+    fnuc_true = build_fnuc_matrix(pos_nuc_freqs_true, f3x4_freqs_true, "GY94_Fnuc_true")    
+    
+
+    
+    # Save results to files
+    print "Saving Fnuc matrices"
+    with open(fnuc_outfile, 'w') as outf:
+        outf.write(fnuc_data + '\n\n\n' + fnuc_true)
+    
     
     print "Creating HyPhy batchfile."
     create_batchfile(raw_batchfile, batch_outfile, f61_data, f61_true, f3x4_data, f3x4_true)
     
+    
+    
+    
 main() 
-
-
-
-
-
-
 
