@@ -6,9 +6,9 @@
 #$ -q wilke
 #$ -m beas
 #$ -t 1-498:1
-#$ -pe serial 2
+#$ -pe serial 4
 
-CPU=2
+CPU=4
 DATASET=$JOB_NAME   # np or yeast, for now. possibly add polio in near future.
 BATCHFILE=globalDNDS_${DATASET}.bf
 FNUCFILE=Fnuc_${DATASET}.mdl
@@ -19,7 +19,7 @@ source ~/.bash_profile
 SIMDIR=/home/sjs3495/MutSel/Simulator/src
 SCRIPTDIR=/home/sjs3495/Omega_MutSel/simulation_scripts
 WDIR=/share/WilkeLab/work/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
-RDIR=/home/sjs3495/$JOB_NAME
+RDIR=/share/WilkeLab/work/sjs3495/Omega_MutSel_rawdata/${DATASET}
 
 mkdir -p $WDIR
 if [ ! -d $WDIR ]
@@ -28,6 +28,8 @@ then
   exit
 fi
 cd $WDIR
+
+#cp $RDIR/seqs${SGE_TASK_ID}.fasta .
 
 # Copy scripts, data files
 cp /home/sjs3495/Omega_MutSel/simulation_scripts/run_nyp.py .
@@ -45,7 +47,6 @@ module load python
 python run_nyp.py $SGE_TASK_ID $SIMDIR $CPU $DATASET
 
 # Cleanup
-mkdir -p $RDIR
 cp params* $RDIR
 cp seqs* $RDIR
 rm -rf $WDIR

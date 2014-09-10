@@ -46,8 +46,8 @@ entropy = calc_entropy(codon_freqs_true)
 
 
 # Simulate according to MutSel model along phylogeny
-print "Simulating"
-simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
+#print "Simulating"
+#simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
 
 
 # Derive omega from eq freqs
@@ -57,7 +57,7 @@ dnds = derive_dnds(codon_freqs_true_dict, mu_dict)
 
 # Maximum likelihood omega inference across a variety of frequency specifications.
 print "Conducting ML inference with HyPhy"
-fspecs = ['fequal', 'f61_true', 'f61_data', 'f3x4_true', 'f3x4_data', 'fnuc_true', 'fnuc_data']
+fspecs = ['f61_true', 'f61_data', 'f3x4_true', 'f3x4_data', 'cf3x4_true', 'cf3x4_data', 'fnuc_true', 'fnuc_data']
 omegas, kappas = run_hyphy_nyp(batchfile, seqfile, treefile, cpu, fspecs)  
 omega_errors = (dnds - omegas) / dnds
 

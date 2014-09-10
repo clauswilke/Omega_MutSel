@@ -273,9 +273,7 @@ def run_hyphy_fequal(seqfile, treefile, cpu, kappa):
 
     
 def run_hyphy_nyp(batchfile, seqfile, treefile, cpu, fspecs):
-    ''' Run global omega inference according to GY94 and GY94_Fnuc. To be used with experimental datasets that use NP, yeast, and polio (hence, nyp) mutation rates.
-        DO NOT CHANGE FILE NAMES. THEY ARE HARDCODED HERE AND IN THE HYPHY BATCHFILE.
-    '''
+    ''' Run global omega inference according to GY94 and GY94_Fnuc. To be used with experimental datasets that use NP, yeast, and polio (hence, nyp) mutation rates.'''
 
     # Set up sequence file with tree
     shutil.copy(seqfile, "temp.fasta")
