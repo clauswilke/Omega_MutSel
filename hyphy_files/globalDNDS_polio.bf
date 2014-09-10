@@ -33,17 +33,11 @@ F3x4_true = {{0.0472422131321},{0.0182269186026},{0.00885416106978},{0.069174853
 
 F3x4_data = {{0.0516306288865},{0.0172336346698},{0.009794035423},{0.0655013296892},{0.0261047700568},{0.0087134338667},{0.00495192578823},{0.0331178834508},{0.0131797839329},{0.00439924103627},{0.00250012973868},{0.0167205666721},{0.0728641699367},{0.0243211154365},{0.0138219168896},{0.0924393159736},{0.0155992756703},{0.005206836016},{0.00295909350288},{0.019790061067},{0.00788709169746},{0.00263260897364},{0.00149613624965},{0.0100059791001},{0.00398203716045},{0.00132915238774},{0.000755369706824},{0.00505182165134},{0.0220146122145},{0.00734819219686},{0.00417604620557},{0.0279288942192},{0.0101202472712},{0.0033780073573},{0.00191975310783},{0.0128390776434},{0.00511686054637},{0.00170794172402},{0.000970639221844},{0.00649151824895},{0.00258340204756},{0.000862306116602},{0.0004900566139},{0.00327743963005},{0.0142822861715},{0.00476724199255},{0.00270926811666},{0.0181192589634},{0.0141812189246},{0.0538997555636},{0.0214811017086},{0.00717011330553},{0.00407484230963},{0.0272520547483},{0.00362004890046},{0.00205730757576},{0.0137590253631},{0.0599584919507},{0.0200133674123},{0.0113737834836},{0.0760664945137}};
 
+CF3x4_true = {{0.0575598420157},{0.0178879458303},{0.0104033620304},{0.0678884500778},{0.0178879369448},{0.00555905707659},{0.00323306453766},{0.0210977701075},{0.0104033227592},{0.00323305393927},{0.00188029586589},{0.0122701076488},{0.0678884251709},{0.0210977728471},{0.0122701494652},{0.0800704067572},{0.0175149741518},{0.00544315095169},{0.00316565526717},{0.0206578824173},{0.0054431482479},{0.00169157415301},{0.000983794253512},{0.00641987339008},{0.00316564331728},{0.000983791028511},{0.000572158163322},{0.00373369020454},{0.0206578748383},{0.00641987422371},{0.00373370292892},{0.0243647490258},{0.0106173092787},{0.00329955480402},{0.00191897177524},{0.0125224921697},{0.00329955316502},{0.00102540636342},{0.000596361020327},{0.00389162899825},{0.0019189645314},{0.000596359065381},{0.000346833522201},{0.00226330586097},{0.0125224875754},{0.00389162950358},{0.0022633135743},{0.0147695379772},{0.020924826624},{0.0794140401097},{0.0209248162299},{0.0065028319419},{0.00378194989835},{0.0246795907054},{0.00378193750064},{0.00219951834429},{0.0143532341637},{0.0794140109743},{0.0246795939101},{0.0143532830793},{0.0936641576958}};
+
+CF3x4_data = {{0.0619398474557},{0.0169027863674},{0.0112535515219},{0.0642438703822},{0.0252475621825},{0.00688981596501},{0.00458710754861},{0.0261867146748},{0.0152477990789},{0.00416097715755},{0.00277029892031},{0.0158149828887},{0.0704714578535},{0.0192309804759},{0.0128036185809},{0.0730928374861},{0.0187140259328},{0.00510687700099},{0.00340006092471},{0.0194101455806},{0.00762810295523},{0.00208163565035},{0.00138591315845},{0.00791185121773},{0.0046068519556},{0.00125716542146},{0.000836996666375},{0.0047782164804},{0.0212917006413},{0.00581029954257},{0.0038683861843},{0.022083703987},{0.012140978528},{0.00331315582423},{0.00220583571002},{0.0125925956053},{0.0049488354094},{0.0013504894043},{0.000899129987251},{0.00513292094903},{0.00298875778389},{0.000815603144022},{0.000543012956749},{0.0030999328471},{0.0138132800092},{0.0037695107531},{0.00250966808373},{0.0143271029381},{0.0175015878684},{0.0665197866231},{0.0261419873857},{0.00713389596764},{0.00474961134091},{0.0271144104825},{0.00430838476912},{0.00286844008564},{0.0163752476454},{0.0729679938576},{0.0199122610484},{0.0132572021414},{0.0756822390109}};
 
 /* Optimize likelihoods for each frequency specification */
-
-////////////// FEQUAL FREQUENCIES //////////////
-Model MyModel = (GY94, Fequal, 1);
-UseModel (USE_NO_MODEL);
-UseModel(MyModel);
-Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn1 = (filt_data, Tree01);
-Optimize (paramValues, LikFn1);
-fprintf ("fequal_hyout.txt", LikFn1);
 
 
 ////////////// F61_TRUE FREQUENCIES //////////////
@@ -51,9 +45,9 @@ Model MyModel = (GY94, F61_true, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn2 = (filt_data, Tree01);
-Optimize (paramValues, LikFn2);
-fprintf ("f61_true_hyout.txt", LikFn2);
+LikelihoodFunction  LikFn1 = (filt_data, Tree01);
+Optimize (paramValues, LikFn1);
+fprintf ("f61_true_hyout.txt", LikFn1);
 
 
 
@@ -65,9 +59,9 @@ Model MyModel = (GY94, F61_data, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn3 = (filt_data, Tree01);
-Optimize (paramValues, LikFn3);
-fprintf ("f61_data_hyout.txt", LikFn3);
+LikelihoodFunction  LikFn2 = (filt_data, Tree01);
+Optimize (paramValues, LikFn2);
+fprintf ("f61_data_hyout.txt", LikFn2);
 
 
 
@@ -79,23 +73,47 @@ Model MyModel = (GY94, F3x4_true, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn4 = (filt_data, Tree01);
-Optimize (paramValues, LikFn4);
-fprintf ("f3x4_true_hyout.txt", LikFn4);
+LikelihoodFunction  LikFn3 = (filt_data, Tree01);
+Optimize (paramValues, LikFn3);
+fprintf ("f3x4_true_hyout.txt", LikFn3);
 
 
 ////////////// F3x4_DATA FREQUENCIES //////////////
 global w;
 global k;
 global t;
-Model MyModel = (GY94, F3x4_true, 1);
+Model MyModel = (GY94, F3x4_data, 1);
+UseModel (USE_NO_MODEL);
+UseModel(MyModel);
+Tree    Tree01 = DATAFILE_TREE;
+LikelihoodFunction  LikFn4 = (filt_data, Tree01);
+Optimize (paramValues, LikFn4);
+fprintf ("f3x4_data_hyout.txt", LikFn4);
+
+////////////// CF3x4_TRUE FREQUENCIES //////////////
+global w;
+global k;
+global t;
+Model MyModel = (GY94, CF3x4_true, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn5 = (filt_data, Tree01);
 Optimize (paramValues, LikFn5);
-fprintf ("f3x4_data_hyout.txt", LikFn5);
+fprintf ("cf3x4_true_hyout.txt", LikFn5);
 
+
+////////////// CF3x4_DATA FREQUENCIES //////////////
+global w;
+global k;
+global t;
+Model MyModel = (GY94, CF3x4_data, 1);
+UseModel (USE_NO_MODEL);
+UseModel(MyModel);
+Tree    Tree01 = DATAFILE_TREE;
+LikelihoodFunction  LikFn6 = (filt_data, Tree01);
+Optimize (paramValues, LikFn6);
+fprintf ("cf3x4_data_hyout.txt", LikFn6);
 
 
 Fones =  {{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1}};
@@ -107,9 +125,9 @@ Model MyModel = (GY94_Fnuc_true, Fones, 0); // Using 0 as last argument means th
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn6 = (filt_data, Tree01);
-Optimize (paramValues, LikFn6);
-fprintf ("fnuc_true_hyout.txt", LikFn6);
+LikelihoodFunction  LikFn7 = (filt_data, Tree01);
+Optimize (paramValues, LikFn7);
+fprintf ("fnuc_true_hyout.txt", LikFn7);
 
 
 ////////////// Fnuc_DATA MODEL //////////////
@@ -120,6 +138,6 @@ Model MyModel = (GY94_Fnuc_data, Fones, 0); // Using 0 as last argument means th
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn7 = (filt_data, Tree01);
-Optimize (paramValues, LikFn7);
-fprintf ("fnuc_data_hyout.txt", LikFn7);
+LikelihoodFunction  LikFn8 = (filt_data, Tree01);
+Optimize (paramValues, LikFn8);
+fprintf ("fnuc_data_hyout.txt", LikFn8);

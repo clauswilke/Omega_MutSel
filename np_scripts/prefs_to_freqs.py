@@ -2,6 +2,7 @@ import sys
 import subprocess
 import shutil
 import os 
+import re
 import numpy as np
 from scipy import linalg
 amino_acids = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
@@ -143,8 +144,44 @@ def calc_f3x4_freqs(pos_nuc_freqs):
         for j in range(3):
             f3x4[i] *= pos_nuc_freqs[j][ nucindex[codon[j]] ]
     f3x4 /= (1. - pi_stop)
-    assert( abs(np.sum(f3x4) - 1.) < 1e-8), "Could not properly caluclate F3x4 frequencies."
+    assert( abs(np.sum(f3x4) - 1.) < 1e-8), "Could not properly caluclate (C)F3x4 frequencies."
     return f3x4   
+
+
+def calc_cf3x4_freqs(pos_nuc_freqs):
+    assert( pos_nuc_freqs.shape == (4,3)), "You need to provide hyphy with the transpose of your pos_nuc_freqs matrix!!"
+    
+    # Create positional nucleotide matrix string to sed into hyphy cf3x4 batchfile
+    posnuc = '{'
+    for row in pos_nuc_freqs:
+        p = str(row).replace("[","").replace("]","").replace("","").strip()
+        p = re.sub("\s+", ",", p)
+        posnuc += '{' + p + '},'
+    posnuc = posnuc[:-1]+'};'
+
+    # sed into hyphy
+    sed_cf3x4 = subprocess.call("sed 's/INSERT_POS_FREQS/"+posnuc+"/g' cf3x4_raw.bf > cf3x4.bf", shell=True)
+    assert(sed_cf3x4 == 0), "Couldn't sed positional nucleotide frequencies into cf3x4.bf"
+    
+    # run hyphy 
+    run_hyphy = subprocess.call("HYPHYMP cf3x4.bf > cf3x4.out", shell=True)
+    assert(run_hyphy == 0), "Couldn't get hyphy to run to compute cf3x4"
+
+    # parse hyphy output file and save new positional frequencies
+    cf3x4_pos_freqs = np.zeros([3,4])
+    with open("cf3x4.out", "r") as file:
+        hystring = file.readlines()
+    for i in range(4):
+        line = str(hystring[i+1]).replace("{","").replace("}","").rstrip()
+        freqs = line.split(',')
+        for j in range(3):
+            cf3x4_pos_freqs[j][i] = float(freqs[j])
+    assert( np.allclose( np.sum(cf3x4_pos_freqs, axis=1), np.ones(3)) ), "Bad CF3x4 positional frequencies."
+
+    # Finally convert these cf3x4 positional frequencies to codon frequencies
+    return calc_f3x4_freqs(cf3x4_pos_freqs)
+
+    
 
 def is_TI(source, target):
     check1 = source in purines and target in purines
@@ -153,6 +190,8 @@ def is_TI(source, target):
         return True
     else:
         return False
+
+
 
 def build_fnuc_matrix(pos_nuc_freqs, f3x4_freqs, matrix_name):
     ''' From the codon frequencies, compute Fnuc, described below.
@@ -163,9 +202,8 @@ def build_fnuc_matrix(pos_nuc_freqs, f3x4_freqs, matrix_name):
         We will need to compute this \pi_l' value for every possible change, thus yielding a 61x61 matrix. These will be the "frequency parameters" we include in the model, and we term this approach Fnuc.
     
         Ultimately, we will use this matrix to build a custom model. We multiply it with the original GY94 (excluding the codon frequency parameters, of course).
-    '''  
+    ''' 
     
-
     fnuc_hyphy_matrix = matrix_name + ' = {61, 61, \n'
     
     for i in range(61):
@@ -198,7 +236,6 @@ def build_fnuc_matrix(pos_nuc_freqs, f3x4_freqs, matrix_name):
                 fnuc_hyphy_matrix += element
     
     fnuc_hyphy_matrix += '};'
-    
     return fnuc_hyphy_matrix
 
 
@@ -214,12 +251,12 @@ def array_to_hyphy_freq(f):
     
     
 
-def create_batchfile(basefile, outfile, f61_data, f61_true, f3x4_data, f3x4_true):
+def create_batchfile(basefile, outfile, f61_data, f61_true, f3x4_data, f3x4_true, cf3x4_data, cf3x4_true):
     ''' sed in the frequency specifications to create an output batchfile from the base/raw batchfile framework.'''
     cp_batch = subprocess.call("cp " + basefile + " " + outfile, shell=True)
     assert(cp_batch == 0), "couldn't copy batchfile"
     shutil.copy(basefile, outfile)
-    flist = ['f61_data', 'f61_true', 'f3x4_data', 'f3x4_true']
+    flist = ['f61_data', 'f61_true', 'f3x4_data', 'f3x4_true', 'cf3x4_data', 'cf3x4_true']
     for i in range( len(flist) ):
         hyf = eval(flist[i])
         insert = flist[i].upper()
@@ -232,8 +269,8 @@ def create_batchfile(basefile, outfile, f61_data, f61_true, f3x4_data, f3x4_true
 
 def main():
     # First, we determine the equilibrium frequencies of the system on a per site basis. As we use amino acid preference data, we assign all synonymous codons the same fitness.
-    # Second, we find the global F61 and F3x4 frequencies, as well as the Fnuc matrix. These use the average dataset frequencies.
-    # Third, we find the so-called "true" (absence of selection) F61, F3x4, and Fnuc parameterizations.
+    # Second, we find the global F61, F3x4, CF3x4 frequencies, as well as the Fnuc matrix. These use the average dataset frequencies.
+    # Third, we find the so-called "true" (absence of selection) F61, F3x4, CF3x4, and Fnuc parameterizations.
     # Finally, we set up the hyphy batch file which makes use of these frequencies. Note that the Fnuc matrices are saved to a separate matrix file, and are not placed directly into the hyphy batchfiles.
     
     # Parse input arguments and set up input/outfile files accordingly
@@ -271,9 +308,11 @@ def main():
     f3x4_freqs_data = calc_f3x4_freqs(pos_nuc_freqs_data)
     f3x4_data  = array_to_hyphy_freq(f3x4_freqs_data)
     
+    print "Calculating CF3x4, data"
+    cf3x4_data = array_to_hyphy_freq( calc_cf3x4_freqs(pos_nuc_freqs_data.T) )    
+    
     print "Building the GY94-Fnuc matrix, data"
     fnuc_data = build_fnuc_matrix(pos_nuc_freqs_data, f3x4_freqs_data, "GY94_Fnuc_data")
-    
     
     
     # Calculate frequency parameterizations using frequencies in absence of selection.
@@ -286,21 +325,28 @@ def main():
     f3x4_freqs_true = calc_f3x4_freqs(pos_nuc_freqs_true)
     f3x4_true  = array_to_hyphy_freq(f3x4_freqs_true)
     
+    print "Calculating CF3x4, data"
+    cf3x4_true = array_to_hyphy_freq( calc_cf3x4_freqs(pos_nuc_freqs_true.T) )    
+    
     print "Building the GY94-Fnuc matrix, true"
     fnuc_true = build_fnuc_matrix(pos_nuc_freqs_true, f3x4_freqs_true, "GY94_Fnuc_true")    
     
 
-    
     # Save results to files
     print "Saving Fnuc matrices"
     with open(fnuc_outfile, 'w') as outf:
         outf.write(fnuc_data + '\n\n\n' + fnuc_true)
-    
-    
     print "Creating HyPhy batchfile."
-    create_batchfile(raw_batchfile, batch_outfile, f61_data, f61_true, f3x4_data, f3x4_true)
+    create_batchfile(raw_batchfile, batch_outfile, f61_data, f61_true, f3x4_data, f3x4_true, cf3x4_data, cf3x4_true)
     
-    
+    # Cleanup!
+    os.remove('cf3x4.out')
+    os.remove('cf3x4.bf')
+    os.remove('messages.log')
+    try:
+        os.remove('errors.log')
+    except:
+        pass
     
     
 main() 

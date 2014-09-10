@@ -33,17 +33,11 @@ F3x4_true = INSERT_F3X4_TRUE
 
 F3x4_data = INSERT_F3X4_DATA
 
+CF3x4_true = INSERT_CF3X4_TRUE
+
+CF3x4_data = INSERT_CF3X4_DATA
 
 /* Optimize likelihoods for each frequency specification */
-
-////////////// FEQUAL FREQUENCIES //////////////
-Model MyModel = (GY94, Fequal, 1);
-UseModel (USE_NO_MODEL);
-UseModel(MyModel);
-Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn1 = (filt_data, Tree01);
-Optimize (paramValues, LikFn1);
-fprintf ("fequal_hyout.txt", LikFn1);
 
 
 ////////////// F61_TRUE FREQUENCIES //////////////
@@ -51,9 +45,9 @@ Model MyModel = (GY94, F61_true, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn2 = (filt_data, Tree01);
-Optimize (paramValues, LikFn2);
-fprintf ("f61_true_hyout.txt", LikFn2);
+LikelihoodFunction  LikFn1 = (filt_data, Tree01);
+Optimize (paramValues, LikFn1);
+fprintf ("f61_true_hyout.txt", LikFn1);
 
 
 
@@ -65,9 +59,9 @@ Model MyModel = (GY94, F61_data, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn3 = (filt_data, Tree01);
-Optimize (paramValues, LikFn3);
-fprintf ("f61_data_hyout.txt", LikFn3);
+LikelihoodFunction  LikFn2 = (filt_data, Tree01);
+Optimize (paramValues, LikFn2);
+fprintf ("f61_data_hyout.txt", LikFn2);
 
 
 
@@ -79,23 +73,47 @@ Model MyModel = (GY94, F3x4_true, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn4 = (filt_data, Tree01);
-Optimize (paramValues, LikFn4);
-fprintf ("f3x4_true_hyout.txt", LikFn4);
+LikelihoodFunction  LikFn3 = (filt_data, Tree01);
+Optimize (paramValues, LikFn3);
+fprintf ("f3x4_true_hyout.txt", LikFn3);
 
 
 ////////////// F3x4_DATA FREQUENCIES //////////////
 global w;
 global k;
 global t;
-Model MyModel = (GY94, F3x4_true, 1);
+Model MyModel = (GY94, F3x4_data, 1);
+UseModel (USE_NO_MODEL);
+UseModel(MyModel);
+Tree    Tree01 = DATAFILE_TREE;
+LikelihoodFunction  LikFn4 = (filt_data, Tree01);
+Optimize (paramValues, LikFn4);
+fprintf ("f3x4_data_hyout.txt", LikFn4);
+
+////////////// CF3x4_TRUE FREQUENCIES //////////////
+global w;
+global k;
+global t;
+Model MyModel = (GY94, CF3x4_true, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn5 = (filt_data, Tree01);
 Optimize (paramValues, LikFn5);
-fprintf ("f3x4_data_hyout.txt", LikFn5);
+fprintf ("cf3x4_true_hyout.txt", LikFn5);
 
+
+////////////// CF3x4_DATA FREQUENCIES //////////////
+global w;
+global k;
+global t;
+Model MyModel = (GY94, CF3x4_data, 1);
+UseModel (USE_NO_MODEL);
+UseModel(MyModel);
+Tree    Tree01 = DATAFILE_TREE;
+LikelihoodFunction  LikFn6 = (filt_data, Tree01);
+Optimize (paramValues, LikFn6);
+fprintf ("cf3x4_data_hyout.txt", LikFn6);
 
 
 Fones =  {{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1}};
@@ -107,9 +125,9 @@ Model MyModel = (GY94_Fnuc_true, Fones, 0); // Using 0 as last argument means th
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn6 = (filt_data, Tree01);
-Optimize (paramValues, LikFn6);
-fprintf ("fnuc_true_hyout.txt", LikFn6);
+LikelihoodFunction  LikFn7 = (filt_data, Tree01);
+Optimize (paramValues, LikFn7);
+fprintf ("fnuc_true_hyout.txt", LikFn7);
 
 
 ////////////// Fnuc_DATA MODEL //////////////
@@ -120,6 +138,6 @@ Model MyModel = (GY94_Fnuc_data, Fones, 0); // Using 0 as last argument means th
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn7 = (filt_data, Tree01);
-Optimize (paramValues, LikFn7);
-fprintf ("fnuc_data_hyout.txt", LikFn7);
+LikelihoodFunction  LikFn8 = (filt_data, Tree01);
+Optimize (paramValues, LikFn8);
+fprintf ("fnuc_data_hyout.txt", LikFn8);
