@@ -241,11 +241,11 @@ def build_fnuc_matrix(nuc_freqs, pos_nuc_freqs, f1x4, f3x4, matrix_name):
                 fnuc_f1x4 = f1x4[j] / (nuc_freqs[nuc1] * nuc_freqs[nuc2])
                 
                 # Create string for matrix element
-                element = '{' + str(i) + ',' + str(j) + ',t'                    
+                element = '{' + str(i) + ',' + str(j) + ',t*'                    
                 if is_TI(diff[0], diff[1]):
-                    element += '*k'
+                    element += 'k*'
                 if codon_dict[source] != codon_dict[target]:
-                    element += '*w'
+                    element += 'w*'
                 matrix_f1x4 += element + str(fnuc_f1x4) + '}\n'
                 matrix_f3x4 += element + str(fnuc_f3x4) + '}\n'
     
