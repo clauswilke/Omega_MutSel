@@ -57,7 +57,7 @@ dnds = derive_dnds(codon_freqs_true_dict, mu_dict)
 
 # Maximum likelihood omega inference across a variety of frequency specifications.
 print "Conducting ML inference with HyPhy"
-fspecs = ['f61_true', 'f61_data', 'f3x4_true', 'f3x4_data', 'cf3x4_true', 'cf3x4_data', 'fnuc_true', 'fnuc_data']
+fspecs = ['f61_true', 'f61_data', 'f1x4_true', 'f1x4_data', 'f3x4_true', 'f3x4_data', 'cf3x4_true', 'cf3x4_data', 'f1x4_fnuc_true', 'f1x4_fnuc_data', 'f3x4_fnuc_true', 'f3x4_fnuc_data']
 omegas, kappas = run_hyphy_nyp(batchfile, seqfile, treefile, cpu, fspecs)  
 omega_errors = (dnds - omegas) / dnds
 

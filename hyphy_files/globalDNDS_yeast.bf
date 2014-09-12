@@ -1,16 +1,14 @@
-/* SJS 9/9/14 - 9/10/14.
+/* SJS. 
 Hyphy inference for an "experimental" dataset. Name of file indicates the mutation scheme.
-Perform 7 inferences for each of the following parameterizations: Fequal, F61_true, F61_data, F3x4_true, F61_data, Fnuc_true, Fnuc_data. The _data refers to empirical frequencies, whereas _true refers to frequencies in absence of selection. 
-Also note that Fnuc is not so much a frequency parameterization, but actually a "new" model.
+Perform 12 total inferences, one for each of the following parameterizations: F61_true, F61_data, F1x4_true, F1x4_data, F3x4_true, F3x4_data, CF3x4_true, CF3x4_data, F1x4_Fnuc_true, F1x4_Fnuc_data, F3x4_Fnuc_true, F3x4_Fnuc_data. The _data refers to empirical frequencies, whereas _true refers to frequencies in absence of selection. 
+Also note that Fnuc is not so much a frequency parameterization, but actually a "new"(ish? it's actually what should have been the original) model.
 */
 
-
-global w;
-global k;
-global t;
+global w; global k; global t;
 
 LIKELIHOOD_FUNCTION_OUTPUT = 1;
 RANDOM_STARTING_PERTURBATIONS = 1;
+OPTIMIZATION PRECSION = 0.00000001 // 1e-8
 #include "GY94.mdl"; // Basic GY94 rate matrix
 #include "fnuc.mdl"; // Custom Fnuc matrices for this run
 
@@ -21,13 +19,15 @@ DataSet	raw_data = ReadDataFile("temp.fasta");
 DataSetFilter   filt_data = CreateFilter(raw_data,3,"", "","TAA,TAG,TGA");
 
 
-/* Set up frequencies. MANY OF THESE WERE HARD-CODED IN WHEN THIS FILE WAS CREATED!!!*/
-
-Fequal = {{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623},{0.016393442623}};
+/* Set up frequencies. Note that these were all hard-coded in when the file was created via the script Omega_MutSel/np_scripts/prefs_to_freqs.py */
 
 F61_true = {{0.0415420976134},{0.019859659982},{0.0199226668741},{0.0418410026486},{0.019859659982},{0.00952086207663},{0.00952773729476},{0.0199841786885},{0.0199226668741},{0.00952773729476},{0.00960027733595},{0.0200172808268},{0.0418410026486},{0.0199841786885},{0.0200172808268},{0.0418563181783},{0.0212103555792},{0.00960702697888},{0.0100649760394},{0.0202818863501},{0.00960702697888},{0.00456888973382},{0.00459672580976},{0.00960216068013},{0.0100649760394},{0.00459672580976},{0.00472709614948},{0.00965950242228},{0.0202818863501},{0.00960216068013},{0.00965950242228},{0.0201068649502},{0.0189747676791},{0.00936938936388},{0.00917571428658},{0.0199620548488},{0.00936938936388},{0.00452903599734},{0.00451834486019},{0.0095442790625},{0.00917571428658},{0.00451834486019},{0.0045759964321},{0.00956040435674},{0.0199620548488},{0.0095442790625},{0.00956040435674},{0.0200222354502},{0.0189970705278},{0.0428338830373},{0.0189970705278},{0.00937204102203},{0.00925761483226},{0.0200028931788},{0.00925761483226},{0.0105071511614},{0.0202173800273},{0.0428338830373},{0.0200028931788},{0.0202173800273},{0.0420783446859}};
 
 F61_data = {{0.0425878663474},{0.0199078643132},{0.0206080077075},{0.0410957486733},{0.0211288327264},{0.0101737510099},{0.0102015024614},{0.0211244049354},{0.0281069065528},{0.0113126700256},{0.0135933116374},{0.0233415011914},{0.038607136559},{0.0183427368963},{0.0208081941436},{0.0378467556072},{0.0212454327197},{0.00799840204442},{0.0102324620869},{0.0165134584925},{0.00727186274848},{0.00347178512148},{0.00349349462},{0.00721584392773},{0.0144718989509},{0.00684780307396},{0.00682240822034},{0.0139887873167},{0.0205386820914},{0.00972918740468},{0.0097893064169},{0.0198883449017},{0.0190032600421},{0.00794583686669},{0.00925901840985},{0.0165008466301},{0.0130669480887},{0.00632403196468},{0.00631782177592},{0.0132104311994},{0.012572795276},{0.00617384774217},{0.00622587915583},{0.0128712793025},{0.0193448210618},{0.00925162260606},{0.00926846715473},{0.0191727272757},{0.0136570776602},{0.03037549023},{0.0221599938113},{0.010960463496},{0.0108055448481},{0.0230642639634},{0.00804200517678},{0.00718219624967},{0.017182851242},{0.0429633607131},{0.0156993564494},{0.0205206463864},{0.0325707642958}};
+
+F1x4_true = {{0.0366337204149},{0.0197450646254},{0.0182477196333},{0.0384277729969},{0.0197450646254},{0.0106423145846},{0.00983526650707},{0.0207120339578},{0.0182477196333},{0.00983526650707},{0.00908942002191},{0.019141359923},{0.0384277729969},{0.0207120339578},{0.019141359923},{0.0403096851965},{0.0197450646254},{0.0106423145846},{0.00983526650707},{0.0207120339578},{0.0106423145846},{0.00573605920604},{0.00530107154257},{0.0111634975751},{0.00983526650707},{0.00530107154257},{0.00489907068426},{0.0103169261658},{0.0207120339578},{0.0111634975751},{0.0103169261658},{0.0217263583993},{0.0182477196333},{0.00983526650707},{0.00908942002191},{0.019141359923},{0.00983526650707},{0.00530107154257},{0.00489907068426},{0.0103169261658},{0.00908942002191},{0.00489907068426},{0.00452755511345},{0.00953455355665},{0.019141359923},{0.0103169261658},{0.00953455355665},{0.0200787641998},{0.0207120339578},{0.0403096851965},{0.0207120339578},{0.0111634975751},{0.0103169261658},{0.0217263583993},{0.0103169261658},{0.00953455355665},{0.0200787641998},{0.0403096851965},{0.0217263583993},{0.0200787641998},{0.0422837597373}};
+
+F1x4_data = {{0.037367588363},{0.0204382258569},{0.0206300848715},{0.0360963515048},{0.0204382258569},{0.011178700432},{0.0112836378402},{0.0197429220611},{0.0206300848715},{0.0112836378402},{0.0113895603235},{0.0199282540757},{0.0360963515048},{0.0197429220611},{0.0199282540757},{0.0348683618353},{0.0204382258569},{0.011178700432},{0.0112836378402},{0.0197429220611},{0.011178700432},{0.006114197202},{0.00617159278315},{0.0107984035855},{0.0112836378402},{0.00617159278315},{0.00622952715175},{0.0108997710469},{0.0197429220611},{0.0107984035855},{0.0108997710469},{0.0190712723424},{0.0206300848715},{0.0112836378402},{0.0113895603235},{0.0199282540757},{0.0112836378402},{0.00617159278315},{0.00622952715175},{0.0108997710469},{0.0113895603235},{0.00622952715175},{0.00628800536554},{0.0110020900715},{0.0199282540757},{0.0108997710469},{0.0110020900715},{0.019250299404},{0.0197429220611},{0.0348683618353},{0.0197429220611},{0.0107984035855},{0.0108997710469},{0.0190712723424},{0.0108997710469},{0.0110020900715},{0.019250299404},{0.0348683618353},{0.0190712723424},{0.019250299404},{0.0336821480952}};
 
 F3x4_true = {{0.0355258267054},{0.0202241751754},{0.018243496951},{0.0430053423838},{0.0202241751754},{0.0115132369731},{0.0103856746589},{0.0244821207135},{0.018243496951},{0.0103856746589},{0.00936854147721},{0.0220844356181},{0.0430053423838},{0.0244821207135},{0.0220844356181},{0.0520595759496},{0.0173564056366},{0.00988067050261},{0.00891299549302},{0.0210105783925},{0.00988067050261},{0.00562487715634},{0.0050739982403},{0.011960921317},{0.00891299549302},{0.0050739982403},{0.00457707029451},{0.0107895145135},{0.0210105783925},{0.011960921317},{0.0107895145135},{0.0254340912301},{0.0167842764586},{0.00955496828002},{0.00861919129812},{0.020317994617},{0.00955496828002},{0.00543946109665},{0.00490674111904},{0.0115666465908},{0.00861919129812},{0.00490674111904},{0.00442619369484},{0.0104338535432},{0.020317994617},{0.0115666465908},{0.0104338535432},{0.0245956926577},{0.0157755233003},{0.0335455846742},{0.0157755233003},{0.00898070435783},{0.00810116858408},{0.0190968611776},{0.00810116858408},{0.00730777117393},{0.0172265877666},{0.0335455846742},{0.0190968611776},{0.0172265877666},{0.0406081853165}};
 
@@ -52,9 +52,7 @@ fprintf ("f61_true_hyout.txt", LikFn1);
 
 
 ////////////// F61_DATA FREQUENCIES //////////////
-global w;
-global k;
-global t;
+global w; global k; global t;
 Model MyModel = (GY94, F61_data, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
@@ -64,80 +62,111 @@ Optimize (paramValues, LikFn2);
 fprintf ("f61_data_hyout.txt", LikFn2);
 
 
-
-////////////// F3x4_TRUE FREQUENCIES //////////////
-global w;
-global k;
-global t;
-Model MyModel = (GY94, F3x4_true, 1);
+////////////// F1x4_TRUE FREQUENCIES //////////////
+global w; global k; global t;
+Model MyModel = (GY94, F1x4_true, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn3 = (filt_data, Tree01);
 Optimize (paramValues, LikFn3);
-fprintf ("f3x4_true_hyout.txt", LikFn3);
+fprintf ("f1x4_true_hyout.txt", LikFn3);
 
 
-////////////// F3x4_DATA FREQUENCIES //////////////
-global w;
-global k;
-global t;
-Model MyModel = (GY94, F3x4_data, 1);
+////////////// F1x4_DATA FREQUENCIES //////////////
+global w; global k; global t;
+Model MyModel = (GY94, F1x4_data, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn4 = (filt_data, Tree01);
 Optimize (paramValues, LikFn4);
-fprintf ("f3x4_data_hyout.txt", LikFn4);
+fprintf ("f1x4_data_hyout.txt", LikFn4);
 
-////////////// CF3x4_TRUE FREQUENCIES //////////////
-global w;
-global k;
-global t;
-Model MyModel = (GY94, CF3x4_true, 1);
+
+////////////// F3x4_TRUE FREQUENCIES //////////////
+global w; global k; global t;
+Model MyModel = (GY94, F3x4_true, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn5 = (filt_data, Tree01);
 Optimize (paramValues, LikFn5);
-fprintf ("cf3x4_true_hyout.txt", LikFn5);
+fprintf ("f3x4_true_hyout.txt", LikFn5);
 
 
-////////////// CF3x4_DATA FREQUENCIES //////////////
-global w;
-global k;
-global t;
-Model MyModel = (GY94, CF3x4_data, 1);
+////////////// F3x4_DATA FREQUENCIES //////////////
+global w; global k; global t;
+Model MyModel = (GY94, F3x4_data, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn6 = (filt_data, Tree01);
 Optimize (paramValues, LikFn6);
-fprintf ("cf3x4_data_hyout.txt", LikFn6);
+fprintf ("f3x4_data_hyout.txt", LikFn6);
 
-
-Fones =  {{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1}};
-////////////// Fnuc_TRUE MODEL //////////////
-global w;
-global k;
-global t;
-Model MyModel = (GY94_Fnuc_true, Fones, 0); // Using 0 as last argument means that the matrix will *not* be multipled by frequencies, but just in case it is, we provide Fones (all entries are 1, so multiplication is basically..not)
+////////////// CF3x4_TRUE FREQUENCIES //////////////
+global w; global k; global t;
+Model MyModel = (GY94, CF3x4_true, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn7 = (filt_data, Tree01);
 Optimize (paramValues, LikFn7);
-fprintf ("fnuc_true_hyout.txt", LikFn7);
+fprintf ("cf3x4_true_hyout.txt", LikFn7);
 
 
-////////////// Fnuc_DATA MODEL //////////////
-global w;
-global k;
-global t;
-Model MyModel = (GY94_Fnuc_data, Fones, 0); // Using 0 as last argument means that the matrix will *not* be multipled by frequencies, but just in case it is, we provide Fones (all entries are 1, so multiplication is basically..not)
+////////////// CF3x4_DATA FREQUENCIES //////////////
+global w; global k; global t;
+Model MyModel = (GY94, CF3x4_data, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn8 = (filt_data, Tree01);
 Optimize (paramValues, LikFn8);
-fprintf ("fnuc_data_hyout.txt", LikFn8);
+fprintf ("cf3x4_data_hyout.txt", LikFn8);
+
+
+Fones =  {{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1}};
+////////////// F1x4 Fnuc_TRUE MODEL //////////////
+global w; global k; global t;
+Model MyModel = (F1x4_GY94_Fnuc_true, Fones, 0); // Using 0 as last argument means that the matrix will *not* be multipled by frequencies, but just in case it is, we provide Fones (all entries are 1, so multiplication is basically..not)
+UseModel (USE_NO_MODEL);
+UseModel(MyModel);
+Tree    Tree01 = DATAFILE_TREE;
+LikelihoodFunction  LikFn9 = (filt_data, Tree01);
+Optimize (paramValues, LikFn9);
+fprintf ("f1x4_fnuc_true_hyout.txt", LikFn9);
+
+
+////////////// F1x4 Fnuc_DATA MODEL //////////////
+global w; global k; global t;
+Model MyModel = (F1x4_GY94_Fnuc_data, Fones, 0); // Using 0 as last argument means that the matrix will *not* be multipled by frequencies, but just in case it is, we provide Fones (all entries are 1, so multiplication is basically..not)
+UseModel (USE_NO_MODEL);
+UseModel(MyModel);
+Tree    Tree01 = DATAFILE_TREE;
+LikelihoodFunction  LikFn10 = (filt_data, Tree01);
+Optimize (paramValues, LikFn10);
+fprintf ("f1x4_fnuc_data_hyout.txt", LikFn10);
+
+////////////// F3x4 Fnuc_TRUE MODEL //////////////
+global w; global k; global t;
+Model MyModel = (F3x4_GY94_Fnuc_true, Fones, 0); // Using 0 as last argument means that the matrix will *not* be multipled by frequencies, but just in case it is, we provide Fones (all entries are 1, so multiplication is basically..not)
+UseModel (USE_NO_MODEL);
+UseModel(MyModel);
+Tree    Tree01 = DATAFILE_TREE;
+LikelihoodFunction  LikFn11 = (filt_data, Tree01);
+Optimize (paramValues, LikFn11);
+fprintf ("f3x4_fnuc_true_hyout.txt", LikFn11);
+
+
+////////////// F3x4 Fnuc_DATA MODEL //////////////
+global w; global k; global t;
+Model MyModel = (F3x4_GY94_Fnuc_data, Fones, 0); // Using 0 as last argument means that the matrix will *not* be multipled by frequencies, but just in case it is, we provide Fones (all entries are 1, so multiplication is basically..not)
+UseModel (USE_NO_MODEL);
+UseModel(MyModel);
+Tree    Tree01 = DATAFILE_TREE;
+LikelihoodFunction  LikFn12 = (filt_data, Tree01);
+Optimize (paramValues, LikFn12);
+fprintf ("f3x4_fnuc_data_hyout.txt", LikFn12);
+
