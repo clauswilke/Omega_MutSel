@@ -1,45 +1,15 @@
 
-nobias_raw <- read.table('../datasets/nobias.txt', header=T)
-nobias <- nobias_raw[nobias_raw$kspec == 'free',]
-bias_raw <- read.table('../datasets/bias.txt', header=T)
-bias <- bias_raw[bias_raw$kspec == 'free',]
-conv <- read.table('../datasets/conv.txt', header=T)
-np <- read.table('../datasets/np.txt', header=T)
-yeast<- read.table('../datasets/yeast.txt', header=T)
-polio <- read.table('../datasets/polio.txt', header=T)
-
-
-############### Regression and convergence plot together. ###############
-pdf('MainText/regression_convergence.pdf', width=13, height=4, useDingbats=F)
-par(mfrow=c(1,3))
-par(mar=c(5,5.25,3.25,3)) #bottom, left, top, right
-
-plot(nobias$dnds, nobias$omega, pch=20, cex = 1.5, cex.lab=1.9, xlab = expression(dN/dS), ylab = '', xlim=c(0,2), ylim=c(0,2), xaxt='n', yaxt='n', frame.plot=F)
-axis(side = 1, at = c(0, 0.5, 1, 1.5, 2), cex.axis = 1.9)
-axis(side = 2, at = c(0, 0.5, 1, 1.5, 2), cex.axis = 1.9)
-mtext(expression(omega), side = 2, at = 1, cex=1.75, line=2.75)
-lines(c(0,1.95), c(0,1.95) ,col='red', lwd=2)
-text(1.0, 1.95, 'No Codon Bias', cex=2)
-mtext('A', side = 3, at = -0.38, cex = 1.75)
-
-
-plot(bias$dnds, bias$omega, pch=20, cex = 1.5, cex.lab=1.9, xlab = expression(dN/dS), ylab = '', xlim=c(0,2), ylim=c(0,2), xaxt='n', yaxt='n', frame.plot=F)
-axis(side = 1, at = c(0, 0.5, 1, 1.5, 2), cex.axis = 1.9)
-axis(side = 2, at = c(0, 0.5, 1, 1.5, 2), cex.axis = 1.9)
-mtext(expression(omega), side = 2, at = 1, cex=1.75, line=2.75)
-lines(c(0,1.95), c(0,1.95) ,col='red', lwd=2)
-text(1.0, 1.95, 'Codon Bias', cex=2)
-mtext('B', side = 3, at = -0.38, cex = 1.75)
-
-plot(conv$seqlen, conv$w_err, cex=1.25, cex.lab=1.9, cex.axis=1.9, xlab = 'Alignment Length', ylab = 'Relative dN/dS Error', log='x', pch=20, ylim=c(-1, 1),  frame.plot=F)
-abline(h=0, col='red', cex=2)
-mtext('C', side = 3, at = 125, cex = 1.75)
-dev.off()
+nobias <- read.table('../../datasets/nobias.txt', header=T)
+bias <- read.table('../../datasets/bias.txt', header=T)
+conv <- read.table('../../datasets/conv.txt', header=T)
+np <- read.table('../../datasets/np.txt', header=T)
+yeast<- read.table('../../datasets/yeast.txt', header=T)
+polio <- read.table('../../datasets/polio.txt', header=T)
 
 
 
-############### Regression and convergence plot together IN 2 PANELS ONLY!!!!!!! To be combined w/ the approach flowchart. ###############
-pdf('MainText/regression_convergence_2panels.pdf', width=9.5, height=4.5, useDingbats=F)
+############### Regression and convergence plot, to be combined w/ the approach flowchart. ###############
+pdf('MainText/regression_convergence_raw.pdf', width=9.5, height=4.5, useDingbats=F)
 par(mfrow=c(1,2))
 par(mar=c(4.4,5.5,2.5,2)) #bottom, left, top, right
 dnds <- c(nobias$dnds, bias$dnds)
@@ -60,6 +30,10 @@ axis(side = 2, at = c(-1, -0.5, 0, 0.5, 1), cex.axis = 1.54, lwd=2.5)
 lines(c(5e2-100,1e6-100), c(0,0) ,col='red', lwd=2.25)
 mtext('C', side = 3, at = 80, cex = 3)
 dev.off()
+
+
+
+
 
 
 
@@ -158,7 +132,7 @@ plot_nyp_r2 <- function(fspecs, np_vector, yeast_vector, polio_vector, point_siz
 }
 
 
-pdf('MainText/nyp_bias_r2.pdf', width=10, height=8, useDingbats=F)
+pdf('MainText/nyp_bias_r2_raw.pdf', width=10, height=8, useDingbats=F)
 par(mfrow=c(2,2))
 par(mar=c(2.1,5,2,2.3)) #bottom, left, top, right
 point_size = 3

@@ -281,7 +281,7 @@ where $\pi_n^j$ is the equilibrium frequency of the target nucleotide which expe
 \end{equation}
 where $C = \Pi_\text{stop} = \pi_\text{T}\pi_\text{A}\pi_\text{G} + \pi_\text{T}\pi_\text{G}\pi_\text{A} + \pi_\text{T}\pi_\text{A}\pi_\text{A}$. This expression \label{eq:F3x4} is better known as either the frequency estimator F1x4, if four parameters for nucleotide frequencies are used, or F3x4, if twelve parameters representing positional nucleotide frequencies are used.
 Using these equilibrium codon frequencies, we can derive precise values for target nucleotide frequencies $\pi_n$ used in \eqref{eq:MG94_omega}. We note that 
-$pi_n = 
+$pi_n = $
 
 		
 \begin{acknowledgments}
@@ -311,7 +311,7 @@ $pi_n =
 \vspace{2cm}
 		
 \begin{figure}[htbp]
-	\centerline{\includegraphics[width=8.7cm]{figures/MainText/flowchart_regression_convergence.pdf}}
+	\centerline{\includegraphics[width=8.7cm]{figures/MainText/regression_convergence.pdf}}
 	\caption{\label{reg_conv} Regressions between $dN/dS$ values as calculated from scaled selection coefficients and as inferred using the M0 mechanistic codon model. Each point corresponds to a single simulated alignment. All $\omega$ values shown here were inferred by parameterizing the M0 model with $\kappa$ fixed to its true, simulated value as well as the Fequal codon frequency specification \cite{Yang2006}. The red line in panels (A-B) is the $x=y$ line. (A) Synonymous codons have equal fitness ($r^2=0.997$). (B) Synonymous codons have different fitness values ($r^2=0.992$). (C) Convergence of $\omega$ MLEs to the true $dN/dS$ value. The y-axis indicates the relative error of the maximum likelihood $dN/dS$ estimate, and the x-axis indicates the number of positions in the simulated alignment. As the number of positions, and hence the size of the data set, increases, the maximum likelihood estimates converge to the $dN/dS$ values calculated using equations \eqref{eq:pi_i}-\eqref{eq:dS}. The red line in panel (C) is the line $y=0$, indicating no error.}
 \end{figure}
 	

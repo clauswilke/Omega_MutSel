@@ -1,68 +1,69 @@
-nobias_raw <- read.table('../datasets/nobias.txt', header=T)
-nobias_ktrue <- nobias_raw[nobias_raw$kspec == 'true',]
-nobias_kfree <- nobias_raw[nobias_raw$kspec == 'free',]
+np <- read.table('../../datasets/np.txt', header=T)
+yeast<- read.table('../../datasets/yeast.txt', header=T)
+polio <- read.table('../../datasets/polio.txt', header=T)
 
-bias_raw <- read.table('../datasets/bias.txt', header=T)
-bias_ktrue <- bias_raw[bias_raw$kspec == 'true',]
-bias_kfree <- bias_raw[bias_raw$kspec == 'free',]
-
-np <- read.table('../datasets/np.txt', header=T)
-yeast<- read.table('../datasets/yeast.txt', header=T)
-polio <- read.table('../datasets/polio.txt', header=T)
 
 
 
 ############################ FULL nucleoprotein, yeast, polio dnds vs omega regressions. One for data and one for true. #############################
-panels1 <- c('A', 'B', 'C', 'D')
-panels2 <- c('E', 'F', 'G', 'H')
-panels3 <- c('I', 'J', 'K', 'L')
-fspecs_data <- c("f61_data", "f3x4_data", "cf3x4_data", "fnuc_data")
-fspecs_true <- c("f61_true", "f3x4_true", "cf3x4_true", "fnuc_true")
+panels1 <- c('A', 'B', 'C', 'D', 'E', 'F')
+panels2 <- c('G', 'H', 'I', 'J', 'K', 'L')
+panels3 <- c('M', 'N', 'O', 'P', 'Q', 'R')
+fspecs_data <- c("f61_data", "f3x4_data", "cf3x4_data", "f1x4_data", "f3x4_fnuc_data", "f1x4_fnuc_data")
+fspecs_true <- c("f61_true", "f3x4_true", "cf3x4_true", "f1x4_true", "f3x4_fnuc_true", "f1x4_fnuc_true")
 
 plot_nyp_fspec<- function(df, panels, fspecs)
 {
     for (i in 1:length(fspecs)){
         temp <- df[df$fspec == fspecs[i],]
         plot(temp$dnds, temp$omega, pch=20, cex.lab=2, xlim=c(0.1,1.1), ylim=c(0.1,1.1), xaxt='n', yaxt='n', xlab='dN/dS', ylab = '', frame.plot = F)
-        axis(side = 1, at=c(0.1, 0.3, 0.5, 0.7, 0.9, 1.1), cex.axis=1.6) 
-        axis(side = 2, at=c(0.1, 0.3, 0.5, 0.7, 0.9, 1.1), cex.axis=1.55) 
-        mtext(expression(omega), side = 2, at = 0.6, cex=1.8, line=2.75)
-        mtext(panels[i], side = 3, at = -0.1, cex = 1.75)
+        axis(side = 1, at=c(0.1, 0.3, 0.5, 0.7, 0.9, 1.1), cex.axis=1.7) 
+        axis(side = 2, at=c(0.1, 0.3, 0.5, 0.7, 0.9, 1.1), cex.axis=1.7) 
+        mtext(expression(omega), side = 2, at = 0.6, cex=2, line=2.75)
+        mtext(panels[i], side = 3, at = -0.2, cex = 1.8)
         lines(c(0.1,1.1), c(0.1,1.1), col='red', lwd=2)
 
     }
 }
 
-pdf('SI/nyp_datafreqs.pdf', width=16, height=10, useDingbats=F)
-par(mfrow=c(3,4))
-par(mar=c(5.5,5,2.5,2.5)) #bottom, left, top, right
+make_labels <- function(size)
+{
+mtext('NP', side = 2, outer=TRUE, las=1, at=0.85, cex=size, line=1.75)
+mtext('Yeast', side = 2, outer=TRUE, las=1, at=0.53, cex=size, line=0.75)
+mtext('Polio', side = 2, outer=TRUE, las=1, at=0.2, cex=size, line=0.75)
+mtext('F61', side = 3, outer=TRUE, at = 0.09, cex=size)
+mtext('F3x4', side = 3, outer=TRUE, at = 0.2605, cex=size)
+mtext('CF3x4', side = 3, outer=TRUE, at=0.4305, cex=size)
+mtext('F1x4', side = 3, outer=TRUE, at=0.5925, cex=size)
+mtext('Fnuc_F3x4', side = 3, outer=TRUE, at = 0.7575, cex=size-0.2)
+mtext('Fnuc_F1x4', side = 3, outer=TRUE, at = 0.925, cex=size-0.2)
+
+}
+
+
+
+
+pdf('SI/nyp_datafreqs.pdf', width=22, height=11, useDingbats=F)
+par(mfrow=c(3,6))
+par(mar=c(5.5, 5.5, 2.5, 2.5)) #bottom, left, top, right
 par(oma=c(0,7,3,0))
 plot_nyp_fspec(np, panels1, fspecs_data)
 plot_nyp_fspec(yeast, panels2, fspecs_data)
 plot_nyp_fspec(polio, panels3, fspecs_data)
-mtext('NP', side = 2, outer=TRUE, las=1, at=0.85, cex=2, line=1.75)
-mtext('Yeast', side = 2, outer=TRUE, las=1, at=0.53, cex=2, line=0.75)
-mtext('Polio', side = 2, outer=TRUE, las=1, at=0.2, cex=2, line=0.75)
-mtext('F61', side = 3, outer=TRUE, at = 0.14, cex=2)
-mtext('F3x4', side = 3, outer=TRUE, at = 0.385, cex=2)
-mtext('CF3x4', side = 3, outer=TRUE, at=0.635, cex=2)
-mtext('Fnuc', side = 3, outer=TRUE, at = 0.88, cex=2)
+make_labels(2)
 dev.off()
 
-pdf('SI/nyp_truefreqs.pdf', width=16, height=10, useDingbats=F)
-par(mfrow=c(3,4))
-par(mar=c(5.5,5,2.5,2.5)) #bottom, left, top, right
+
+
+
+pdf('SI/nyp_truefreqs.pdf', width=22, height=11, useDingbats=F)
+par(mfrow=c(3,6))
+par(mar=c(5.5, 5.5, 2.5, 2.5)) #bottom, left, top, right
 par(oma=c(0,7,3,0))
 plot_nyp_fspec(np, panels1, fspecs_true)
 plot_nyp_fspec(yeast, panels2, fspecs_true)
 plot_nyp_fspec(polio, panels3, fspecs_true)
-mtext('NP', side = 2, outer=TRUE, las=1, at=0.85, cex=2, line=1.75)
-mtext('Yeast', side = 2, outer=TRUE, las=1, at=0.53, cex=2, line=0.75)
-mtext('Polio', side = 2, outer=TRUE, las=1, at=0.2, cex=2, line=0.75)
-mtext('F61', side = 3, outer=TRUE, at = 0.14, cex=2)
-mtext('F3x4', side = 3, outer=TRUE, at = 0.385, cex=2)
-mtext('CF3x4', side = 3, outer=TRUE, at=0.635, cex=2)
-mtext('Fnuc', side = 3, outer=TRUE, at = 0.88, cex=2)
+make_labels(2)
 dev.off()
 
 
