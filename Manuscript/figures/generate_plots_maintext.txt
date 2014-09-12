@@ -1,0 +1,197 @@
+
+nobias_raw <- read.table('../datasets/nobias.txt', header=T)
+nobias <- nobias_raw[nobias_raw$kspec == 'free',]
+bias_raw <- read.table('../datasets/bias.txt', header=T)
+bias <- bias_raw[bias_raw$kspec == 'free',]
+conv <- read.table('../datasets/conv.txt', header=T)
+np <- read.table('../datasets/np.txt', header=T)
+yeast<- read.table('../datasets/yeast.txt', header=T)
+polio <- read.table('../datasets/polio.txt', header=T)
+
+
+############### Regression and convergence plot together. ###############
+pdf('MainText/regression_convergence.pdf', width=13, height=4, useDingbats=F)
+par(mfrow=c(1,3))
+par(mar=c(5,5.25,3.25,3)) #bottom, left, top, right
+
+plot(nobias$dnds, nobias$omega, pch=20, cex = 1.5, cex.lab=1.9, xlab = expression(dN/dS), ylab = '', xlim=c(0,2), ylim=c(0,2), xaxt='n', yaxt='n', frame.plot=F)
+axis(side = 1, at = c(0, 0.5, 1, 1.5, 2), cex.axis = 1.9)
+axis(side = 2, at = c(0, 0.5, 1, 1.5, 2), cex.axis = 1.9)
+mtext(expression(omega), side = 2, at = 1, cex=1.75, line=2.75)
+lines(c(0,1.95), c(0,1.95) ,col='red', lwd=2)
+text(1.0, 1.95, 'No Codon Bias', cex=2)
+mtext('A', side = 3, at = -0.38, cex = 1.75)
+
+
+plot(bias$dnds, bias$omega, pch=20, cex = 1.5, cex.lab=1.9, xlab = expression(dN/dS), ylab = '', xlim=c(0,2), ylim=c(0,2), xaxt='n', yaxt='n', frame.plot=F)
+axis(side = 1, at = c(0, 0.5, 1, 1.5, 2), cex.axis = 1.9)
+axis(side = 2, at = c(0, 0.5, 1, 1.5, 2), cex.axis = 1.9)
+mtext(expression(omega), side = 2, at = 1, cex=1.75, line=2.75)
+lines(c(0,1.95), c(0,1.95) ,col='red', lwd=2)
+text(1.0, 1.95, 'Codon Bias', cex=2)
+mtext('B', side = 3, at = -0.38, cex = 1.75)
+
+plot(conv$seqlen, conv$w_err, cex=1.25, cex.lab=1.9, cex.axis=1.9, xlab = 'Alignment Length', ylab = 'Relative dN/dS Error', log='x', pch=20, ylim=c(-1, 1),  frame.plot=F)
+abline(h=0, col='red', cex=2)
+mtext('C', side = 3, at = 125, cex = 1.75)
+dev.off()
+
+
+
+############### Regression and convergence plot together IN 2 PANELS ONLY!!!!!!! To be combined w/ the approach flowchart. ###############
+pdf('MainText/regression_convergence_2panels.pdf', width=9.5, height=4.5, useDingbats=F)
+par(mfrow=c(1,2))
+par(mar=c(4.4,5.5,2.5,2)) #bottom, left, top, right
+dnds <- c(nobias$dnds, bias$dnds)
+omega <- c(nobias$omega, bias$omega)
+
+plot(dnds, omega, pch=20, cex = 1.2, cex.lab=1.75, xlab = expression(dN/dS), ylab = '', xlim=c(0,2), ylim=c(0,2), xaxt='n', yaxt='n', frame.plot=F)
+axis(side = 1, at = c(0, 0.5, 1, 1.5, 2), cex.axis = 1.7, lwd=3)
+axis(side = 2, at = c(0, 0.5, 1, 1.5, 2), cex.axis = 1.7, lwd=3)
+text(1.6, 1, expression(paste(r^2, " = 0.994")), cex=1.65)
+mtext(expression(omega), side = 2, at = 1, cex=2.5, line=2.75)
+lines(c(0,1.95), c(0,1.95) ,col='red', lwd=2.25)
+mtext('B', side = 3, at = -0.55, cex = 3)
+
+conv2 <- conv[conv$seqlen <=5e5,]
+plot(conv2$seqlen, conv2$w_err, pch=20, cex=1.2, cex.lab=1.7, xlab = 'Alignment Length', ylab = 'Relative Error', log='x', ylim=c(-1, 1), xaxt='n', yaxt='n', frame.plot=F)
+axis(side = 1, at = c(5e2, 5e3, 5e4, 5e5), cex.axis = 1.4, lwd=2.5)
+axis(side = 2, at = c(-1, -0.5, 0, 0.5, 1), cex.axis = 1.54, lwd=2.5)
+lines(c(5e2-100,1e6-100), c(0,0) ,col='red', lwd=2.25)
+mtext('C', side = 3, at = 80, cex = 3)
+dev.off()
+
+
+
+
+###################### sigma^2 and dn/ds. single plot with one panel no bias, one panel bias ###########
+pdf('MainText/dnds_variance.pdf', width=9, height=4, useDingbats=F)
+par(mfrow=c(1,2))
+par(mar=c(4.25,4.75,1.6,2)) #bottom, left, top, right
+
+plot(nobias$sd, nobias$dnds, xlim=c(0,4), ylim=c(0,2), cex=1.3, cex.lab=1.35, cex.axis=1.5, pch=20, ylab='', xlab = expression(paste("Variance of selection strength (",sigma^2,")")), frame.plot = F)
+mtext(expression(dN/dS), side = 2, at = 1, cex=1.7, las=0, line=2.5)
+abline(h=1, col='gray25', lwd=2.5)
+mtext('A', side = 3, at = -1, cex = 2.2)
+text(2, 1.98, 'No Codon Bias', cex=1.5)
+
+plot(bias$sd, bias$dnds, xlim=c(0,4), ylim=c(0,2), cex=1.3, cex.lab = 1.35, cex.axis = 1.5, pch=20, ylab='', xlab = expression(paste("Variance of selection strength (",sigma^2,")")), frame.plot = F)
+mtext(expression(dN/dS), side = 2, at = 1, cex=1.7, las=0, line=2.5)
+abline(h=1, col='gray25', lwd=2.5)
+mtext('B', side = 3, at = -1, cex = 2.2)
+text(2, 2, 'Codon Bias', cex=1.5)
+
+dev.off()
+
+
+
+
+
+
+
+
+
+
+
+
+############################ nucleoprotein, yeast, polio r^2 and bias plots #############################
+fspecs_data <- c("f61_data", "f3x4_data", "cf3x4_data", "f1x4_data", "f3x4_fnuc_data", "f1x4_fnuc_data")
+fspecs_true <- c("f61_true", "f3x4_true", "cf3x4_true", "f1x4_true", "f3x4_fnuc_true", "f1x4_fnuc_true")
+names <- c("F61", "F3x4", "CF3x4", "F1x4", "Fnuc3", "Fnuc1")
+
+
+
+np_r2_data <- c(); yeast_r2_data <- c(); polio_r2_data <- c(); np_bias_data <- c(); yeast_bias_data <- c(); polio_bias_data <- c()
+np_r2_true <- c(); yeast_r2_true <- c(); polio_r2_true <- c(); np_bias_true <- c(); yeast_bias_true <- c(); polio_bias_true <- c()
+
+for (i in 1:length(fspecs_data))
+{
+    temp <- np[np$fspec == fspecs_data[i],]
+    np_r2_data <- c( np_r2_data, cor(temp$dnds, temp$omega)^2)
+    np_bias_data <- c( np_bias_data, glm(omega ~ offset(dnds), data=temp)$coefficients )    
+    temp <- yeast[yeast$fspec == fspecs_data[i],]
+    yeast_r2_data <- c( yeast_r2_data, cor(temp$dnds, temp$omega)^2)
+    yeast_bias_data <- c( yeast_bias_data, glm(omega ~ offset(dnds), data=temp)$coefficients )
+    temp <- polio[polio$fspec == fspecs_data[i],]
+    polio_r2_data <- c( polio_r2_data, cor(temp$dnds, temp$omega)^2)
+    polio_bias_data <- c( polio_bias_data, glm(omega ~ offset(dnds), data=temp)$coefficients )
+
+}
+for (i in 1:length(fspecs_true))
+{
+    temp <- np[np$fspec == fspecs_true[i],]
+    np_r2_true <- c( np_r2_true, cor(temp$dnds, temp$omega)^2)
+    np_bias_true <- c( np_bias_true, glm(omega ~ offset(dnds), data=temp)$coefficients )    
+    temp <- yeast[yeast$fspec == fspecs_true[i],]
+    yeast_r2_true <- c( yeast_r2_true, cor(temp$dnds, temp$omega)^2)
+    yeast_bias_true <- c( yeast_bias_true, glm(omega ~ offset(dnds), data=temp)$coefficients )
+    temp <- polio[polio$fspec == fspecs_true[i],]
+    polio_r2_true <- c( polio_r2_true, cor(temp$dnds, temp$omega)^2)
+    polio_bias_true <- c( polio_bias_true, glm(omega ~ offset(dnds), data=temp)$coefficients )
+
+}
+
+
+plot_nyp_bias <- function(fspecs, np_vector, yeast_vector, polio_vector, point_size, xlab_size, ylab_size, axis_size, panel, panel_size){
+    plot(1:length(fspecs), np_vector, pch=20, xaxt='n', ylim=c(-0.2,0.2), xlab='', ylab = 'Estimator Bias', cex=point_size, cex.lab=ylab_size, cex.axis=axis_size, frame.plot=F)
+    axis(side=1, at=1:length(fspecs), labels = names, las=1, cex.axis=xlab_size)
+    points(1:length(fspecs), yeast_vector, col='red', pch=20, cex=point_size)
+    points(1:length(fspecs), polio_vector, col='blue', pch=20, cex=point_size)
+    abline(h=0, col='gray25', lwd=2)
+    mtext(panel, side = 3, at = 0, cex = panel_size)
+}
+
+plot_nyp_r2 <- function(fspecs, np_vector, yeast_vector, polio_vector, point_size, xlab_size, ylab_size, axis_size, panel, panel_size){
+	plot(1:length(fspecs), polio_vector, col='blue', pch=20, cex=point_size, xaxt='n', ylim=c(0,1), xlab='', ylab = expression(r^2), cex.lab=ylab_size, cex.axis=axis_size, frame.plot=F)
+	if (panel == "B"){
+	    points(2:length(fspecs), np_vector[2:length(fspecs)], pch=20, cex=point_size)
+	    points(2:length(fspecs), yeast_vector[2:length(fspecs)], col='red', pch=20, cex=point_size)
+	    points(0.95, np_vector[1], pch=20, cex=point_size)
+	    points(1.15, yeast_vector[1], pch=20, col='red', cex=point_size)
+	}
+	else{
+	    points(1:length(fspecs), np_vector, pch=20, cex=point_size)
+	    points(1:length(fspecs), yeast_vector, col='red', pch=20, cex=point_size)
+	}
+	axis(side=1, at=1:length(fspecs), labels = names, las=1, cex.axis=xlab_size)
+	mtext(panel, side = 3, at = 0, cex = panel_size)
+}
+
+
+pdf('MainText/nyp_bias_r2.pdf', width=10, height=8, useDingbats=F)
+par(mfrow=c(2,2))
+par(mar=c(2.1,5,2,2.3)) #bottom, left, top, right
+point_size = 3
+ylab_size = 1.85
+xlab_size = 1.4
+axis_size = 1.7
+panel_size = 2
+
+
+# Top left panel: bias, data frequencies
+plot_nyp_bias(fspecs_data, np_bias_data, yeast_bias_data, polio_bias_data, point_size, xlab_size, ylab_size, axis_size, "A", panel_size)
+
+
+#legend
+points(5.35, 0.2, pch=20, cex=1.6)
+points(5.35, 0.16, pch=20, cex=1.6, col='red')
+points(5.35, 0.12, pch=20, cex=1.6, col='blue')
+text(5.7, 0.2, 'NP', cex=1.5)
+text(5.8, 0.16, 'Yeast', cex=1.5)
+text(5.8, 0.12, 'Polio', cex=1.5)
+
+# Top right panel: r^2, data frequencies
+plot_nyp_r2(fspecs_data, np_r2_data, yeast_r2_data, polio_r2_data, point_size, xlab_size, ylab_size, axis_size, "B", panel_size)
+
+
+# Bottom left panel: bias, true frequencies
+plot_nyp_bias(fspecs_data, np_bias_true, yeast_bias_true, polio_bias_true, point_size, xlab_size, ylab_size, axis_size, "C", panel_size)
+
+# Top right panel: r^2, data frequencies
+plot_nyp_r2(fspecs_true, np_r2_true, yeast_r2_true, polio_r2_true, point_size, xlab_size, ylab_size, axis_size, "D", panel_size)
+
+dev.off()
+
+
+
+
