@@ -50,25 +50,35 @@ Finally, we are able to use this robust relationship to assess the performance o
 We model sequence evolution as a continuous-time Markov process \cite{Yang2006} under the assumptions of a fixed effective population size $N_e$ and constant selection pressure over time. This process is governed by the $61 \times 61$ transition matrix $P(t) = e^{Qt}$, where the corresponding instantaneous rate matrix $Q$ gives the instantaneous substitution probabilities between all 61 sense codons. We further assume that only single nucleotide changes occur instantaneously. We adopt the Halpern-Bruno \cite{HalpernBruno1998,YangNielsen2008,Tamurietal2012,Thorne2012} MutSel modeling framework, which models the evolutionary process with explicit population genetics theory. 
 
 To being, let $f_i$ be the fitness of codon $i$, and thus the selection coefficient acting on a mutation from codon $i$ to codon $j$ is $s_{ij} = f_j - f_i$ \cite{SellaHirsh2005,YangNielsen2008}. The fixation probability for a mutation from codon $i$ to codon $j$ is given by 
-\begin{equation}\label{eq:pfix}
-P_\text{fix}(i \rightarrow j) = \frac{2s_{ij}}{1 - e^{-2N_es_{ij}}} \approx \frac{1}{N_e}\frac{2N_es_{ij}}{1 - e^{-2N_es_{ij}}} 
-\end{equation} \cite{Kimura1962,HalpernBruno1998,YangNielsen2008}. We further define $S_{ij} = 2N_es_{ij}$ as the scaled selection coefficient for this mutation. We model the substitution as the product of fixation and mutation rates, $\mu$. Therefore, the substitution probability for codon $i$ to codon $j$ is 
+\begin{equation}\label{eq:u_ij}
+u_{ij} = \frac{2s_{ij}}{1 - e^{-2N_es_{ij}}} \approx \frac{1}{N_e}\frac{2N_es_{ij}}{1 - e^{-2N_es_{ij}}}
+\end{equation} \cite{Kimura1962,HalpernBruno1998,YangNielsen2008}. 
+
+We further define $S_{ij} = 2N_es_{ij}$ as the scaled selection coefficient for this mutation. We model the substitution as the product of fixation and mutation rates, $\mu$. 
+
+Therefore, the substitution probability for codon $i$ to codon $j$ is 
 \begin{equation}\label{eq:q_ij}
-q_{ij} = N_e\mu_{ij}P_\text{fix}(i \rightarrow j) = \mu_{ij}\frac{S_{ij}}{1 - e^{-S_{ij}}} , 
+q_{ij} = N_e\mu_{ij}u_{ij} = \mu_{ij}\frac{S_{ij}}{1 - e^{-S_{ij}}} , 
 \end{equation} and this expression corresponds to the instantaneous matrix element $Q_{ji}$. 
-\cite{HalpernBruno1998,SellaHirsh2005}. Given detailed balance (reversibility), we have 
+\cite{HalpernBruno1998,SellaHirsh2005}. 
+
+Given detailed balance (reversibility), we have 
 \begin{equation}\label{eq:DB}
-q_{ij}p_i = q_{ji}p_j,
+q_{ij}P_i = q_{ji}P_j,
 \end{equation} 
-where $p_i$ is the stationary frequency of codon $i$. From equations \eqref{eq:q_ij} and \eqref{eq:DB}, we can write the ratio of substitution probabilities as 
+where $P_i$ is the stationary frequency of codon $i$. 
+
+From equations \eqref{eq:q_ij} and \eqref{eq:DB}, we can write the ratio of substitution probabilities as 
 \begin{equation}\label{ratio_q_ij}
-\frac{q_{ij}}{q_{ji}} = \frac{p_i \mu_{ij} S_{ij} (1-e^{-S_{ji}})}{p_j \mu_{ji} S_{ji} (1-e^{-S_{ij}})} 
+\frac{q_{ij}}{q_{ji}} = \frac{P_i \mu_{ij} S_{ij} (1-e^{-S_{ji}})}{P_j \mu_{ji} S_{ji} (1-e^{-S_{ij}})} 
 \end{equation}
+
+
 Given that $S_{ij} = -S_{ji}$, we can simplify equation \eqref{ratio_q_ij} to show that $q_{ij}/q_{ji} = e^{S_{ij}}$, and we therefore find that
 \begin{equation}\label{eq:s_pmu}
-S_{ij} = \ln\bigg{(} \frac{p_j\mu_{ji}}{p_i\mu_{ij}} \bigg{)}. 
+S_{ij} = \ln\bigg{(} \frac{P_j\mu_{ji}}{P_i\mu_{ij}} \bigg{)}. 
 \end{equation}
-These equations establish a relationship between scaled selection coefficients and the stationary codon frequencies of the Markov model. Moreover, we note that in the specific case of symmetric mutation rates $\mu_{ij} = \mu_{ji}$, we have $S_{ij} = \ln\big{(}{\frac{p_j} {p_i}}\big{)}$ \cite{SellaHirsh2005}. 
+These equations establish a relationship between scaled selection coefficients and the stationary codon frequencies of the Markov model. Moreover, we note that in the specific case of symmetric mutation rates $\mu_{ij} = \mu_{ji}$, we have $S_{ij} = \ln\big{(}{\frac{P_j} {P_i}}\big{)}$ \cite{SellaHirsh2005}. 
 
 
 		
@@ -77,31 +87,31 @@ These equations establish a relationship between scaled selection coefficients a
 Using the theory laid out in the previous subsection, we can calculate an evolutionary rate by summing over all substitution probabilities weighted by the frequency of the originating codon. Further, we can establish specific expressions for nonsynonymous and synonymous evolutionary rates, and then divide them in order to obtain a value for the evolutionary rate ratio $dN/dS$.
 
 To begin, we can write the nonsynonymous rate $K_\text{N}$ as 
-\begin{equation}\label{eq:kN}
-	K_\text{N} = N_e \sum_i \sum_{j \in {\cal N}_i} p_i P_\text{fix}(i \rightarrow j) \mu_{ij}\,,
+\begin{equation}\label{eq:KN}
+	K_\text{N} = N_e \sum_i \sum_{j \in {\cal N}_i} P_i \mu_{ij} u_{ij} \,,
 \end{equation}
 where ${\cal N}_i$ is the set of codons that are nonsynonymous to codon $i$ and differ from it by one nucleotide. To normalize $K_\text{N}$, we divide it by the number of nonsynonymous sites, which we calculate according to the mutational opportunity definition of a site \cite{GoldmanYang1994, Yang2006} as 
 \begin{equation}\label{eq:LN}
-	L_\text{N} = \sum_i \sum_{j \in {\cal N}_i} p_i \mu_{ij}\,, 
+	L_\text{N} = \sum_i \sum_{j \in {\cal N}_i} P_i \mu_{ij}\,, 
 \end{equation} and thus we find that 
 \begin{equation}\label{eq:dN}
-	dN = \frac{K_\text{N}}{L_\text{N}}=\frac{N_e \sum_i \sum_{j \in {\cal N}_i} p_i P_\text{fix}(i \rightarrow j) \mu_{ij} } {\sum_i \sum_{j \in {\cal N}_i} p_i \mu_{ij}}\,.
+	dN = \frac{K_\text{N}}{L_\text{N}}=\frac{N_e \sum_i \sum_{j \in {\cal N}_i} P_i \mu_{ij} u_{ij} } {\sum_i \sum_{j \in {\cal N}_i}P_i \mu_{ij}}\,.
 \end{equation}
 		
-Similarly, for $dS$, the synonymous evolutionary rate $K_\text{S}$ per synonymous site $L_\text{S}$, we find
+Similarly, for $dS$, the synonymous evolutionary rate $K_\text{S}$ per synonymous site $L_\text{S}$, we have
 \begin{equation}\label{eq:dS}
-	dS = \frac{K_\text{S}}{L_\text{S}}=\frac{ N_e \sum_i \sum_{j \in {\cal S}_i} p_i P_\text{fix}(i \rightarrow j) \mu_{ij} } {\sum_i \sum_{j \in {\cal S}_i} p_i \mu_{ij} }\,,
+	dS = \frac{K_\text{S}}{L_\text{S}}=\frac{ N_e \sum_i \sum_{j \in {\cal S}_i} P_i \mu_{ij} u_{ij} } {\sum_i \sum_{j \in {\cal S}_i} P_i \mu_{ij} }\,,
 \end{equation}
-where ${\cal S}_i$ is the set of codons that are synonymous to codon $i$ and differ from it by one nucleotide substitution. The quantities $K_\text{S}$ and $L_\text{S}$ are defined as in Eqs.~\eqref{eq:KN} and \eqref{eq:LN} but sum over $j\in {\cal S}_i$ instead of $j\in {\cal N}_i$. Moreover, we note that, if we make the dual assumptions that nucleotide mutation rates are symmetric and that all synonymous codons have equal fitness (i.e.\ synonymous mutations are neutral), the synonymous fixation rate $P_\text{fix}(i \rightarrow j)= 1/N_e$ \cite{CrowKimura1970}. Under this circumstance, the value for $dS$ reduces to 1.
+where ${\cal S}_i$ is the set of codons that are synonymous to codon $i$ and differ from it by one nucleotide substitution. The quantities $K_\text{S}$ and $L_\text{S}$ are defined as in Eqs.~\eqref{eq:KN} and \eqref{eq:LN} but sum over $j\in {\cal S}_i$ instead of $j\in {\cal N}_i$. Moreover, we note that, if we make the dual assumptions that nucleotide mutation rates are symmetric and that all synonymous codons have equal fitness (i.e.\ synonymous mutations are neutral), the synonymous fixation rate $u_{ij}= 1/N_e$ \cite{CrowKimura1970}. Under this circumstance, the value for $dS$ reduces to 1.
 		
 				
 \subsection*{dN/dS accurately reflects selection strength.}
 
-Using the theoretical framework established in equations \eqref{eq:pfix} - \eqref{eq:dS}, we can examine the relationship between the $dN/dS$ values corresponding to different distributions of scaled selection coefficients. To this end, we generated 200 distinct distributions of amino acid fitness values $f_a$. We drew these 20 amino acid fitness values from a normal distribution $\mathcal{N}(0,\sigma^2)$, where $\sigma^2 \sim \mathcal{U}(0,4)$. Here, $\sigma^2$ effectively represents the strength of natural selection; higher $\sigma^2$ correspond to larger fitness difference among amino acids, prompting selection to act more strongly against nonsynonymous changes. In other words, high $\sigma^2$ values indicate strong purifying selection, while lower values indicate weaker purifying selection. We additionally note that these amino acid fitness quantities correspond to the amino acid propensity parameters estimated by currently available MutSel inference methods \cite{RodrigueLartillot2014,Tamurietal2014}.
+Using the theoretical framework established in equations \eqref{eq:u_ij} - \eqref{eq:dS}, we can examine the relationship between the $dN/dS$ values corresponding to different distributions of scaled selection coefficients. To this end, we generated 200 distinct distributions of amino acid fitness values $f_a$. We drew these 20 amino acid fitness values from a normal distribution $\mathcal{N}(0,\sigma^2)$, where $\sigma^2 \sim \mathcal{U}(0,4)$. Here, $\sigma^2$ effectively represents the strength of natural selection; higher $\sigma^2$ correspond to larger fitness difference among amino acids, prompting selection to act more strongly against nonsynonymous changes. In other words, high $\sigma^2$ values indicate strong purifying selection, while lower values indicate weaker purifying selection. We additionally note that these amino acid fitness quantities correspond to the amino acid propensity parameters estimated by currently available MutSel inference methods \cite{RodrigueLartillot2014,Tamurietal2014}.
 
 We then converted each distribution of amino acid fitnesses to a corresponding set of codon fitnesses. For 100 of the distributions, we assumed that synonymous changes were neutral, and thus we directly assigned each codon the same fitness $f_i = f_a$. For the other 100 sets of fitnesses, we allowed synonymous codons to have different fitness values. In these circumstances, we randomly selected a preferred codon for each amino acid, and we assigned the preferred codon the fitness of $f_i = f_a + \lambda$ and all non-preferred codons the fitness $f_i = f_a - \lambda$. We drew a unique $\lambda$ for each fitness distribution from $\mathcal{U}[0,2]$. We refer to first set of codon selection coefficients as ``no codon bias," and the second set as ``codon bias." 
 
-Finally, using equations \eqref{eq:pfix} - \eqref{eq:dS}, we computed $dN/dS$ for each distribution of codon fitnesses. For these calculations, we also need to select mutation rates. We set the mutation rate for transitions as $\mu\kappa$, and the rate for all transversions as $\mu$. We use the value $\mu = 10^{-6}$ for all $dN/dS$ calculations, and we draw a unique value for $\kappa$ from $\mathcal{U}[1,6]$ for each set of codon fitnesses.
+Finally, using equations \eqref{eq:u_ij} - \eqref{eq:dS}, we computed $dN/dS$ for each distribution of codon fitnesses. For these calculations, we also need to select mutation rates. We set the mutation rate for transitions as $\mu\kappa$, and the rate for all transversions as $\mu$. We use the value $\mu = 10^{-6}$ for all $dN/dS$ calculations, and we draw a unique value for $\kappa$ from $\mathcal{U}[1,6]$ for each set of codon fitnesses.
 
 We found that $dN/dS$ values scale excellently with the variance ($\sigma^2$) of the distribution of amino-acid scaled selection coefficients (Figure~\ref{dnds_variance}). As Figure~\ref{dnds_variance} shows, $dN/dS$ and $\sigma^2$ are strongly negatively correlated; when fitness differences among amino acids are very high, $dN/dS$ takes on lower values, properly reflecting stronger purifying selection. Furthermore, as expected, this trend is much stronger for alignments without codon bias (Figure~\ref{dnds_variance}A, $r^2 = 0.83$) than for alignments with codon bias (Figure~\ref{dnds_variance}B, $r^2 = 0.45$). The weakened relationship for alignments with codon bias emerges from the fact that fitness differences among synonymous codons will obscure underlying amino acid fitness differences. Even so, the presence of codon bias does not remove the significant negative correlation between $dN/dS$ and selection strength.
 		
@@ -115,7 +125,7 @@ We acknowledge that it is unlikely that this result will have a strong influence
 
 As a consequence of the relationship between $dN/dS$ and scaled selection coefficients, we have a unique opportunity to assess the robustness of $dN/dS$ inference methods. It is conventional practice in model development to benchmark the model against data simulated according to the model itself. While this strategy is crucial for testing whether a model was implemented correctly, it is inherently incapable of discerning limitations and properties of the inference framework under more general conditions. Moreover, it cannot confirm that the underlying model accurately represents the evolutionary process. Therefore, we apply a novel benchmarking approach which uses the theoretical relationship among modeling frameworks to assess the accuracy and specific utility of those models. This approach, outlined in Figure~\ref{reg_conv}A, entails comparing $dN/dS$ values calculated from selection coefficients to those inferred by an $\omega$-based model, in order to benchmark the model's accuracy.
 
-Using the selection coefficients and mutation rates derived in the previous subsection, we simulated alignments using standard methods \cite{Yang2006} according the Halpern-Bruno MutSel model \cite{HalpernBruno1998}. We then inferred $dN/dS$ for each alignment using the M0 model \cite{GoldmanYang1994,Yangetal2000}, as implemented in the HyPhy batch language \cite{KosakovskyPondetal2005}. This model uses the GY94 instantaneous rate matrix, which includes parameters for transition/transversion bias ($\kappa$), equilibrium codon frequencies ($\pi$), and finally the $dN/dS$ rate ratio ($\omega$) (see equation \eqref{eq:GY94}). Throughout the remaining text, we refer to $dN/dS$ as inferred by M0 as $\omega$, and to $dN/dS$ computed using equations \eqref{eq:pfix} - \eqref{eq:dS} simply as $dN/dS$. 
+Using the selection coefficients and mutation rates derived in the previous subsection, we simulated alignments using standard methods \cite{Yang2006} according the Halpern-Bruno MutSel model \cite{HalpernBruno1998}. We then inferred $dN/dS$ for each alignment using the M0 model \cite{GoldmanYang1994,Yangetal2000}, as implemented in the HyPhy batch language \cite{KosakovskyPondetal2005}. This model uses the GY94 instantaneous rate matrix, which includes parameters for transition/transversion bias ($\kappa$), equilibrium codon frequencies ($\pi$), and finally the $dN/dS$ rate ratio ($\omega$) (see equation \eqref{eq:GY94}). Throughout the remaining text, we refer to $dN/dS$ as inferred by M0 as $\omega$, and to $dN/dS$ computed using equations \eqref{eq:u_ij} - \eqref{eq:dS} simply as $dN/dS$. 
 
 We found that $dN/dS$ values agree nearly perfectly with $\omega$ values (Figure~\ref{reg_conv}B). This agreement was neither influenced by the presence of codon bias, nor by nucleotide compostitional bias; indeed, simulated alignments featured a wide range (0.21-0.89) of GC contents. Additionally, in Figure~\ref{reg_conv}C, we demonstrate that $\omega$ converges to the true $dN/dS$ value as the size of the data set, represented by simulated alignment length, increases. These results unequivocally show that the $dN/dS$ quantity is fully contained within MutSel model parameters, and importantly that ML $dN/dS$ inference methods are robust indeed reveal that ML $dN/dS$ inference frameworks behave exactly as expected, yielding precise $dN/dS$ estimates. This finding has important implications for modeling choices; although the MutSel framework might model the sequence evolution in a way that more mechanistically matches the evolutionary process, $\omega$-based models do not dramatically suffer from any modeling limitations. 
 
@@ -180,10 +190,6 @@ In sum, we have garnered several important insights into the behavior of MC and 
 We additionally emphasize that improper model parameterizations lead to spurious $\omega$ MLEs which do not accurately represent $dN/dS$. If other model parameters ($\kappa$ and equilibrium codon frequencies) are specified incorrectly, or inadvertently contain information about amino-acid level natural selection, the resulting $\omega$ MLE will not represent the true $dN/dS$ evolutionary rate ratio. Only by ensuring that $\omega$ is the only model parameter which contains information about natural selection will it assuredly represent $dN/dS$. 
 		
 		
-		
-In sum, we have garnered several important insights into the behavior of MC and MutSel models, as well as the $dN/dS$ metric. These results were only made possible through establishing a formal mathematical relationship between distinct modeling frameworks. We believe that the approach presented in this paper represents a promising future avenue for methodological benchmarking. Typically, researchers assess the performance of a given inference framework through simulations which adhere to the underlying model's assumptions (with a notable exception of ref.\ \cite{Holder2008}). While this strategy is critical for testing whether a model implementation behaves as expected, it is innately incapable of assessing the limitations and properties of the inference framework under more general conditions, and it cannot confirm that the underlying model accurately represents the evolutionary process. Therefore, we suggest an alternate approach to benchmark inference methods: assessing the extent to which distinct models agree may serve as a novel, robust strategy to determine the accuracy and specific utility of different modeling frameworks. As we have shown here, this approach has great potential to reveal previously unrecognized model properties or biases and will help ensure robust model development going forward.
-		
-		
 \section*{Methods}
 
 \subsection*{Simulation of scaled selection coefficients}
@@ -192,7 +198,7 @@ We first examined the relationship between $dN/dS$ and scaled selection coeffici
 We then computed stationary codon frequencies as 
 \begin{equation}\label{eq:boltzmann}
 p_i = \frac{e^{F_i}}{\sum e^{F_k}}, 
-\end{equation} where the sum in the denominator runs over all 61 sense codons \cite{SellaHirsh2005}. Equation \eqref{eq:boltzmann} gives the analytically precise stationary frequencies for a MutSel model, under the assumption of symmetric nucleotide mutation rates, i.e.\ where $\mu_{xy} = \mu_{yx}$ \cite{SellaHirsh2005}. For each resulting set of stationary codon frequencies, we used equations \eqref{eq:kN} - \eqref{eq:dS} to compute a $dN/dS$ value. For these calculations, we set the mutation rate for transitions as $\mu\kappa$, and the rate for all transversions as $\mu$. We used the value $\mu = 10^{-6}$ for all $dN/dS$ calculations, and we drew a unique value for $\kappa$ from $\mathcal{U}[1,6]$ for each set of codon frequencies.
+\end{equation} where the sum in the denominator runs over all 61 sense codons \cite{SellaHirsh2005}. Equation \eqref{eq:boltzmann} gives the analytically precise stationary frequencies for a MutSel model, under the assumption of symmetric nucleotide mutation rates, i.e.\ where $\mu_{xy} = \mu_{yx}$ \cite{SellaHirsh2005}. For each resulting set of stationary codon frequencies, we used equations \eqref{eq:KN} - \eqref{eq:dS} to compute a $dN/dS$ value. For these calculations, we set the mutation rate for transitions as $\mu\kappa$, and the rate for all transversions as $\mu$. We used the value $\mu = 10^{-6}$ for all $dN/dS$ calculations, and we drew a unique value for $\kappa$ from $\mathcal{U}[1,6]$ for each set of codon frequencies.
 
 
 \subsection*{Alignment simulations.}
@@ -238,29 +244,39 @@ where $\kappa$ is the transition-transversion bias, $\pi_j$ is the equilibrium f
 
 
 \section*{Appendix 1}
-To prove that $dN/dS \leq 1$, when computed from scaled selection coefficients, we note that 
+In this appendix, we prove that, when calculated from scaled selection coefficients, $dN/dS \leq 1$. We assume that nucleotide mutation rates are symmetric ($\mu_{xy} = \mu_{yx}$) and that synonymous codons have the same fitness (synonymous changes are neutral). As described in the main text of this paper, these assumptions yield $dS = 1$, and hence we have to show that $dN = 	\frac{K_\text{N}}{L_\text{N}} \leq 1$. To demonstrate this, we note that the $dN$ calculation consists of a series pairwise sums of the evolutionary rate between a given pair of nonsynonymous codons, normalized by the sum of the frequencies of these codons. Therefore, we will now show that each of these pairwise sums is less than 1, and hence $dN$ must be less than 1.
 
-We assume that $P_i \leq P_j$ and that $P_j > 0$.
+For this proof, we consider the pair of nonsynonymous codons $i$ and $j$, where $P_i \leq P_j$ that $P_j > 0$ ($P_i$ represents the stationary frequency of codon $i$). Moreover, as we assume $\mu_{ij} = \mu_{ji}$, we will simply write $\mu$ for each of these quantities throughout the following.
+
+As follows from equation \eqref{eq:KN}, the sum of the probability weights of evolving from codon $i$ to $j$ and from codon $j$ to $i$ is,
+\begin{equation}
+N_e\mu \big{(} P_iu_{ij} + P_ju_{ji} \big{)} = \frac{2P_iP_j(\log(P_i) - \log(P_j))}{P_i - P_j}
+\end{equation}
+This quantity represents the $K_\text{N}$ (numerator) calculation for $dN$. To prove $dN \leq 1$, we must show that this quantity is less than or equal to $P_i + P_j$, which represents the $L_\text{N}$ (denominator) in the $dN$ calculation.
 
 To this end, we introduce the function 
 \begin{equation}\label{eq:Fxy}
-F(x,y) = x + y - \frac{2xy[\log(x) - \log(y)]}{x - y}
-\end{equation}, 
+F(x,y) = x + y - \frac{2xy[\log(x) - \log(y)]}{x - y} ,
+\end{equation}
 and we will now show that $F(x,y) \geq 0$ for $x \leq y$ and $y \geq 0 $. It is straightforward to show this for $x=y$. For $x < y$, we show that the first derivative of equation \eqref{eq:Fxy} is negative throughout $x \in (0,y)$, which proves that the function monotonically decreases, and thus $F(x,y) > 0$, in this interval. We calculate the first derivative as 
 \begin{equation}
 \frac{\partial{F(x,y)}}{\partial{x}} = \frac{\big{[} (x-3y)(x-y)+ 2y^2(\log{x} - \log{y}) \big{]}}{(x-y)^2} .
 \end{equation}
-We can further rewrite (expand?) the expression $\log{x} - log{x}$ as a series, thus yielding
+We can further rewrite (expand?) the expression $\log{x} - \log{y}$ as a series, yielding
 
-\begin{equation}
+\begin{equation}\label{eq:expand}
 \frac{\partial{F(x,y)}}{\partial{x}} = \frac{(x-3y)(x-y) + 2y^2\log(\frac{x}{y})} {(x-y)^2} .
 \end{equation}
 
-If we then take only the first two terms of the series, we find that the expression simplifies to 0. Therefore, we can write
+If we then take only the first two terms of the series, we find that equation \eqref{eq:expand} simplifies to 0. Therefore, we can write
 \begin{equation}
 \frac{\partial{F(x,y)}}{\partial{x}} = \frac{-2y^2\sum\limits_{n=3}^\infty \bigg{(}1-\frac{x}{y}\bigg{)}^n}{(x-y)^2} ,
 \end{equation}
 which is clearly negative. 
+
+
+\bigskip
+
 
 
 \section*{Appendix 2}
@@ -275,13 +291,14 @@ Q_{ji} = \left\{
 0                        &\mbox{multiple nucleotide changes} \\           
 \end{array} \right.,
 \end{equation}
-where $\pi_n^j$ is the equilibrium frequency of the target nucleotide which experienced a mutation from codon $i$ to codon $j$. The primary difference between equation \eqref{eq:MG94_omega} and the original MG94 rate matrix is that we consider a single parameter, $\omega$ for the nonsynonymous/synonymous rate ratio, whereas the original formulation used parameters $\beta$ and $\alpha$ to describe separately nonsynonymous and synonymous rates, respectively. As Muse and Gaut \cite{MuseGaut1994} noted, the stationary frequency for a codon comprised of nucleotides $x$, $y$, and $z$ (in that order) is
-\begin{equation}\label{eq:F3x4}
-\pi_x\pi_y\pi_z\frac{1}{C}, 
+where $\pi_n^j$ is the equilibrium frequency of the target nucleotide which experienced a mutation from codon $i$ to codon $j$. The primary difference between equation \eqref{eq:MG94_omega} and the original MG94 rate matrix is that we consider a single parameter, $\omega$ for the nonsynonymous/synonymous rate ratio, whereas the original formulation used parameters $\beta$ and $\alpha$ to describe separately nonsynonymous and synonymous rates, respectively. As Muse and Gaut \cite{MuseGaut1994} noted, the stationary frequency for a codon comprised of nucleotides $x$, $y$, and $z$ is
+\begin{equation}\label{eq:F1x4}
+\frac{\pi_x\pi_y\pi_z}{1 - \Pi_\text{stop}}, 
 \end{equation}
-where $C = \Pi_\text{stop} = \pi_\text{T}\pi_\text{A}\pi_\text{G} + \pi_\text{T}\pi_\text{G}\pi_\text{A} + \pi_\text{T}\pi_\text{A}\pi_\text{A}$. This expression \label{eq:F3x4} is better known as either the frequency estimator F1x4, if four parameters for nucleotide frequencies are used, or F3x4, if twelve parameters representing positional nucleotide frequencies are used.
-Using these equilibrium codon frequencies, we can derive precise values for target nucleotide frequencies $\pi_n$ used in \eqref{eq:MG94_omega}. We note that 
-$pi_n = $
+where $\Pi_\text{stop} = \pi_\text{T}\pi_\text{A}\pi_\text{G} + \pi_\text{T}\pi_\text{G}\pi_\text{A} + \pi_\text{T}\pi_\text{A}\pi_\text{A}$. The expression in equation \eqref{eq:F1x4} is better known as the frequency estimator F1x4. We note emphasize that framework considers global, not positional, nucleotide frequencies; in other words, 4 parameters, not 12, describe nucleotide equilibrium frequency values. Typically, these F1x4 stationary codon frequencies are subsequently used in the rate matrix, rather than the target nucleotide frequencies. Instead, we propose a simple model reformulation, which we term Fnuc, to actually incorporate the target nucleotide frequencies, as was originally intended. These target nucleotide frequencies are given by 
+\begin{equation}
+\pi_x = \frac{P_i(1 - \Pi_\text{stop})}{\pi_y\pi_z}, 
+\end{equation} where $P_i$ is the F1x4 frequency for codon $i$ and is comprised of the nucleotides $x$, $y$ and $z$. It is easy to show that, if applied to all 61 codons, 4 unique nucleotide frequency values will result, which can be readily incorporated into the matrix given in equation \eqref{eq:MG94_omega} to reveal the Fnuc parameterization.
 
 		
 \begin{acknowledgments}
