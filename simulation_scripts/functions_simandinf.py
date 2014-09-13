@@ -262,7 +262,7 @@ def run_hyphy_fequal(seqfile, treefile, cpu, kappa):
     runhyphy = subprocess.call( "./HYPHYMP globalDNDS_fequal.bf CPU="+cpu+" > hyout.txt", shell = True)
     assert (runhyphy == 0), "hyphy fail"
     
-    w, k = parse_output_GY94("hyout.txt")
+    lk, w, k = parse_output_GY94("hyout.txt")
     if k is None:
         k = kappa
     return w, k
@@ -284,34 +284,40 @@ def run_hyphy_nyp(batchfile, seqfile, treefile, cpu, fspecs):
     runhyphy = subprocess.call("./HYPHYMP " + batchfile + " CPU="+cpu, shell = True)
     assert (runhyphy == 0), "hyphy fail"
     
-    # Retrieve omega, kappa MLEs from the hyout files, names of which are hardcoded!!
+    # Retrieve likelihood, omega, kappa from the hyout files, names of which are hardcoded!!
     omegas = np.zeros(len(fspecs))
     kappas = np.zeros(len(fspecs))
+    lnliks = np.zeros(len(fspecs)) # log likelihood values
     count = 0
     for suffix in fspecs:
         file = suffix + '_hyout.txt'  
-        omegas[count], kappas[count] = parse_output_GY94(file)
+        lnliks[count], omegas[count], kappas[count] = parse_output_GY94(file)
         count += 1
-    return omegas, kappas
+    return lnliks, omegas, kappas
      
     
 def parse_output_GY94(file):
-    hyout = open(file, 'r')
-    hylines = hyout.readlines()
-    hyout.close()
-    hyphy_w = None
-    hyphy_k = None
+    with open(file, 'r') as hyout:
+        hylines = hyout.readlines()
+    lnlik = None; hyphy_w = None; hyphy_k = None;
     for line in hylines:
+        findlk = re.search("^Likelihood Function's Current Value =\s+ (-\d+\.*\d*)", line)
+        if findlk:
+            lnlik = float(findlk.group(1))
         findw = re.search("^w=(\d+\.*\d*)", line)
         if findw:
             hyphy_w = float(findw.group(1))
         findk = re.search("^k=(\d+\.*\d*)", line)
         if findk:
             hyphy_k = float(findk.group(1))
+    assert(lnlik is not None),   "Couldn't retrieve log likelihood from hyphy output file."
     assert(hyphy_w is not None), "Couldn't retrieve omega from hyphy output file."
     assert(hyphy_k is not None), "Couldn't retrieve kappa from hyphy output file."
-    return hyphy_w, hyphy_k
+    return lnlik, hyphy_w, hyphy_k
 
 
+
+def calc_AIC(k, lnlk):
+    return 2.*(float(k) - float(lnlk))
 
 ######################################################################################################################################

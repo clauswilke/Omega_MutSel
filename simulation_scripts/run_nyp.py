@@ -57,18 +57,18 @@ dnds = derive_dnds(codon_freqs_true_dict, mu_dict)
 
 # Maximum likelihood omega inference across a variety of frequency specifications.
 print "Conducting ML inference with HyPhy"
-fspecs = ['f61_true', 'f61_data', 'f1x4_true', 'f1x4_data', 'f3x4_true', 'f3x4_data', 'cf3x4_true', 'cf3x4_data', 'f1x4_fnuc_true', 'f1x4_fnuc_data', 'f3x4_fnuc_true', 'f3x4_fnuc_data']
-omegas, kappas = run_hyphy_nyp(batchfile, seqfile, treefile, cpu, fspecs)  
+fspecs = ['f61_true', 'f61_data', 'f1x4_true', 'f1x4_data', 'f3x4_true', 'f3x4_data', 'cf3x4_true', 'cf3x4_data', 'f1x4_fnuc_true', 'f1x4_fnuc_data']
+fspecs_k = np.array([62., 62., 5., 5., 11., 11., 11., 11., 5., 5.]) # number of parameters, in same order as fspecs.
+lnliks, omegas, kappas = run_hyphy_nyp(batchfile, seqfile, treefile, cpu, fspecs)  
 omega_errors = (dnds - omegas) / dnds
+AICs = 2*(fspecs_k - lnliks)
 
 
 # Finally, save results
 outstring_params = rep + '\t' + str(entropy) + '\t' + str(dnds)
-outf = open(paramfile, 'w')
-for f in fspecs:
-    y =  fspecs.index(f)
-    outf.write( outstring_params + '\t' + f + '\t' +  str(omegas[y]) + '\t' + str(omega_errors[y]) + '\t' + str(kappas[y]) + '\n')
-outf.close()   
+with open(paramfile, 'w') as outf:
+    for x in range(len(fspecs)):
+        outf.write( outstring_params + '\t' + fspecs[x] + '\t' +  str(omegas[x]) + '\t' + str(omega_errors[x]) + '\t' + str(kappas[x]) + '\t' + str(AICs[x]) + '\n')
 
 
 

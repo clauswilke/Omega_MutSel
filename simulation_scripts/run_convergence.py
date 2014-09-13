@@ -50,7 +50,7 @@ dnds = derive_dnds(codon_freqs_dict, mu_dict)
 
 # ML
 print "Conducting ML inference with HyPhy"
-mlw, k = run_hyphy_fequal(seqfile, treefile, cpu, kappa)
+lk, mlw, k = run_hyphy_fequal(seqfile, treefile, cpu, kappa)
 err = (dnds - mlw) / dnds
 
 # Save
