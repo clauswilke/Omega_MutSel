@@ -1,6 +1,6 @@
 /* SJS. 
 Hyphy inference for an "experimental" dataset. Name of file indicates the mutation scheme.
-Perform 12 total inferences, one for each of the following parameterizations: F61_true, F61_data, F1x4_true, F1x4_data, F3x4_true, F3x4_data, CF3x4_true, CF3x4_data, F1x4_Fnuc_true, F1x4_Fnuc_data, F3x4_Fnuc_true, F3x4_Fnuc_data. The _data refers to empirical frequencies, whereas _true refers to frequencies in absence of selection. 
+Perform 10 total inferences, one for each of the following parameterizations: F61_true, F61_data, F1x4_true, F1x4_data, F3x4_true, F3x4_data, CF3x4_true, CF3x4_data, Fnuc_true, Fnuc_data. The _data refers to empirical frequencies, whereas _true refers to frequencies in absence of selection. 
 Also note that Fnuc is not so much a frequency parameterization, but actually a "new"(ish? it's actually what should have been the original) model.
 */
 
@@ -8,7 +8,7 @@ global w; global k; global t;
 
 LIKELIHOOD_FUNCTION_OUTPUT = 1;
 RANDOM_STARTING_PERTURBATIONS = 1;
-OPTIMIZATION_PRECSION = 0.000001;
+OPTIMIZATION_PRECSION = 0.00000001;
 #include "GY94.mdl"; // Basic GY94 rate matrix
 #include "fnuc.mdl"; // Custom Fnuc matrices for this run
 
@@ -128,45 +128,24 @@ fprintf ("cf3x4_data_hyout.txt", LikFn8);
 
 
 Fones =  {{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1}};
-////////////// F1x4 Fnuc_TRUE MODEL //////////////
+////////////// Fnuc_TRUE MODEL //////////////
 global w; global k; global t;
-Model MyModel = (F1x4_GY94_Fnuc_true, Fones, 0); // Using 0 as last argument means that the matrix will *not* be multipled by frequencies, but just in case it is, we provide Fones (all entries are 1, so multiplication is basically..not)
+Model MyModel = (Fnuc_true, Fones, 0); // Using 0 as last argument means that the matrix will *not* be multipled by frequencies, but just in case it is, we provide Fones (all entries are 1, so multiplication is basically..not)
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn9 = (filt_data, Tree01);
 Optimize (paramValues, LikFn9);
-fprintf ("f1x4_fnuc_true_hyout.txt", LikFn9);
+fprintf ("fnuc_true_hyout.txt", LikFn9);
 
 
-////////////// F1x4 Fnuc_DATA MODEL //////////////
+////////////// Fnuc_DATA MODEL //////////////
 global w; global k; global t;
-Model MyModel = (F1x4_GY94_Fnuc_data, Fones, 0); // Using 0 as last argument means that the matrix will *not* be multipled by frequencies, but just in case it is, we provide Fones (all entries are 1, so multiplication is basically..not)
+Model MyModel = (Fnuc_data, Fones, 0); // Using 0 as last argument means that the matrix will *not* be multipled by frequencies, but just in case it is, we provide Fones (all entries are 1, so multiplication is basically..not)
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn10 = (filt_data, Tree01);
 Optimize (paramValues, LikFn10);
-fprintf ("f1x4_fnuc_data_hyout.txt", LikFn10);
-
-////////////// F3x4 Fnuc_TRUE MODEL //////////////
-global w; global k; global t;
-Model MyModel = (F3x4_GY94_Fnuc_true, Fones, 0); // Using 0 as last argument means that the matrix will *not* be multipled by frequencies, but just in case it is, we provide Fones (all entries are 1, so multiplication is basically..not)
-UseModel (USE_NO_MODEL);
-UseModel(MyModel);
-Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn11 = (filt_data, Tree01);
-Optimize (paramValues, LikFn11);
-fprintf ("f3x4_fnuc_true_hyout.txt", LikFn11);
-
-
-////////////// F3x4 Fnuc_DATA MODEL //////////////
-global w; global k; global t;
-Model MyModel = (F3x4_GY94_Fnuc_data, Fones, 0); // Using 0 as last argument means that the matrix will *not* be multipled by frequencies, but just in case it is, we provide Fones (all entries are 1, so multiplication is basically..not)
-UseModel (USE_NO_MODEL);
-UseModel(MyModel);
-Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn12 = (filt_data, Tree01);
-Optimize (paramValues, LikFn12);
-fprintf ("f3x4_fnuc_data_hyout.txt", LikFn12);
+fprintf ("fnuc_data_hyout.txt", LikFn10);
 
