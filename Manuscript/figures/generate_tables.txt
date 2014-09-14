@@ -12,9 +12,13 @@ cat("%%%% Latex tables for 'The relationship between dN/dS and scaled selection 
 make_daic_table <- function(dat, fspecs, rownames)
 {
 for (i in seq(1,10,2)){
-    daic_data <- mean(dat$aic[dat$fspec=="fnuc_data"]) - mean(dat$aic[dat$fspec==fspecs[i]])
-    daic_true <- mean(dat$aic[dat$fspec=="fnuc_true"]) - mean(dat$aic[dat$fspec==fspecs[i+1]])
-    cat(paste(rownames[(i+1)/2], dat$num_params[dat$fspec==fspecs[i]][1], round(daic_data,2), round(daic_true,2), sep=' & '))
+    mean_data <- round( mean(dat$aic[dat$fspec=="fnuc_data"] - dat$aic[dat$fspec==fspecs[i]]), 2)
+    mean_true <- round( mean(dat$aic[dat$fspec=="fnuc_true"] - dat$aic[dat$fspec==fspecs[i+1]]), 2)
+    sd_data   <- round( sd(dat$aic[dat$fspec=="fnuc_data"] - dat$aic[dat$fspec==fspecs[i]]), 2)
+    sd_true   <- round( sd(dat$aic[dat$fspec=="fnuc_true"] - dat$aic[dat$fspec==fspecs[i+1]]), 2)
+    data <- paste(mean_data, " (", sd_data, ") ", sep="")
+    true <- paste(mean_true, " (", sd_true, ") ", sep="")
+    cat(paste(rownames[(i+1)/2], dat$num_params[dat$fspec==fspecs[i]][1], data, true, sep=' & '))
     cat(' \\\\ \n')
 }}
 
