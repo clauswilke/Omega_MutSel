@@ -4,7 +4,11 @@
 \usepackage{amsmath}
 \usepackage{lscape}
 \newcommand{\xline}[0]{\noindent\underline{\makebox[0.15cm][l]{}}}
-
+\makeatletter
+\def\hlinewd#1{%
+	\noalign{\ifnum0=`}\fi\hrule \@height #1 \futurelet
+	\reserved@a\@xhline}
+\makeatother
 \begin{document}
 	
 	
@@ -315,7 +319,7 @@ where $\Pi_\text{stop} = \pi_\text{T}\pi_\text{A}\pi_\text{G} + \pi_\text{T}\pi_
 \end{article}
 	
 	
-\section*{Figures}
+\section*{Figures and Tables }
 
 \vspace{2cm}
 	
@@ -339,7 +343,23 @@ where $\Pi_\text{stop} = \pi_\text{T}\pi_\text{A}\pi_\text{G} + \pi_\text{T}\pi_
 	\centerline{\includegraphics[width=8.7cm]{figures/MainText/nyp_bias_r2.pdf}}
 	\caption{\label{nyp_bias_r2} (A) Estimator bias and (B) $r^2$ values between $dN/dS$ and $\omega$ MLEs across M0 codon frequency parameterizations, for each set of nucleotide mutation rates. Note that negative biases indicate $\omega$ values that are, on average, lower than $dN/dS$. All bias and $r^2$ values are highly statistically significant, with all $p < 10^{-12}$. In this figure, we see that $\omega$-based models tend to systematically underestimate $dN/dS$, across all codon frequency parameterizations. Generally, F\protect\xline equal features the least amount of bias, and has very high $r^2$ values for both NP and yeast mutation rates. Although Fequal yields lower $r^2$ values for polio mutation rates than do F61, F3x4, and CF3x4, the latter three estimators also have relatively high biases, demonstrating that they systematically underestimate $dN/dS$. That Ftrue, which assigns codon frequencies to those which would exist in the absence of amino-acid level selection, also underestimates $dN/dS$ implies that codon frequency parameters are ill-suited to accomodate mutation-induced nucleotide compositional bias.}	
 \end{figure}
+
+\vspace{2cm}	
 	
+\begin{table}[htbp]
+	\caption {\label{tab:AIC_yeast} Yeast mean $\Delta$AIC.}
+	\begin{tabular}{l c c c}
+		\hline\noalign{\smallskip}
+		\multicolumn{1}{c}{Frequencies} & k & Empirical $\Delta$AIC & True $\Delta$AIC \\
+		\noalign{\smallskip}\hline\noalign{\smallskip}
+		Fnuc & 5 & 0 & 0 \\ 
+		F1x4 & 5 & -3967854.04 & -3974571.92 \\ 
+		CF3x4 & 11 & -3963057.08 & -3973790.54 \\ 
+		F3x4 & 11 & -3972768.03 & -3980424.02 \\ 
+		F61 & 62 & -3955505.20 & -3974007.80 \\
+		\noalign{\smallskip}\hline\noalign{\smallskip} 
+	\end{tabular}
+\end{table}
 \clearpage
 
 	
@@ -347,49 +367,84 @@ where $\Pi_\text{stop} = \pi_\text{T}\pi_\text{A}\pi_\text{G} + \pi_\text{T}\pi_
 
 \vspace{2cm}
 
-\noindent Table S1. Estimator bias between $\omega$ MLEs and the expected, true $dN/dS$ values, for all mutation rates and M0 codon frequency parameterizations examined. Negative bias values indicate that $\omega$ MLEs are, on average, lower than $dN/dS$. All biases are statistically significant, with all $p < 2 \times 10^{-16}$, except yeast fnuc data (9.23e-5) .
+\noindent Table S1. Estimator bias between $\omega$ MLEs and the expected, true $dN/dS$ values, for all mutation rates and M0 codon frequency parameterizations examined. Negative bias values indicate that $\omega$ MLEs are, on average, lower than $dN/dS$. All biases are statistically significant, with all $p < 2\times10^{-16}$.
 \begin{table}[htbp]
-	\begin{tabular}{c c c c c}
+	\begin{tabular}{c c c c c c}
 		\hline\noalign{\smallskip}
-		Mutation rate & F61 & F3x4 & CF3x4 & Fnuc \\
+		Mutation rate & Fnuc & F1x4 & CF3x4 & F3x4 & F61 \\
 		\hline\noalign{\smallskip}
-		& \multicolumn{4}{c}{Empirical Frequencies}\\
-		\cline{2-5}\noalign{\medskip}
-		NP & 0.019 & -0.007 & -0.009 & -0.020 \\
-		Yeast & -0.062 & -0.072 & -0.079 & 0.006 \\
-		Polio & -0.129 & -0.156 & -0.143 & -0.102 \\
-		\hline\noalign{\smallskip}
-		& \multicolumn{4}{c}{True Frequencies}\\
-		\cline{2-5}\noalign{\medskip}
-		NP & -0.010 & -0.008 & -0.010 & -0.015 \\
-		Yeast & -0.078 & -0.070 & -0.078 & 0.021 \\
-		Polio & -0.093 & -0.108 & -0.093 & -0.051 \\
+		& \multicolumn{5}{c}{Empirical Frequencies}\\
+		\cline{2-6}\noalign{\medskip}
+		NP & -0.014 & -0.007 & -0.009 & -0.007 & 0.02 \\ 
+		Yeast & 0.022 & -0.061 & -0.079 & -0.072 & -0.062 \\ 
+		Polio & -0.046 & -0.083 & -0.143 & -0.156 & -0.129 \\ 
+		\hline\noalign{\medskip}
+		& \multicolumn{5}{c}{True Frequencies}\\
+		\cline{2-6}\noalign{\medskip}
+		NP & -0.01 & -0.006 & -0.01 & -0.008 & -0.01 \\ 
+		Yeast & 0.028 & -0.066 & -0.078 & -0.07 & -0.078 \\ 
+		Polio & -0.041 & -0.085 & -0.093 & -0.108 & -0.093 \\ 
 		\noalign{\smallskip}\hline\noalign{\smallskip}
 	\end{tabular}
 \end{table}	
 
 \vspace{2cm}
 
-\noindent Table S2. NYP $r^2$ values between $\omega$ MLEs and $dN/dS$, for all mutation rates and M0 codon frequency parameterizations examined. All $r^2$ values are statistically significant, with all $p < 10^{-15}$.
+\noindent Table S2. NYP $r^2$ values between $\omega$ MLEs and $dN/dS$, for all mutation rates and M0 codon frequency parameterizations examined. All $r^2$ values are statistically significant, with all $p < 2\times10^{-16}$.
 \begin{table}[htbp]
-	\begin{tabular}{c c c c c}
+	\begin{tabular}{c c c c c c}
 		\hline\noalign{\smallskip}
-		Mutation rate & F61 & F3x4 & CF3x4 & Fnuc \\
+		Mutation rate & Fnuc & F1x4 & CF3x4 & F3x4 & F61 \\
 		\hline\noalign{\smallskip}
-		& \multicolumn{4}{c}{Empirical Frequencies}\\
-		\cline{2-5}\noalign{\medskip}
-		NP & 0.901 & 0.977 & 0.985 & 0.988 \\
-		Yeast & 0.902 & 0.874 & 0.908 & 0.913 \\
-		Polio & 0.771 & 0.801 & 0.777 & 0.841 \\
-		\hline\noalign{\smallskip}
-		& \multicolumn{4}{c}{True Frequencies}\\
-		\cline{2-5}\noalign{\medskip}
-		NP & 0.986 & 0.985 & 0.986 & 0.986 \\
-		Yeast & 0.833 & 0.812 & 0.834 & 0.947 \\
-		Polio & 0.736 & 0.766 & 0.735 & 0.932 \\
-	\noalign{\smallskip}\hline\noalign{\smallskip}
+		& \multicolumn{5}{c}{Empirical Frequencies}\\
+		\cline{2-6}\noalign{\medskip}
+		NP & 0.987 & 0.985 & 0.985 & 0.977 & 0.903 \\ 
+		Yeast & 0.937 & 0.919 & 0.909 & 0.876 & 0.902 \\ 
+		Polio & 0.870 & 0.796 & 0.777 & 0.800 & 0.770 \\ 
+		\hline\noalign{\medskip}
+		& \multicolumn{5}{c}{True Frequencies}\\
+		\cline{2-6}\noalign{\medskip}
+		NP & 0.986 & 0.988 & 0.986 & 0.985 & 0.986 \\ 
+		Yeast & 0.954 & 0.868 & 0.836 & 0.814 & 0.834 \\ 
+		Polio & 0.929 & 0.763 & 0.735 & 0.765 & 0.736 \\ 
+		\noalign{\smallskip}\hline\noalign{\smallskip}
 	\end{tabular}
 \end{table}	
+
+\vspace{2cm}
+
+\noindent Table S3. NP mean $\Delta$AIC.
+\begin{table}[htbp]
+	\begin{tabular}{l c c c}
+		\hline\noalign{\smallskip}
+		\multicolumn{1}{c}{Frequencies} & k & Empirical $\Delta$AIC & True $\Delta$AIC \\
+		\noalign{\smallskip}\hline\noalign{\smallskip}
+		Fnuc & 5 & 0 & 0 \\ 
+		F1x4 & 5 & -4110522.59 & -4113176.42 \\ 
+		CF3x4 & 11 & -4106695.83 & -4110412.62 \\ 
+		F3x4 & 11 & -4112103.30 & -4113684.34 \\ 
+		F61 & 62 & -4096741.43 & -4110482.75 \\ 
+		\noalign{\smallskip}\hline\noalign{\smallskip} 
+	\end{tabular}
+\end{table}
+
+\vspace{2cm}
+
+\noindent Table S4. Polio mean $\Delta$AIC.
+\begin{table}[htbp]
+	\begin{tabular}{l c c c}
+		\hline\noalign{\smallskip}
+		\multicolumn{1}{c}{Frequencies} & k & Empirical $\Delta$AIC & True $\Delta$AIC \\
+		\noalign{\smallskip}\hline\noalign{\smallskip}
+		Fnuc & 5 & 0 & 0 \\ 
+		F1x4 & 5 & -3535535.65 & -3548685.06 \\ 
+		CF3x4 & 11 & -3528315.59 & -3543917.87 \\ 
+		F3x4 & 11 & -3539604.01 & -3555805.19 \\ 
+		F61 & 62 & -3520641.22 & -3543716.83 \\ 
+		\noalign{\smallskip}\hline\noalign{\smallskip} 
+	\end{tabular}
+\end{table}
+
 
 \newpage
 

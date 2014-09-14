@@ -69,9 +69,9 @@ dev.off()
 
 
 ############################ nucleoprotein, yeast, polio r^2 and bias plots #############################
-fspecs_data <- c("f61_data", "f3x4_data", "cf3x4_data", "f1x4_data", "f3x4_fnuc_data", "f1x4_fnuc_data")
-fspecs_true <- c("f61_true", "f3x4_true", "cf3x4_true", "f1x4_true", "f3x4_fnuc_true", "f1x4_fnuc_true")
-names <- c("F61", "F3x4", "CF3x4", "F1x4", "Fnuc3", "Fnuc1")
+fspecs_data <- c("f61_data", "f3x4_data", "cf3x4_data", "f1x4_data", "fnuc_data")
+fspecs_true <- c("f61_true", "f3x4_true", "cf3x4_true", "f1x4_true", "fnuc_true")
+names <- c("F61", "F3x4", "CF3x4", "F1x4", "Fnuc")
 
 
 
@@ -112,7 +112,7 @@ plot_nyp_bias <- function(fspecs, np_vector, yeast_vector, polio_vector, point_s
     points(1:length(fspecs), yeast_vector, col='red', pch=20, cex=point_size)
     points(1:length(fspecs), polio_vector, col='blue', pch=20, cex=point_size)
     abline(h=0, col='gray25', lwd=2)
-    mtext(panel, side = 3, at = 0, cex = panel_size)
+    mtext(panel, side = 3, at = 0.18, cex = panel_size)
 }
 
 plot_nyp_r2 <- function(fspecs, np_vector, yeast_vector, polio_vector, point_size, xlab_size, ylab_size, axis_size, panel, panel_size){
@@ -128,7 +128,7 @@ plot_nyp_r2 <- function(fspecs, np_vector, yeast_vector, polio_vector, point_siz
 	    points(1:length(fspecs), yeast_vector, col='red', pch=20, cex=point_size)
 	}
 	axis(side=1, at=1:length(fspecs), labels = names, las=1, cex.axis=xlab_size)
-	mtext(panel, side = 3, at = 0, cex = panel_size)
+	mtext(panel, side = 3, at = .18, cex = panel_size)
 }
 
 
@@ -137,9 +137,9 @@ par(mfrow=c(2,2))
 par(mar=c(2.1,5,2,2.3)) #bottom, left, top, right
 point_size = 3
 ylab_size = 1.85
-xlab_size = 1.4
+xlab_size = 1.85
 axis_size = 1.7
-panel_size = 2
+panel_size = 2.25
 
 
 # Top left panel: bias, data frequencies
@@ -147,12 +147,12 @@ plot_nyp_bias(fspecs_data, np_bias_data, yeast_bias_data, polio_bias_data, point
 
 
 #legend
-points(5.35, 0.2, pch=20, cex=1.6)
-points(5.35, 0.16, pch=20, cex=1.6, col='red')
-points(5.35, 0.12, pch=20, cex=1.6, col='blue')
-text(5.7, 0.2, 'NP', cex=1.5)
-text(5.8, 0.16, 'Yeast', cex=1.5)
-text(5.8, 0.12, 'Polio', cex=1.5)
+points(4.35, 0.2, pch=20, cex=1.6)
+points(4.35, 0.16, pch=20, cex=1.6, col='red')
+points(4.35, 0.12, pch=20, cex=1.6, col='blue')
+text(4.7, 0.2, 'NP', cex=1.5)
+text(4.8, 0.16, 'Yeast', cex=1.5)
+text(4.8, 0.12, 'Polio', cex=1.5)
 
 # Top right panel: r^2, data frequencies
 plot_nyp_r2(fspecs_data, np_r2_data, yeast_r2_data, polio_r2_data, point_size, xlab_size, ylab_size, axis_size, "B", panel_size)
@@ -165,6 +165,37 @@ plot_nyp_bias(fspecs_data, np_bias_true, yeast_bias_true, polio_bias_true, point
 plot_nyp_r2(fspecs_true, np_r2_true, yeast_r2_true, polio_r2_true, point_size, xlab_size, ylab_size, axis_size, "D", panel_size)
 
 dev.off()
+
+
+
+
+
+#pdf('SI/omega_data_true.pdf', width=15, height=6)
+#par(mfrow=c(3,5))
+#data <- c("f61_data", "f3x4_data", "cf3x4_data", "f1x4_data", "fnuc_data")
+#true <- c("f61_true", "f3x4_true", "cf3x4_true", "f1x4_true", "fnuc_true")
+#for (f in 1:5)
+#{
+#    r2 <- cor(np$omega[np$fspec == data[f]], np$omega[np$fspec == true[f]])^2
+#    plot(np$omega[np$fspec == data[f]], np$omega[np$fspec == true[f]], xlab='Data omega', ylab = 'True omega', main=paste(names[f], round(r2,5)), pch=20)
+#    abline(0,1,col='red')
+#}
+#for (f in 1:5)
+#{
+#    r2 <- cor(yeast$omega[yeast$fspec == data[f]], yeast$omega[yeast$fspec == true[f]])^2
+#    plot(yeast$omega[yeast$fspec == data[f]], yeast$omega[yeast$fspec == true[f]], xlab='Data omega', ylab = 'True omega',main=paste(names[f], round(r2,5)), pch=20)
+#    abline(0,1,col='red')
+#}
+#
+#for (f in 1:5)
+#{
+#    r2 <- cor(polio$omega[polio$fspec == data[f]], polio$omega[polio$fspec == true[f]])^2
+#    plot(polio$omega[polio$fspec == data[f]], polio$omega[polio$fspec == true[f]], xlab='Data omega', ylab = 'True omega',main=paste(names[f], round(r2,5)), pch=20)
+#    abline(0,1,col='red')
+#}
+#dev.off()
+#
+
 
 
 

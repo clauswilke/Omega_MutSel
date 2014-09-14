@@ -1,0 +1,102 @@
+# Both the MainText and SI tables are made here and all tables go into latex_tables.txt. 
+
+np <- read.table('../../datasets/np.txt', header=T)
+yeast<- read.table('../../datasets/yeast.txt', header=T)
+polio <- read.table('../../datasets/polio.txt', header=T)
+fspecs <- c("fnuc_data", "fnuc_true", "f1x4_data", "f1x4_true", "cf3x4_data", "cf3x4_true", "f3x4_data", "f3x4_true", "f61_data", "f61_true")
+rownames <- c("Fnuc", "F1x4", "CF3x4", "F3x4", "F61")
+
+sink("latex_tables.txt")
+cat("%%%% Latex tables for 'The relationship between dN/dS and scaled selection coefficients' (SJS, COW). %%%%%\n\n\n\n\n\n")
+############################# NYP dAIC tables ###################################
+make_daic_table <- function(dat, fspecs, rownames)
+{
+for (i in seq(1,10,2)){
+    daic_data <- mean(dat$aic[dat$fspec=="fnuc_data"]) - mean(dat$aic[dat$fspec==fspecs[i]])
+    daic_true <- mean(dat$aic[dat$fspec=="fnuc_true"]) - mean(dat$aic[dat$fspec==fspecs[i+1]])
+    cat(paste(rownames[(i+1)/2], dat$num_params[dat$fspec==fspecs[i]][1], round(daic_data,2), round(daic_true,2), sep=' & '))
+    cat(' \\\\ \n')
+}}
+
+cat("%%%%%%%%%  NP dAIC table  %%%%%%%%%%\n")
+make_daic_table(np, fspecs, rownames)
+cat("\n\n\n%%%%%%%%%  Yeast dAIC table  %%%%%%%%%\n")
+make_daic_table(yeast, fspecs, rownames)
+cat("\n\n\n%%%%%%%%%  Polio dAIC table  %%%%%%%%%\n")
+make_daic_table(polio, fspecs, rownames)
+
+############################# NYP Estimator bias and r^2 tables ###################################
+
+fspecs_data <- c("fnuc_data", "f1x4_data", "cf3x4_data", "f3x4_data", "f61_data")
+fspecs_true <- c("fnuc_true", "f1x4_true", "cf3x4_true", "f3x4_true", "f61_true")
+np_r2_data <- c(); yeast_r2_data <- c(); polio_r2_data <- c(); np_bias_data <- c(); yeast_bias_data <- c(); polio_bias_data <- c()
+np_r2_true <- c(); yeast_r2_true <- c(); polio_r2_true <- c(); np_bias_true <- c(); yeast_bias_true <- c(); polio_bias_true <- c()
+
+for (i in 1:length(fspecs_data))
+{
+    temp <- np[np$fspec == fspecs_data[i],]
+    np_r2_data <- c( np_r2_data, cor(temp$dnds, temp$omega)^2)
+    np_bias_data <- c( np_bias_data, glm(omega ~ offset(dnds), data=temp)$coefficients )    
+    temp <- yeast[yeast$fspec == fspecs_data[i],]
+    yeast_r2_data <- c( yeast_r2_data, cor(temp$dnds, temp$omega)^2)
+    yeast_bias_data <- c( yeast_bias_data, glm(omega ~ offset(dnds), data=temp)$coefficients )
+    temp <- polio[polio$fspec == fspecs_data[i],]
+    polio_r2_data <- c( polio_r2_data, cor(temp$dnds, temp$omega)^2)
+    polio_bias_data <- c( polio_bias_data, glm(omega ~ offset(dnds), data=temp)$coefficients )
+
+}
+for (i in 1:length(fspecs_true))
+{
+    temp <- np[np$fspec == fspecs_true[i],]
+    np_r2_true <- c( np_r2_true, cor(temp$dnds, temp$omega)^2)
+    np_bias_true <- c( np_bias_true, glm(omega ~ offset(dnds), data=temp)$coefficients )    
+    temp <- yeast[yeast$fspec == fspecs_true[i],]
+    yeast_r2_true <- c( yeast_r2_true, cor(temp$dnds, temp$omega)^2)
+    yeast_bias_true <- c( yeast_bias_true, glm(omega ~ offset(dnds), data=temp)$coefficients )
+    temp <- polio[polio$fspec == fspecs_true[i],]
+    polio_r2_true <- c( polio_r2_true, cor(temp$dnds, temp$omega)^2)
+    polio_bias_true <- c( polio_bias_true, glm(omega ~ offset(dnds), data=temp)$coefficients )
+
+}
+
+make_bias_r2_table <- function(np_list, yeast_list, polio_list)
+{
+row <- "NP"
+for (entry in np_list){ row <- paste(row, round(entry,3), sep=" & ") }
+cat(row)
+cat(' \\\\ \n')
+row <- "Yeast"
+for (entry in yeast_list){ row <- paste(row, round(entry,3), sep=" & ") }
+cat(row)
+cat(' \\\\ \n')
+row <- "Polio"
+for (entry in polio_list){ row <- paste(row, round(entry,3), sep=" & ") }
+cat(row)
+cat(' \\\\ \n')
+}
+
+
+cat("\n\n\n\n\n\n%%%%%%%%%  Empirical bias  %%%%%%%%%%\n")
+make_bias_r2_table(np_bias_data, yeast_bias_data, polio_bias_data)
+cat("\n\n\n%%%%%%%%%  True bias  %%%%%%%%%\n")
+make_bias_r2_table(np_bias_true, yeast_bias_true, polio_bias_true)
+cat("\n\n\n\n\n\n%%%%%%%%%  Empirical r^2  %%%%%%%%%\n")
+make_bias_r2_table(np_r2_data, yeast_r2_data, polio_r2_data)
+cat("\n\n\n%%%%%%%%%  True r^2  %%%%%%%%%\n")
+make_bias_r2_table(np_r2_true, yeast_r2_true, polio_r2_true)
+
+
+
+sink()
+
+
+
+
+
+
+
+
+
+
+
+
