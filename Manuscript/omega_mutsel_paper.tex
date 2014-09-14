@@ -250,31 +250,26 @@ where $\kappa$ is the transition-transversion bias, $\pi_j$ is the equilibrium f
 \section*{Appendix 1}
 In this appendix, we prove that, when calculated from scaled selection coefficients, $dN/dS \leq 1$. We assume that nucleotide mutation rates are symmetric ($\mu_{xy} = \mu_{yx}$) and that synonymous codons have the same fitness (synonymous changes are neutral). As described in the main text of this paper, these assumptions yield $dS = 1$, and hence we have to show that $dN = 	\frac{K_\text{N}}{L_\text{N}} \leq 1$. To demonstrate this, we note that the $dN$ calculation consists of a series pairwise sums of the evolutionary rate between a given pair of nonsynonymous codons, normalized by the sum of the frequencies of these codons. Therefore, we will now show that each of these pairwise sums is less than 1, and hence $dN$ must be less than 1.
 
-For this proof, we consider the pair of nonsynonymous codons $i$ and $j$, where $P_i \leq P_j$ that $P_j > 0$ ($P_i$ represents the stationary frequency of codon $i$). Moreover, as we assume $\mu_{ij} = \mu_{ji}$, we will simply write $\mu$ for each of these quantities throughout the following.
-
-As follows from equation \eqref{eq:KN}, the sum of the probability weights of evolving from codon $i$ to $j$ and from codon $j$ to $i$ is,
+For this proof, we consider the pair of nonsynonymous codons $i$ and $j$, where $P_i \leq P_j$ that $P_j > 0$ ($P_i$ represents the stationary frequency of codon $i$). Moreover, as we assume $\mu_{ij} = \mu_{ji}$, we will simply write $\mu$ for each of these quantities throughout the following. As follows from equation \eqref{eq:KN}, the sum of the probability weights of evolving from codon $i$ to $j$ and from codon $j$ to $i$ is,
 \begin{equation}
-N_e\mu \big{(} P_iu_{ij} + P_ju_{ji} \big{)} = \frac{2P_iP_j(\log(P_i) - \log(P_j))}{P_i - P_j}
+N_e\mu \big{(} P_iu_{ij} + P_ju_{ji} \big{)} = \frac{2P_iP_j(\log(P_i) - \log(P_j))}{P_i - P_j} \,.
 \end{equation}
-This quantity represents the $K_\text{N}$ (numerator) calculation for $dN$. To prove $dN \leq 1$, we must show that this quantity is less than or equal to $P_i + P_j$, which represents the $L_\text{N}$ (denominator) in the $dN$ calculation.
-
-To this end, we introduce the function 
+This quantity represents the $K_\text{N}$ (numerator) calculation for $dN$. To prove $dN \leq 1$, we must show that this quantity is less than or equal to $P_i + P_j$, which represents the $L_\text{N}$ (denominator) in the $dN$ calculation. To this end, we introduce the function 
 \begin{equation}\label{eq:Fxy}
-F(x,y) = x + y - \frac{2xy[\log(x) - \log(y)]}{x - y} ,
+F(x,y) = x + y - \frac{2xy[\log(x) - \log(y)]}{x - y} \,,
 \end{equation}
 and we will now show that $F(x,y) \geq 0$ for $x \leq y$ and $y \geq 0 $. It is straightforward to show this for $x=y$. For $x < y$, we show that the first derivative of equation \eqref{eq:Fxy} is negative throughout $x \in (0,y)$, which proves that the function monotonically decreases, and thus $F(x,y) > 0$, in this interval. We calculate the first derivative as 
 \begin{equation}
-\frac{\partial{F(x,y)}}{\partial{x}} = \frac{\big{[} (x-3y)(x-y)+ 2y^2(\log{x} - \log{y}) \big{]}}{(x-y)^2} .
+\frac{\partial{F(x,y)}}{\partial{x}} = \frac{\big{[} (x-3y)(x-y) - 2y^2(\log{x} - \log{y}) \big{]}}{(x-y)^2} \,.
 \end{equation}
-We can further rewrite (expand?) the expression $\log{x} - \log{y}$ as a series, yielding
-
+We now replace the expression $\log{x} - \log{y}$ by its Taylor expansion, yielding
 \begin{equation}\label{eq:expand}
-\frac{\partial{F(x,y)}}{\partial{x}} = \frac{(x-3y)(x-y) + 2y^2\log(\frac{x}{y})} {(x-y)^2} .
+	\frac{\partial{F(x,y)}}{\partial{x}} = \frac{\bigg{[} (x-3y)(x-y) - 2y^2\bigg{(}\sum\limits_{n=1}^\infty \frac{(1-x/y)^n}{n}\bigg{)} \bigg{]}}{(x-y)^2} \,.
 \end{equation}
 
-If we then take only the first two terms of the series, we find that equation \eqref{eq:expand} simplifies to 0. Therefore, we can write
+We further note that the first two terms of the Taylor series equal $(x-3y)(x-y)$, and thus expression \eqref{eq:expand} simplifies to 
 \begin{equation}
-\frac{\partial{F(x,y)}}{\partial{x}} = \frac{-2y^2\sum\limits_{n=3}^\infty \bigg{(}1-\frac{x}{y}\bigg{)}^n}{(x-y)^2} ,
+\frac{\partial{F(x,y)}}{\partial{x}} = \frac{-2y^2\sum\limits_{n=3}^\infty \big{(}1-\frac{x}{y}\big{)}^n}{(x-y)^2} ,
 \end{equation}
 which is clearly negative. 
 
