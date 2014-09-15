@@ -41,17 +41,12 @@ def parse_input(arguments):
     return mu_type, mudict, compute_freqs_from_prefs
 
 
-def get_nuc_diff(source, target, grab_position = False):
+def get_nuc_diff(source, target):
     diff = ''
-    position = 5
     for i in range(3):
         if source[i] != target[i]: 
             diff += source[i]+target[i]
-            position = i
-    if grab_position:
-        return diff, position
-    else:
-        return diff
+    return diff
 
 
 def build_matrix(amino_prop_dict, mu_dict):
@@ -147,6 +142,8 @@ def calc_f3x4_freqs(pos_nuc_freqs):
     assert( abs(np.sum(f3x4) - 1.) < 1e-8), "Could not properly caluclate (C)F3x4 frequencies."
     return f3x4   
 
+
+
 def calc_f1x4_freqs(nuc_freqs):
     ''' Compute F1x4 codon frequencies from nucleotide frequencies. '''
     f1x4 = np.ones(61)
@@ -157,7 +154,7 @@ def calc_f1x4_freqs(nuc_freqs):
             f1x4[i] *= nuc_freqs[nucindex[codon[j]]]
     f1x4 /= (1. - pi_stop)
     assert( abs(np.sum(f1x4) - 1.) < 1e-8), "Could not properly caluclate F1x4 frequencies."
-    return f1x4, pi_stop
+    return f1x4
     
 
 def calc_cf3x4_freqs(pos_nuc_freqs):
@@ -204,43 +201,28 @@ def is_TI(source, target):
         return False
 
 
-def build_fnuc_matrices(nuc_freqs_data, pi_stop_data, f1x4_data, nuc_freqs_true, pi_stop_true, f1x4_true, outfile):
-    ''' From the codon frequencies, compute Fnuc, described below. ''' 
+def build_fnuc_matrices(nuc_freqs_data, nuc_freqs_true, outfile):
+    ''' Create matrices which use target nucleotide frequencies (not codon frequencies). ''' 
 
     matrix_data = 'Fnuc_data = {61, 61, \n'    
     matrix_true = 'Fnuc_true = {61, 61, \n'
-    data_freqs = set()
-    true_freqs = set()
-    
     
     for i in range(61):
         source = codons[i]
         for j in range(61):
             target = codons[j]
                 
-            positions = [0,1,2]
-            diff, x = get_nuc_diff(source, target, grab_position = True)
+            diff = get_nuc_diff(source, target)
             if len(diff) == 2:
                     
-                # Calculate fnuc part of matrix element. 
-                assert(len(str(x)) == 1), "Problem with determining nucleotide difference between codons"
-                del positions[x]   
-                static1 = positions[0]
-                static2 = positions[1]   
-                nuc1 = nucindex[source[static1]]
-                nuc2 = nucindex[source[static2]]   
-                assert(nuc1 == nucindex[target[static1]] and nuc2 == nucindex[target[static2]]), "Incorrectly identified which position in the codon is changing."
-                fnuc_data = ( f1x4_data[j]*(1. - pi_stop_data) ) / ( nuc_freqs_data[nuc1] * nuc_freqs_data[nuc2] )
-                fnuc_true = ( f1x4_true[j]*(1. - pi_stop_true) ) / ( nuc_freqs_true[nuc1] * nuc_freqs_true[nuc2] )
-
                 # Create string for matrix element
                 element = '{' + str(i) + ',' + str(j) + ',t*'                    
                 if is_TI(diff[0], diff[1]):
                     element += 'k*'
                 if codon_dict[source] != codon_dict[target]:
                     element += 'w*'
-                matrix_data += element + str(fnuc_data) + '}\n'
-                matrix_true += element + str(fnuc_true) + '}\n'
+                matrix_data += element + str(nuc_freqs_data[diff[1]]) + '}\n'
+                matrix_true += element + str(nuc_freqs_true[diff[1]]) + '}\n'
 
     # And save to file.
     with open(outfile, 'w') as outf:
@@ -314,7 +296,7 @@ def main():
     
     print "Calculating F1x4 and F3x4, data"
     nuc_freqs_data, pos_nuc_freqs_data = codon_to_nuc(f61_freqs_data)
-    f1x4_freqs_data, pi_stop_data = calc_f1x4_freqs(nuc_freqs_data)
+    f1x4_freqs_data = calc_f1x4_freqs(nuc_freqs_data)
     f3x4_freqs_data = calc_f3x4_freqs(pos_nuc_freqs_data)
     f1x4_data = array_to_hyphy_freq(f1x4_freqs_data)
     f3x4_data = array_to_hyphy_freq(f3x4_freqs_data)
@@ -330,7 +312,7 @@ def main():
     
     print "Calculating F1x4 and F3x4, true"
     nuc_freqs_true, pos_nuc_freqs_true = codon_to_nuc(f61_freqs_true)
-    f1x4_freqs_true, pi_stop_true = calc_f1x4_freqs(nuc_freqs_true)
+    f1x4_freqs_true = calc_f1x4_freqs(nuc_freqs_true)
     f3x4_freqs_true = calc_f3x4_freqs(pos_nuc_freqs_true)
     f1x4_true = array_to_hyphy_freq(f1x4_freqs_true)
     f3x4_true = array_to_hyphy_freq(f3x4_freqs_true)
@@ -345,7 +327,7 @@ def main():
        
     # Calculate and save Fnuc 
     print "Building and saving the Fnuc matrices for true and data frequencies"
-    fnuc_matrices = build_fnuc_matrices(nuc_freqs_data, pi_stop_data, f1x4_freqs_data, nuc_freqs_true, pi_stop_true, f1x4_freqs_true, fnuc_outfile)
+    fnuc_matrices = build_fnuc_matrices(nuc_freqs_data, nuc_freqs_true, fnuc_outfile)
 
 
     # Cleanup!
