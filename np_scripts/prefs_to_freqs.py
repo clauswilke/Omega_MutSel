@@ -214,6 +214,7 @@ def build_fnuc_matrices(nuc_freqs_data, nuc_freqs_true, outfile):
                 
             diff = get_nuc_diff(source, target)
             if len(diff) == 2:
+                target_nuc_index = nucindex[diff[1]]   
                     
                 # Create string for matrix element
                 element = '{' + str(i) + ',' + str(j) + ',t*'                    
@@ -221,8 +222,8 @@ def build_fnuc_matrices(nuc_freqs_data, nuc_freqs_true, outfile):
                     element += 'k*'
                 if codon_dict[source] != codon_dict[target]:
                     element += 'w*'
-                matrix_data += element + str(nuc_freqs_data[diff[1]]) + '}\n'
-                matrix_true += element + str(nuc_freqs_true[diff[1]]) + '}\n'
+                matrix_data += element + str(nuc_freqs_data[target_nuc_index]) + '}\n'
+                matrix_true += element + str(nuc_freqs_true[target_nuc_index]) + '}\n'
 
     # And save to file.
     with open(outfile, 'w') as outf:
