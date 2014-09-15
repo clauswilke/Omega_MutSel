@@ -1,12 +1,14 @@
 import numpy as np
-from Bio import SeqIO
 import os
 import sys
+import re
+import shutil
 import subprocess
-path_to_mutsel = "/Users/sjspielman/Research/MutSel/Simulator/src/"
-sys.path.append(path_to_mutsel)
+rep = sys.argv[1]
+simdir = sys.argv[2]
+sys.path.append(simdir)
 from stateFreqs import *
-
+codon_dict  = {"AAA":"K", "AAC":"N", "AAG":"K", "AAT":"N", "ACA":"T", "ACC":"T", "ACG":"T", "ACT":"T", "AGA":"R", "AGC":"S", "AGG":"R", "AGT":"S", "ATA":"I", "ATC":"I", "ATG":"M", "ATT":"I", "CAA":"Q", "CAC":"H", "CAG":"Q", "CAT":"H", "CCA":"P", "CCC":"P", "CCG":"P", "CCT":"P", "CGA":"R", "CGC":"R", "CGG":"R", "CGT":"R", "CTA":"L", "CTC":"L", "CTG":"L", "CTT":"L", "GAA":"E", "GAC":"D", "GAG":"E", "GAT":"D", "GCA":"A", "GCC":"A", "GCG":"A", "GCT":"A", "GGA":"G", "GGC":"G", "GGG":"G", "GGT":"G", "GTA":"V", "GTC":"V", "GTG":"V", "GTT":"V", "TAC":"Y", "TAT":"Y", "TCA":"S", "TCC":"S", "TCG":"S", "TCT":"S", "TGC":"C", "TGG":"W", "TGT":"C", "TTA":"L", "TTC":"F", "TTG":"L", "TTT":"F"}
 codons      = ["AAA", "AAC", "AAG", "AAT", "ACA", "ACC", "ACG", "ACT", "AGA", "AGC", "AGG", "AGT", "ATA", "ATC", "ATG", "ATT", "CAA", "CAC", "CAG", "CAT", "CCA", "CCC", "CCG", "CCT", "CGA", "CGC", "CGG", "CGT", "CTA", "CTC", "CTG", "CTT", "GAA", "GAC", "GAG", "GAT", "GCA", "GCC", "GCG", "GCT", "GGA", "GGC", "GGG", "GGT", "GTA", "GTC", "GTG", "GTT", "TAC", "TAT", "TCA", "TCC", "TCG", "TCT", "TGC", "TGG", "TGT", "TTA", "TTC", "TTG", "TTT"]
 nucindex    = {'A':0, 'C':1, 'G':2, 'T':3}
 purines     = ["A", "G"]
@@ -88,7 +90,7 @@ def calc_cf3x4_freqs(pos_nuc_freqs):
     assert(sed_cf3x4 == 0), "Couldn't sed positional nucleotide frequencies into cf3x4.bf"
     
     # run hyphy 
-    run_hyphy = subprocess.call("HYPHYMP cf3x4.bf > cf3x4.out", shell=True)
+    run_hyphy = subprocess.call("./HYPHYMP CPU=1 cf3x4.bf > cf3x4.out", shell=True)
     assert(run_hyphy == 0), "Couldn't get hyphy to run to compute cf3x4"
 
     # parse hyphy output file and save new positional frequencies
@@ -146,7 +148,7 @@ def build_fnuc(nuc_freqs):
                     element += 'k*'
                 if codon_dict[source] != codon_dict[target]:
                     element += 'w*'
-                matrix_data += element + str(nuc_freqs[target_nuc_index]) + '}\n'
+                matrix += element + str(nuc_freqs[target_nuc_index]) + '}\n'
 
     # And save to file.
     with open('fnuc.mdl', 'w') as outf:
@@ -186,7 +188,7 @@ def run_hyphy(batchfile, seqfile, fspecs):
     shutil.copy(seqfile, "temp.fasta")
 
     # Run hyphy.
-    runhyphy = subprocess.call("./HYPHYMP " + batchfile, shell = True)
+    runhyphy = subprocess.call("./HYPHYMP CPU=1 " + batchfile, shell = True)
     assert (runhyphy == 0), "hyphy fail"
     
     lnliks = np.zeros(len(fspecs)) # log likelihood values
@@ -212,7 +214,7 @@ def parse_output_GY94(file):
         
 
 def main():
-    rep = sys.argv[1]
+    
     seqfile = "gpcr"+rep+".fasta"
     outfile = "output"+rep+".txt"
     
@@ -226,24 +228,27 @@ def main():
     nuc_freqs = freqObject.calcFreqs(type = 'nuc')
     
     # F1x4, F3x4, CF3x4
-    f1x4 = array_to_hyphy(calc_f1x4_freqs(nuc_freqs))
+    f1x4 = array_to_hyphy_freq(calc_f1x4_freqs(nuc_freqs))
     pos_nuc_freqs = codon_to_nuc(f61_freqs)
-    f3x4 = array_to_hyphy(calc_f3x4_freqs(pos_nuc_freqs))
+    f3x4 = array_to_hyphy_freq(calc_f3x4_freqs(pos_nuc_freqs))
     cf3x4 = array_to_hyphy_freq( calc_cf3x4_freqs(pos_nuc_freqs.T) ) 
     
     # Save batchfile
     create_batchfile("raw_batchfile.bf", "batchfile.bf", f61, f1x4, f3x4, cf3x4)
     
     # Fnuc 
-    build_fnuc_matrices(nuc_freqs)
+    build_fnuc(nuc_freqs)
     
     # Call hyphy
     numparams = np.array([62., 11., 11., 5., 5.])
     lnliks = run_hyphy("batchfile.bf", seqfile, ['f61', 'f3x4', 'cf3x4', 'f1x4', 'fnuc'])
-    AIC = 2*(numparms - lnliks)
+    AICs = 2*(numparams - lnliks)
     
+    outstring = rep
+    for aic in AICs:
+        outstring += '\t' + str(aic)
     with open(outfile, 'w') as outf:
-        outf.write(rep + '\t' + AIC[0] + '\t' + AIC[1] + '\t' + AIC[2] + '\t' + AIC[3] + '\t' + AIC[4] + '\t' + AIC[5] + '\n')
+        outf.write(outstring + '\n')
         
         
         
