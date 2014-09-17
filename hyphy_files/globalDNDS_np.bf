@@ -1,14 +1,16 @@
 /* SJS. 
 Hyphy inference for an "experimental" dataset. Name of file indicates the mutation scheme.
-Perform 10 total inferences, one for each of the following parameterizations: F61_true, F61_data, F1x4_true, F1x4_data, F3x4_true, F3x4_data, CF3x4_true, CF3x4_data, Fnuc_true, Fnuc_data. The _data refers to empirical frequencies, whereas _true refers to frequencies in absence of selection. 
-Also note that Fnuc is not so much a frequency parameterization, but actually a "new"(ish? it's actually what should have been the original) model.
+Perform 12 total inferences, one for each of the following parameterizations: F61_true, F61_data, F1x4_true, F1x4_data, F3x4_true, F3x4_data, CF3x4_true, CF3x4_data, Fnuc_pos_true, Fnuc_pos_data, Fnuc_glob_true, Fnuc_glob_data. The _data refers to empirical frequencies, whereas _true refers to frequencies in absence of selection. 
 */
 
-global w; global k; global t;
+
+
+global w; global k; global t; // note that we use "global t" (instead of locally estimated for each branch) since all branch lengths are the same in the simulation tree.
 
 LIKELIHOOD_FUNCTION_OUTPUT = 1;
 RANDOM_STARTING_PERTURBATIONS = 1;
 OPTIMIZATION_PRECSION = 0.00000001;
+#include "CF3x4.bf"; // to compute the CF3x4 frequencies
 #include "GY94.mdl"; // Basic GY94 rate matrix
 #include "fnuc.mdl"; // Custom Fnuc matrices for this run
 
@@ -33,9 +35,12 @@ F3x4_true = {{0.0139509930507},{0.0162487180251},{0.0151906998939},{0.0159166873
 
 F3x4_data = {{0.0142519897201},{0.0153529026809},{0.0151914430195},{0.0150784095804},{0.0178227082998},{0.0191994459308},{0.0189975338817},{0.018856180846},{0.0183714337539},{0.0197905583761},{0.0195824298598},{0.0194367248476},{0.017833448029},{0.0192110152639},{0.0190089815452},{0.0188675433321},{0.0128478822995},{0.0138403332077},{0.0136947805679},{0.0135928831943},{0.0160668133356},{0.0173079146405},{0.0171258949862},{0.0169984680654},{0.0165614783042},{0.0178407906299},{0.0176531669554},{0.0175218168152},{0.0160764949856},{0.0173183441618},{0.0171362148248},{0.0170087111183},{0.0141818756196},{0.015277372528},{0.0151167071837},{0.015004229824},{0.0177350276892},{0.0191049923205},{0.0189040735981},{0.0187634159629},{0.018281053633},{0.0196931967285},{0.0194860921215},{0.0193411039197},{0.0177457145832},{0.0191165047371},{0.0189154649437},{0.0187747225501},{0.010861819815},{0.0106676223619},{0.0126091495655},{0.0135831592619},{0.0134403112063},{0.0133403072373},{0.0140013575013},{0.0138541114405},{0.0137510285498},{0.0126167476728},{0.0135913442947},{0.0134484101607},{0.0133483459306}};
 
-CF3x4_true = {{0.0159551157803},{0.0162859953563},{0.0162197212968},{0.0159532203971},{0.0162859187359},{0.016623658553},{0.0165560104104},{0.0162839840551},{0.0162197001014},{0.0165560666665},{0.0164886935816},{0.0162177732869},{0.0159531468116},{0.0162839855547},{0.0162177196739},{0.0159512516622},{0.0161496307232},{0.0164845441792},{0.0164174621471},{0.0161477122327},{0.0164844666247},{0.0168263239576},{0.0167578510905},{0.0164825083574},{0.0164174406933},{0.0167579080325},{0.0166897135764},{0.0164154903884},{0.01614763775},{0.0164825098754},{0.0164154361217},{0.0161457194962},{0.0162952628822},{0.0166331964796},{0.0165655095234},{0.0162933270913},{0.0166331182258},{0.0169780583178},{0.0169089679845},{0.0166311422995},{0.0165654878762},{0.0169090254399},{0.0168402160283},{0.016563519984},{0.016293251937},{0.0166311438311},{0.016563465228},{0.016291316385},{0.0162453874856},{0.0159134422751},{0.0162453110563},{0.0165822087453},{0.0165147292781},{0.0162433811995},{0.016514785394},{0.0164475802987},{0.0161773355228},{0.015913368873},{0.0162433826954},{0.0161772820434},{0.0159114784491}};
+// CF3x4 has a lot of stuff going on.
+pos_freqs_data = {{0.277466635237,0.208729897889,0.238030069605},{0.250130595205,0.261025453749,0.256417003207},{0.276101610146,0.269061904114,0.253720379422},{0.196301159412,0.261182744248,0.251832547766}};
+pos_freqs_true = {{0.260051776333,0.227559180359,0.227559180359},{0.263222201436,0.265038118952,0.265038118952},{0.265596167283,0.247780441462,0.247780441462},{0.211129854948,0.259622259226,0.259622259226}};
+CF3x4_true = BuildCodonFrequencies(CF3x4(pos_freqs_true, "TAA,TAG,TGA"));
+CF3x4_data = BuildCodonFrequencies(CF3x4(pos_freqs_data, "TAA,TAG,TGA"));
 
-CF3x4_data = {{0.0161917526885},{0.0154265311478},{0.0161074582697},{0.0151507062293},{0.0178456857825},{0.0170022994345},{0.0177527809723},{0.0166982999279},{0.0195585959592},{0.0186342575493},{0.0194567737223},{0.0183010787859},{0.017856455163},{0.0170125598545},{0.0177634942873},{0.0167083768926},{0.014596496685},{0.013906666875},{0.0145205071842},{0.0136580169859},{0.0160874797422},{0.0153271861365},{0.0160037281694},{0.0150531374974},{0.0176316292976},{0.0167983592499},{0.0175398388675},{0.0164980061746},{0.0160971880937},{0.0153364356718},{0.0160133859791},{0.0150622216518},{0.0161120534484},{0.0153505984904},{0.0160281739447},{0.0150761312406},{0.0177578455331},{0.0169186105114},{0.0176653980201},{0.0166161073549},{0.0194623244026},{0.0185425357824},{0.0193610033564},{0.0182109969956},{0.0177685619044},{0.0169288204275},{0.0176760586018},{0.0166261347187},{0.0134225292032},{0.01318253565},{0.0155274206672},{0.0147935954295},{0.0154465847673},{0.0145290873418},{0.0162135520772},{0.0169292183049},{0.0159236552989},{0.0155367910385},{0.0148025229574},{0.0154559063563},{0.0145378552463}};
 
 /* Optimize likelihoods for each frequency specification */
 
@@ -127,25 +132,46 @@ Optimize (paramValues, LikFn8);
 fprintf ("cf3x4_data_hyout.txt", LikFn8);
 
 
-Fones =  {{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1}};
-////////////// Fnuc_TRUE MODEL //////////////
+////////////// Fnuc_pos TRUE MODEL //////////////
 global w; global k; global t;
-Model MyModel = (Fnuc_true, Fones, 0); // Using 0 as last argument means that the matrix will *not* be multipled by frequencies, but just in case it is, we provide Fones (all entries are 1, so multiplication is basically..not)
+Model MyModel = (Fnuc_pos_true, F3x4_true, 0); 
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn9 = (filt_data, Tree01);
 Optimize (paramValues, LikFn9);
-fprintf ("fnuc_true_hyout.txt", LikFn9);
+fprintf ("fnuc_pos_true_hyout.txt", LikFn9);
 
 
-////////////// Fnuc_DATA MODEL //////////////
+////////////// Fnuc_pos DATA MODEL //////////////
 global w; global k; global t;
-Model MyModel = (Fnuc_data, Fones, 0); // Using 0 as last argument means that the matrix will *not* be multipled by frequencies, but just in case it is, we provide Fones (all entries are 1, so multiplication is basically..not)
+Model MyModel = (Fnuc_pos_data, F3x4_data, 0);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn10 = (filt_data, Tree01);
 Optimize (paramValues, LikFn10);
-fprintf ("fnuc_data_hyout.txt", LikFn10);
+fprintf ("fnuc_pos_data_hyout.txt", LikFn10);
+
+
+////////////// Fnuc_glob TRUE MODEL //////////////
+global w; global k; global t;
+Model MyModel = (Fnuc_glob_true, F1x4_true, 0); 
+UseModel (USE_NO_MODEL);
+UseModel(MyModel);
+Tree    Tree01 = DATAFILE_TREE;
+LikelihoodFunction  LikFn11 = (filt_data, Tree01);
+Optimize (paramValues, LikFn11);
+fprintf ("fnuc_glob_hyout.txt", LikFn11);
+
+
+////////////// Fnuc_glob DATA MODEL //////////////
+global w; global k; global t;
+Model MyModel = (Fnuc_glob_data, F1x4_data, 0);
+UseModel (USE_NO_MODEL);
+UseModel(MyModel);
+Tree    Tree01 = DATAFILE_TREE;
+LikelihoodFunction  LikFn12 = (filt_data, Tree01);
+Optimize (paramValues, LikFn12);
+fprintf ("fnuc_glob_data_hyout.txt", LikFn12);
 

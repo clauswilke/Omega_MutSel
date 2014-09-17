@@ -1,14 +1,16 @@
 /* SJS. 
 Hyphy inference for an "experimental" dataset. Name of file indicates the mutation scheme.
-Perform 10 total inferences, one for each of the following parameterizations: F61_true, F61_data, F1x4_true, F1x4_data, F3x4_true, F3x4_data, CF3x4_true, CF3x4_data, Fnuc_true, Fnuc_data. The _data refers to empirical frequencies, whereas _true refers to frequencies in absence of selection. 
-Also note that Fnuc is not so much a frequency parameterization, but actually a "new"(ish? it's actually what should have been the original) model.
+Perform 12 total inferences, one for each of the following parameterizations: F61_true, F61_data, F1x4_true, F1x4_data, F3x4_true, F3x4_data, CF3x4_true, CF3x4_data, Fnuc_pos_true, Fnuc_pos_data, Fnuc_glob_true, Fnuc_glob_data. The _data refers to empirical frequencies, whereas _true refers to frequencies in absence of selection. 
 */
 
-global w; global k; global t;
+
+
+global w; global k; global t; // note that we use "global t" (instead of locally estimated for each branch) since all branch lengths are the same in the simulation tree.
 
 LIKELIHOOD_FUNCTION_OUTPUT = 1;
 RANDOM_STARTING_PERTURBATIONS = 1;
 OPTIMIZATION_PRECSION = 0.00000001;
+#include "CF3x4.bf"; // to compute the CF3x4 frequencies
 #include "GY94.mdl"; // Basic GY94 rate matrix
 #include "fnuc.mdl"; // Custom Fnuc matrices for this run
 
@@ -33,9 +35,12 @@ F3x4_true = INSERT_F3X4_TRUE
 
 F3x4_data = INSERT_F3X4_DATA
 
-CF3x4_true = INSERT_CF3X4_TRUE
+// CF3x4 has a lot of stuff going on.
+pos_freqs_data = INSERT_POS_FREQS_DATA
+pos_freqs_true = INSERT_POS_FREQS_TRUE
+CF3x4_true = BuildCodonFrequencies(CF3x4(pos_freqs_true, "TAA,TAG,TGA"));
+CF3x4_data = BuildCodonFrequencies(CF3x4(pos_freqs_data, "TAA,TAG,TGA"));
 
-CF3x4_data = INSERT_CF3X4_DATA
 
 /* Optimize likelihoods for each frequency specification */
 
@@ -127,25 +132,46 @@ Optimize (paramValues, LikFn8);
 fprintf ("cf3x4_data_hyout.txt", LikFn8);
 
 
-Fones =  {{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1}};
-////////////// Fnuc_TRUE MODEL //////////////
+////////////// Fnuc_pos TRUE MODEL //////////////
 global w; global k; global t;
-Model MyModel = (Fnuc_true, Fones, 0); // Using 0 as last argument means that the matrix will *not* be multipled by frequencies, but just in case it is, we provide Fones (all entries are 1, so multiplication is basically..not)
+Model MyModel = (Fnuc_pos_true, F3x4_true, 0); 
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn9 = (filt_data, Tree01);
 Optimize (paramValues, LikFn9);
-fprintf ("fnuc_true_hyout.txt", LikFn9);
+fprintf ("fnuc_pos_true_hyout.txt", LikFn9);
 
 
-////////////// Fnuc_DATA MODEL //////////////
+////////////// Fnuc_pos DATA MODEL //////////////
 global w; global k; global t;
-Model MyModel = (Fnuc_data, Fones, 0); // Using 0 as last argument means that the matrix will *not* be multipled by frequencies, but just in case it is, we provide Fones (all entries are 1, so multiplication is basically..not)
+Model MyModel = (Fnuc_pos_data, F3x4_data, 0);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn10 = (filt_data, Tree01);
 Optimize (paramValues, LikFn10);
-fprintf ("fnuc_data_hyout.txt", LikFn10);
+fprintf ("fnuc_pos_data_hyout.txt", LikFn10);
+
+
+////////////// Fnuc_glob TRUE MODEL //////////////
+global w; global k; global t;
+Model MyModel = (Fnuc_glob_true, F1x4_true, 0); 
+UseModel (USE_NO_MODEL);
+UseModel(MyModel);
+Tree    Tree01 = DATAFILE_TREE;
+LikelihoodFunction  LikFn11 = (filt_data, Tree01);
+Optimize (paramValues, LikFn11);
+fprintf ("fnuc_glob_hyout.txt", LikFn11);
+
+
+////////////// Fnuc_glob DATA MODEL //////////////
+global w; global k; global t;
+Model MyModel = (Fnuc_glob_data, F1x4_data, 0);
+UseModel (USE_NO_MODEL);
+UseModel(MyModel);
+Tree    Tree01 = DATAFILE_TREE;
+LikelihoodFunction  LikFn12 = (filt_data, Tree01);
+Optimize (paramValues, LikFn12);
+fprintf ("fnuc_glob_data_hyout.txt", LikFn12);
 
