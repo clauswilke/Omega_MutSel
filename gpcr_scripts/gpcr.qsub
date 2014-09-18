@@ -6,8 +6,8 @@
 #$ -q wilke
 #$ -m beas
 #$ -t 1-533:1
-#$ -pe serial 8
-CPU=7
+#$ -pe serial 16
+CPU=16
 
 source ~/.bash_profile
 
@@ -41,5 +41,5 @@ python run_gpcrs.py $SGE_TASK_ID $CPU
 
 # Cleanup
 mkdir -p $RDIR
-cp output* $RDIR
+cp outfile* $RDIR
 rm -rf $WDIR
