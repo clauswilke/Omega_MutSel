@@ -3,63 +3,29 @@
 np <- read.table('../../datasets/np.txt', header=T)
 yeast<- read.table('../../datasets/yeast.txt', header=T)
 polio <- read.table('../../datasets/polio.txt', header=T)
-fspecs <- c("fnuc_data", "fnuc_true", "f1x4_data", "f1x4_true", "cf3x4_data", "cf3x4_true", "f3x4_data", "f3x4_true", "f61_data", "f61_true")
-rownames <- c("Fnuc", "F1x4", "CF3x4", "F3x4", "F61")
+fspecs <- c("fnuc1",  "fnuc3", "f1x4", "cf3x4", "f3x4", "f61")
+rownames <- c("Fnuc1", "Fnuc3", "F1x4", "CF3x4", "F3x4", "F61")
 
 sink("latex_tables.txt")
 cat("%%%% Latex tables for 'The relationship between dN/dS and scaled selection coefficients' (SJS, COW). %%%%%\n\n\n\n\n\n")
-############################# NYP dAIC tables ###################################
-make_daic_table <- function(dat, fspecs, rownames)
-{
-for (i in seq(1,10,2)){
-    mean_data <- round( mean(dat$aic[dat$fspec=="fnuc_data"] - dat$aic[dat$fspec==fspecs[i]]), 2)
-    mean_true <- round( mean(dat$aic[dat$fspec=="fnuc_true"] - dat$aic[dat$fspec==fspecs[i+1]]), 2)
-    sd_data   <- round( sd(dat$aic[dat$fspec=="fnuc_data"] - dat$aic[dat$fspec==fspecs[i]]), 2)
-    sd_true   <- round( sd(dat$aic[dat$fspec=="fnuc_true"] - dat$aic[dat$fspec==fspecs[i+1]]), 2)
-    data <- paste(mean_data, " (", sd_data, ") ", sep="")
-    true <- paste(mean_true, " (", sd_true, ") ", sep="")
-    cat(paste(rownames[(i+1)/2], dat$num_params[dat$fspec==fspecs[i]][1], data, true, sep=' & '))
-    cat(' \\\\ \n')
-}}
 
-cat("%%%%%%%%%  NP dAIC table  %%%%%%%%%%\n")
-make_daic_table(np, fspecs, rownames)
-cat("\n\n\n%%%%%%%%%  Yeast dAIC table  %%%%%%%%%\n")
-make_daic_table(yeast, fspecs, rownames)
-cat("\n\n\n%%%%%%%%%  Polio dAIC table  %%%%%%%%%\n")
-make_daic_table(polio, fspecs, rownames)
 
 ############################# NYP Estimator bias and r^2 tables ###################################
 
-fspecs_data <- c("fnuc_data", "f1x4_data", "cf3x4_data", "f3x4_data", "f61_data")
-fspecs_true <- c("fnuc_true", "f1x4_true", "cf3x4_true", "f3x4_true", "f61_true")
-np_r2_data <- c(); yeast_r2_data <- c(); polio_r2_data <- c(); np_bias_data <- c(); yeast_bias_data <- c(); polio_bias_data <- c()
-np_r2_true <- c(); yeast_r2_true <- c(); polio_r2_true <- c(); np_bias_true <- c(); yeast_bias_true <- c(); polio_bias_true <- c()
+fspecs <- c("fnuc1", "fnuc3", "f1x4", "cf3x4", "f61", "f3x4")
+np_r2 <- c(); yeast_r2 <- c(); polio_r2 <- c(); np_bias <- c(); yeast_bias <- c(); polio_bias <- c()
 
-for (i in 1:length(fspecs_data))
+for (i in 1:length(fspecs))
 {
-    temp <- np[np$fspec == fspecs_data[i],]
-    np_r2_data <- c( np_r2_data, cor(temp$dnds, temp$omega)^2)
-    np_bias_data <- c( np_bias_data, glm(omega ~ offset(dnds), data=temp)$coefficients )    
-    temp <- yeast[yeast$fspec == fspecs_data[i],]
-    yeast_r2_data <- c( yeast_r2_data, cor(temp$dnds, temp$omega)^2)
-    yeast_bias_data <- c( yeast_bias_data, glm(omega ~ offset(dnds), data=temp)$coefficients )
-    temp <- polio[polio$fspec == fspecs_data[i],]
-    polio_r2_data <- c( polio_r2_data, cor(temp$dnds, temp$omega)^2)
-    polio_bias_data <- c( polio_bias_data, glm(omega ~ offset(dnds), data=temp)$coefficients )
-
-}
-for (i in 1:length(fspecs_true))
-{
-    temp <- np[np$fspec == fspecs_true[i],]
-    np_r2_true <- c( np_r2_true, cor(temp$dnds, temp$omega)^2)
-    np_bias_true <- c( np_bias_true, glm(omega ~ offset(dnds), data=temp)$coefficients )    
-    temp <- yeast[yeast$fspec == fspecs_true[i],]
-    yeast_r2_true <- c( yeast_r2_true, cor(temp$dnds, temp$omega)^2)
-    yeast_bias_true <- c( yeast_bias_true, glm(omega ~ offset(dnds), data=temp)$coefficients )
-    temp <- polio[polio$fspec == fspecs_true[i],]
-    polio_r2_true <- c( polio_r2_true, cor(temp$dnds, temp$omega)^2)
-    polio_bias_true <- c( polio_bias_true, glm(omega ~ offset(dnds), data=temp)$coefficients )
+    temp <- np[np$fspec == fspecs[i],]
+    np_r2 <- c( np_r2, cor(temp$dnds, temp$omega)^2)
+    np_bias <- c( np_bias, glm(omega ~ offset(dnds), data=temp)$coefficients )    
+    temp <- yeast[yeast$fspec == fspecs[i],]
+    yeast_r2 <- c( yeast_r2, cor(temp$dnds, temp$omega)^2)
+    yeast_bias <- c( yeast_bias, glm(omega ~ offset(dnds), data=temp)$coefficients )
+    temp <- polio[polio$fspec == fspecs[i],]
+    polio_r2 <- c( polio_r2, cor(temp$dnds, temp$omega)^2)
+    polio_bias <- c( polio_bias, glm(omega ~ offset(dnds), data=temp)$coefficients )
 
 }
 
@@ -80,15 +46,45 @@ cat(' \\\\ \n')
 }
 
 
-cat("\n\n\n\n\n\n%%%%%%%%%  Empirical bias  %%%%%%%%%%\n")
-make_bias_r2_table(np_bias_data, yeast_bias_data, polio_bias_data)
-cat("\n\n\n%%%%%%%%%  True bias  %%%%%%%%%\n")
-make_bias_r2_table(np_bias_true, yeast_bias_true, polio_bias_true)
-cat("\n\n\n\n\n\n%%%%%%%%%  Empirical r^2  %%%%%%%%%\n")
-make_bias_r2_table(np_r2_data, yeast_r2_data, polio_r2_data)
-cat("\n\n\n%%%%%%%%%  True r^2  %%%%%%%%%\n")
-make_bias_r2_table(np_r2_true, yeast_r2_true, polio_r2_true)
+cat("%%%%%%%%%  nyp bias  %%%%%%%%%%\n")
+make_bias_r2_table(np_bias, yeast_bias, polio_bias)
 
+cat("\n\n\n%%%%%%%%%  nyp r^2  %%%%%%%%%\n")
+make_bias_r2_table(np_r2, yeast_r2, polio_r2)
+
+cat("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n")
+
+
+############################# NYP dAIC tables ###################################
+make_daic_table <- function(dat, fspecs, rownames)
+{
+}
+
+cat("\n\n\n\n%%%%%%%%%  NP dAIC table  %%%%%%%%%%\n")
+fspecs <- c("f61", "cf3x4", "fnuc1", "f1x4", "fnuc3", "f3x4")
+rownames <- c("F61", "CF3x4", "Fnuc1", "F1x4", "Fnuc3", "F3x4")
+for (i in seq(1,6)){
+    daic <- round( mean(np$aic[np$fspec==fspecs[1]] - np$aic[np$fspec==fspecs[i]]), 2)
+    cat(paste(rownames[i], daic, sep=' & '))
+    cat(' \\\\ \n')
+}
+
+cat("\n\n\n%%%%%%%%%  Yeast dAIC table  %%%%%%%%%\n")
+for (i in seq(1,6)){
+    daic <- round( mean(yeast$aic[yeast$fspec==fspecs[1]] - yeast$aic[yeast$fspec==fspecs[i]]), 2)
+    cat(paste(rownames[i], daic, sep=' & '))
+    cat(' \\\\ \n')
+}
+
+
+cat("\n\n\n%%%%%%%%%  Polio dAIC table  %%%%%%%%%\n")
+fspecs <- c("f61", "fnuc1", "cf3x4", "fnuc3", "f1x4", "f3x4")
+rownames <- c("F61", "Fnuc1", "CF3x4", "Fnuc3", "F1x4", "F3x4")
+for (i in seq(1,6)){
+    daic <- round( mean(polio$aic[polio$fspec==fspecs[1]] - polio$aic[polio$fspec==fspecs[i]]), 2)
+    cat(paste(rownames[i], daic, sep=' & '))
+    cat(' \\\\ \n')
+}
 
 
 sink()
