@@ -1,11 +1,11 @@
 #!/bin/bash
-#$ -N gpcr_M0
+#$ -N gpcr_M0_again
 #$ -e e_$JOB_NAME
 #$ -o o_$JOB_NAME
 #$ -S /bin/bash
 #$ -q wilke
 #$ -m beas
-#$ -t 1-533:1
+#$ -t 1-1:1
 
 source ~/.bash_profile
 
@@ -38,5 +38,6 @@ python run_gpcrs.py $SGE_TASK_ID $SIMDIR
 
 # Cleanup
 mkdir -p $RDIR
-cp output* $RDIR
+cp outfile* $RDIR
+cp batchfile.bf $RDIR
 rm -rf $WDIR
