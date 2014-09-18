@@ -46,8 +46,8 @@ entropy = calc_entropy(codon_freqs_true)
 
 
 # Simulate according to MutSel model along phylogeny
-print "Simulating"
-simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
+#print "Simulating"
+#simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
 
 
 # Derive omega from eq freqs
@@ -57,20 +57,17 @@ dnds = derive_dnds(codon_freqs_true_dict, mu_dict)
 
 # Maximum likelihood omega inference across a variety of frequency specifications.
 print "Conducting ML inference with HyPhy"
-fspecs = ['f61_true', 'f61_data', 'f1x4_true', 'f1x4_data', 'f3x4_true', 'f3x4_data', 'cf3x4_true', 'cf3x4_data', 'f1x4_fnuc_true', 'f1x4_fnuc_data']
-fspecs_k = np.array([62., 62., 5., 5., 11., 11., 11., 11., 5., 5.]) # number of parameters, in same order as fspecs.
+
+fspecs = ['f61_true', 'f61_data', 'f1x4_true', 'f1x4_data', 'f3x4_true', 'f3x4_data', 'cf3x4_true', 'cf3x4_data', 'fnuc_pos_true', 'fnuc_pos_data', 'fnuc_glob_true', 'fnuc_glob_data']
+k = 3. # all models have 3 free parameters (k,t,w)
 lnliks, omegas, kappas = run_hyphy_nyp(batchfile, seqfile, treefile, cpu, fspecs)  
+AICs = 2*(k - lnliks)
 omega_errors = (dnds - omegas) / dnds
-AICs = 2*(fspecs_k - lnliks)
+
 
 
 # Finally, save results
 outstring_params = rep + '\t' + str(entropy) + '\t' + str(dnds)
 with open(paramfile, 'w') as outf:
     for x in range(len(fspecs)):
-        outf.write( outstring_params + '\t' + fspecs[x] + '\t' +  str(omegas[x]) + '\t' + str(omega_errors[x]) + '\t' + str(kappas[x]) + '\t' + str(AICs[x]) + '\n')
-
-
-
-
-
+        outf.write( outstring_params + '\t' + fspecs[x] + '\t' +  str(omegas[x]) + '\t' + str(omega_errors[x]) + '\t' + str(kappas[x]) + '\t' + str(lnliks[x]) + '\t' + str(int(k)) + '\t' + str(AICs[x]) + '\n')
