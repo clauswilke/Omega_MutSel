@@ -1,63 +1,56 @@
 import numpy as np
-import os
+from Bio import AlignIO
 import sys
 import re
 import shutil
 import subprocess
-rep = sys.argv[1]
-simdir = sys.argv[2]
-sys.path.append(simdir)
-from stateFreqs import *
+
 codon_dict  = {"AAA":"K", "AAC":"N", "AAG":"K", "AAT":"N", "ACA":"T", "ACC":"T", "ACG":"T", "ACT":"T", "AGA":"R", "AGC":"S", "AGG":"R", "AGT":"S", "ATA":"I", "ATC":"I", "ATG":"M", "ATT":"I", "CAA":"Q", "CAC":"H", "CAG":"Q", "CAT":"H", "CCA":"P", "CCC":"P", "CCG":"P", "CCT":"P", "CGA":"R", "CGC":"R", "CGG":"R", "CGT":"R", "CTA":"L", "CTC":"L", "CTG":"L", "CTT":"L", "GAA":"E", "GAC":"D", "GAG":"E", "GAT":"D", "GCA":"A", "GCC":"A", "GCG":"A", "GCT":"A", "GGA":"G", "GGC":"G", "GGG":"G", "GGT":"G", "GTA":"V", "GTC":"V", "GTG":"V", "GTT":"V", "TAC":"Y", "TAT":"Y", "TCA":"S", "TCC":"S", "TCG":"S", "TCT":"S", "TGC":"C", "TGG":"W", "TGT":"C", "TTA":"L", "TTC":"F", "TTG":"L", "TTT":"F"}
 codons      = ["AAA", "AAC", "AAG", "AAT", "ACA", "ACC", "ACG", "ACT", "AGA", "AGC", "AGG", "AGT", "ATA", "ATC", "ATG", "ATT", "CAA", "CAC", "CAG", "CAT", "CCA", "CCC", "CCG", "CCT", "CGA", "CGC", "CGG", "CGT", "CTA", "CTC", "CTG", "CTT", "GAA", "GAC", "GAG", "GAT", "GCA", "GCC", "GCG", "GCT", "GGA", "GGC", "GGG", "GGT", "GTA", "GTC", "GTG", "GTT", "TAC", "TAT", "TCA", "TCC", "TCG", "TCT", "TGC", "TGG", "TGT", "TTA", "TTC", "TTG", "TTT"]
 nucindex    = {'A':0, 'C':1, 'G':2, 'T':3}
 purines     = ["A", "G"]
 pyrims      = ["C", "T"]
-
-
-def calc_nuc_freqs(alnfile):
-    ''' From an alignment file, return the empirical nucleotide frequencies. Note that as the input alignment file is actually a hyphy input file (has tree), we have to remove it. '''
-    
-    nuc_freqs = np.zeros(4)
-    
-    with open(alnfile, 'r') as infile:
-        for line in infile:
-            if "(" not in line and ">" not in line:
-                    nuc_freqs[0] += float(line.count('A'))
-                    nuc_freqs[1] += float(line.count('C'))
-                    nuc_freqs[2] += float(line.count('G'))
-                    nuc_freqs[3] += float(line.count('T'))
-    nuc_freqs /= np.sum(nuc_freqs)
-    return nuc_freqs
+  
     
     
     
+def calc_nuc_freqs(infile):
+    pos_nuc_freqs = np.zeros([4,3])
+    
+    full_seq = ''
+    aln = AlignIO.read(infile, "fasta")
+    for record in aln:
+        full_seq += str(record.seq)  
+        
+    # Calc positional nucleotide frequencies      
+    for i in range(0,len(full_seq),3):
+        codon = full_seq[i:i+3]
+        if codon in codons:
+            for x in range(3):
+                pos_nuc_freqs[nucindex[codon[x]]][x] += 1.
+        
+    pos_nuc_freqs /= np.sum(pos_nuc_freqs, axis=0)
+    nuc_freqs = np.mean(pos_nuc_freqs, axis=1)
+    
+    assert( abs(np.sum(nuc_freqs) - 1.) < 1e-8), "bad global nucleotide frequencies"
+    assert( np.allclose(np.sum(pos_nuc_freqs, axis=0),np.ones(3))), "bad positional nucleotide frequencies"
+    return nuc_freqs, pos_nuc_freqs
 
-def codon_to_nuc(codon_freqs):
-    ''' Calculate positional nucleotide frequencies from codon frequencies. '''
-    pos_nuc_freqs = np.zeros( [3, 4] ) # row is position, column in nucleotide
-    for i in range(3):
-        count = 0
-        for codon in codons:
-            pos_nuc_freqs[i][nucindex[codon[i]]] += codon_freqs[count]
-            count += 1
-        assert( abs(np.sum(pos_nuc_freqs[i]) - 1.) < 1e-8 ), "bad positional nucleotide frequencies"
-    return pos_nuc_freqs
 
-
+        
 def calc_f3x4_freqs(pos_nuc_freqs):
     ''' Compute F3x4 codon frequencies from positional nucleotide frequencies. '''
-    
     f3x4 = np.ones(61)
-    pi_stop = pos_nuc_freqs[0][nucindex['T']]*pos_nuc_freqs[1][nucindex['A']]*pos_nuc_freqs[2][nucindex['G']]  +  pos_nuc_freqs[0][nucindex['T']]*pos_nuc_freqs[1][nucindex['G']]*pos_nuc_freqs[2][nucindex['A']]  +  pos_nuc_freqs[0][nucindex['T']]*pos_nuc_freqs[1][nucindex['A']]*pos_nuc_freqs[2][nucindex['A']] 
+    pi_stop = pos_nuc_freqs[nucindex['T']][0]*pos_nuc_freqs[nucindex['A']][1]*pos_nuc_freqs[nucindex['G']][2]  +  pos_nuc_freqs[nucindex['T']][0]*pos_nuc_freqs[nucindex['G']][1]*pos_nuc_freqs[nucindex['A']][2]  +  pos_nuc_freqs[nucindex['T']][0]*pos_nuc_freqs[nucindex['A']][1]*pos_nuc_freqs[nucindex['A']][2] 
 
     for i in range(61):
         codon = codons[i]
         for j in range(3):
-            f3x4[i] *= pos_nuc_freqs[j][ nucindex[codon[j]] ]
+            f3x4[i] *= pos_nuc_freqs[ nucindex[codon[j]] ][j]
     f3x4 /= (1. - pi_stop)
-    assert( abs(np.sum(f3x4) - 1.) < 1e-8), "Could not properly caluclate (C)F3x4 frequencies."
+    assert( abs(np.sum(f3x4) - 1.) < 1e-8), "Could not properly calculate F3x4 frequencies."
     return f3x4   
+
 
 
 
@@ -72,53 +65,7 @@ def calc_f1x4_freqs(nuc_freqs):
     f1x4 /= (1. - pi_stop)
     assert( abs(np.sum(f1x4) - 1.) < 1e-8), "Could not properly caluclate F1x4 frequencies."
     return f1x4
-    
-
-def calc_cf3x4_freqs(pos_nuc_freqs):
-    assert( pos_nuc_freqs.shape == (4,3)), "You need to provide hyphy with the transpose of your pos_nuc_freqs matrix!!"
-    
-    # Create positional nucleotide matrix string to sed into hyphy cf3x4 batchfile
-    posnuc = '{'
-    for row in pos_nuc_freqs:
-        p = str(row).replace("[","").replace("]","").replace("","").strip()
-        p = re.sub("\s+", ",", p)
-        posnuc += '{' + p + '},'
-    posnuc = posnuc[:-1]+'};'
-
-    # sed into hyphy
-    sed_cf3x4 = subprocess.call("sed 's/INSERT_POS_FREQS/"+posnuc+"/g' cf3x4_raw.bf > cf3x4.bf", shell=True)
-    assert(sed_cf3x4 == 0), "Couldn't sed positional nucleotide frequencies into cf3x4.bf"
-    
-    # run hyphy 
-    run_hyphy = subprocess.call("./HYPHYMP CPU=1 cf3x4.bf > cf3x4.out", shell=True)
-    assert(run_hyphy == 0), "Couldn't get hyphy to run to compute cf3x4"
-
-    # parse hyphy output file and save new positional frequencies
-    cf3x4_pos_freqs = np.zeros([3,4])
-    with open("cf3x4.out", "r") as file:
-        hystring = file.readlines()
-    for i in range(4):
-        line = str(hystring[i+1]).replace("{","").replace("}","").rstrip()
-        freqs = line.split(',')
-        for j in range(3):
-            cf3x4_pos_freqs[j][i] = float(freqs[j])
-    assert( np.allclose( np.sum(cf3x4_pos_freqs, axis=1), np.ones(3)) ), "Bad CF3x4 positional frequencies."
-
-    # Finally convert these cf3x4 positional frequencies to codon frequencies
-    return calc_f3x4_freqs(cf3x4_pos_freqs)
-
-
-
-
-
-def get_nuc_diff(source, target):
-    diff = ''
-    for i in range(3):
-        if source[i] != target[i]: 
-            diff += source[i]+target[i]
-    return diff
-
-
+        
 
 def is_TI(source, target):
     check1 = source in purines and target in purines
@@ -127,122 +74,107 @@ def is_TI(source, target):
         return True
     else:
         return False
-    
-        
-def build_fnuc(nuc_freqs):
-    ''' Create hyphy matrix which use target nucleotide frequencies (not codon frequencies). ''' 
 
-    matrix = 'Fnuc = {61, 61, \n'    
+def get_nuc_diff(source, target, grab_position = False):
+    diff = ''
+    position = 5
+    for i in range(3):
+        if source[i] != target[i]: 
+            diff += source[i]+target[i]
+            position = i
+    if grab_position:
+        return diff, position
+    else:
+        return diff
+        
+def build_fnuc_matrices(nuc_freqs, pos_nuc_freqs, outfile):
+    ''' Create matrices which use target nucleotide frequencies (not codon frequencies). 
+        Note: pos means "positional", we use 12 positional nucleotide frequencies. Goes with F3x4 stationary distribution.
+              glob means "global", we use 4 global (position-free) nucleotide frequencies. Goes with F1x4 stationary distribution.
+    ''' 
+
+    matrix_pos  = 'Fnuc_pos = {61, 61, \n'    
+    matrix_glob = 'Fnuc_glob = {61, 61, \n'
+
     for i in range(61):
         source = codons[i]
         for j in range(61):
             target = codons[j]
                 
-            diff = get_nuc_diff(source, target)
+            diff, x = get_nuc_diff(source, target, grab_position=True)
             if len(diff) == 2:
-                target_nuc_index = nucindex[diff[1]]   
-                    
+                assert(len(str(x)) == 1), "Problem with determining nucleotide difference between codons"
+                target_index = nucindex[diff[1]]   
+                glob = str(nuc_freqs[nucindex[diff[1]]])
+                pos  = str(pos_nuc_freqs[nucindex[diff[1]]][x])
+    
                 # Create string for matrix element
-                element = '{' + str(i) + ',' + str(j) + ',t*'                    
+                element = '{' + str(i) + ',' + str(j) + ',t'  
+
                 if is_TI(diff[0], diff[1]):
-                    element += 'k*'
+                    element += '*k'
                 if codon_dict[source] != codon_dict[target]:
-                    element += 'w*'
-                matrix += element + str(nuc_freqs[target_nuc_index]) + '}\n'
+                    element += '*w'
+                
+                matrix_pos  += element + '*' + pos + '}\n'
+                matrix_glob += element + '*' + glob + '}\n'
 
     # And save to file.
-    with open('fnuc.mdl', 'w') as outf:
-        outf.write(matrix+ '};\n\n\n')
-        
-        
-        
-def array_to_hyphy_freq(f):
-    ''' Convert a python/numpy list/array of codon frequencies to a hyphy frequency string to directly write into a batchfile. '''
-    hyphy_f = "{"
-    for freq in f:
-        hyphy_f += "{" + str(freq) + "},"
-    hyphy_f = hyphy_f[:-1]
-    hyphy_f += "};"
-    return hyphy_f
-    
-    
-
-def create_batchfile(basefile, outfile, f61, f1x4, f3x4, cf3x4):
-    ''' sed in the frequency specifications to create an output batchfile from the base/raw batchfile framework.'''
-    cp_batch = subprocess.call("cp " + basefile + " " + outfile, shell=True)
-    assert(cp_batch == 0), "couldn't copy batchfile"
-    shutil.copy(basefile, outfile)
-    flist = ['f61', 'f1x4', 'f3x4', 'cf3x4']
-    for i in range( len(flist) ):
-        hyf = eval(flist[i])
-        insert = flist[i].upper()
-        setuphyphyf = "sed -i 's/INSERT_"+insert+"/"+hyf+"/g' " + outfile
-        setupf = subprocess.call(setuphyphyf, shell = True)
-        assert(setupf == 0), "couldn't properly add in frequencies"
-        
+    with open(outfile, 'w') as outf:
+        outf.write(matrix_pos + '};\n\n\n' + matrix_glob + '};\n\n\n')
 
 
-def run_hyphy(batchfile, seqfile, fspecs):
+def run_hyphy(batchfile, cpu, seqfile, fspecs):
 
     # Set up sequence file with tree
     shutil.copy(seqfile, "temp.fasta")
 
     # Run hyphy.
-    runhyphy = subprocess.call("./HYPHYMP CPU=1 " + batchfile, shell = True)
+    runhyphy = subprocess.call("./HYPHYMP CPU="cpu + " " + batchfile, shell = True)
     assert (runhyphy == 0), "hyphy fail"
     
     lnliks = np.zeros(len(fspecs)) # log likelihood values
+    numparams = np.zeros(len(fspecs)) # free parameters in model
+    
     count = 0
     for suffix in fspecs:
         file = suffix + '_hyout.txt'  
-        lnliks[count] = parse_output_GY94(file)
+        numparams[count], lnliks[count] = parse_output_GY94(file)
         count += 1
-    return lnliks
+    return 2*(numparams - lnliks)
      
     
 def parse_output_GY94(file):
     with open(file, 'r') as hyout:
         hylines = hyout.readlines()
+    numparams = float(len(hylines)-1)
     lnlik = None;
     for line in hylines:
         findlk = re.search("^Likelihood Function's Current Value = (-\d+\.*\d*)", line)
         if findlk:
             lnlik = float(findlk.group(1))
     assert(lnlik is not None),   "Couldn't retrieve log likelihood from hyphy output file."
-    return lnlik
-        
+    return numparams, lnlik
+
         
 
 def main():
     
+    rep = sys.argv[1]
+    cpu = sys.argv[2]
     seqfile = "gpcr"+rep+".fasta"
     outfile = "output"+rep+".txt"
     
-    # Use MutSel simulator code to get f61_freqs, nuc_freqs
-    # First need to have a temporary file w/out the tree at the bottom
+    # Build the Fnuc matrices
     rm_tree = subprocess.call("sed '$d' " + seqfile + " > notree.fasta", shell=True)
     assert(rm_tree == 0), "Could not remove tree from fasta file."
-    freqObject = ReadFreqs(by ='codon', file = "notree.fasta")
-    f61_freqs = freqObject.calcFreqs(type = 'codon')
-    f61 = array_to_hyphy_freq(f61_freqs)
-    nuc_freqs = freqObject.calcFreqs(type = 'nuc')
-    
-    # F1x4, F3x4, CF3x4
-    f1x4 = array_to_hyphy_freq(calc_f1x4_freqs(nuc_freqs))
-    pos_nuc_freqs = codon_to_nuc(f61_freqs)
-    f3x4 = array_to_hyphy_freq(calc_f3x4_freqs(pos_nuc_freqs))
-    cf3x4 = array_to_hyphy_freq( calc_cf3x4_freqs(pos_nuc_freqs.T) ) 
-    
-    # Save batchfile
-    create_batchfile("raw_batchfile.bf", "batchfile.bf", f61, f1x4, f3x4, cf3x4)
-    
-    # Fnuc 
-    build_fnuc(nuc_freqs)
-    
+    nuc_freqs, pos_nuc_freqs = calc_nuc_freqs('notree.fasta')
+    f1x4 = calc_f1x4_freqs(nuc_freqs)
+    f3x4 = calc_f3x4_freqs(pos_nuc_freqs)
+    build_fnuc_matrices(nuc_freqs, pos_nuc_freqs, "fnuc.mdl")
+        
     # Call hyphy
-    numparams = np.array([62., 11., 11., 5., 5.])
-    lnliks = run_hyphy("batchfile.bf", seqfile, ['f61', 'f3x4', 'cf3x4', 'f1x4', 'fnuc'])
-    AICs = 2*(numparams - lnliks)
+    AICs = run_hyphy("globalDNDS_gpcr.bf", cpu, seqfile, ['f61', 'f3x4', 'cf3x4', 'f1x4', 'fnuc_pos', 'fnuc_glob'])
     
     outstring = rep
     for aic in AICs:
