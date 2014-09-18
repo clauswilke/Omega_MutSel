@@ -171,16 +171,14 @@ def is_TI(source, target):
         return False
 
 
-def build_fnuc_matrices(nuc_freqs_data, nuc_freqs_true, pos_nuc_freqs_data, pos_nuc_freqs_true, outfile):
+def build_fnuc_matrices(nuc_freqs, pos_nuc_freqs, outfile):
     ''' Create matrices which use target nucleotide frequencies (not codon frequencies). 
         Note: pos means "positional", we use 12 positional nucleotide frequencies. Goes with F3x4 stationary distribution.
               glob means "global", we use 4 global (position-free) nucleotide frequencies. Goes with F1x4 stationary distribution.
     ''' 
 
-    matrix_pos_data  = 'Fnuc_pos_data = {61, 61, \n'    
-    matrix_pos_true  = 'Fnuc_pos_true = {61, 61, \n'
-    matrix_glob_data = 'Fnuc_glob_data = {61, 61, \n'    
-    matrix_glob_true = 'Fnuc_glob_true = {61, 61, \n'
+    matrix_pos  = 'Fnuc_pos = {61, 61, \n'
+    matrix_glob = 'Fnuc_glob = {61, 61, \n'
     
     for i in range(61):
         source = codons[i]
@@ -191,27 +189,21 @@ def build_fnuc_matrices(nuc_freqs_data, nuc_freqs_true, pos_nuc_freqs_data, pos_
             if len(diff) == 2:
                 assert(len(str(x)) == 1), "Problem with determining nucleotide difference between codons"
                 target_index = nucindex[diff[1]]   
-                glob_data = str(nuc_freqs_data[nucindex[diff[1]]])
-                glob_true = str(nuc_freqs_data[nucindex[diff[1]]]) 
-                pos_data  = str(pos_nuc_freqs_data[nucindex[diff[1]]][x])
-                pos_true  = str(pos_nuc_freqs_true[nucindex[diff[1]]][x])
+                glob = str(nuc_freqs[nucindex[diff[1]]]) 
+                pos  = str(pos_nuc_freqs[nucindex[diff[1]]][x])
     
                 # Create string for matrix element
                 element = '{' + str(i) + ',' + str(j) + ',t'  
-
                 if is_TI(diff[0], diff[1]):
                     element += '*k'
                 if codon_dict[source] != codon_dict[target]:
-                    element += '*w'
-                
-                matrix_pos_data  += element + '*' + pos_data + '}\n'
-                matrix_pos_true  += element + '*' + pos_true + '}\n'
-                matrix_glob_data += element + '*' + glob_data + '}\n'
-                matrix_glob_true += element + '*' + glob_true + '}\n'
+                    element += '*w' 
+                matrix_pos  += element + '*' + pos + '}\n'
+                matrix_glob += element + '*' + glob + '}\n'
 
     # And save to file.
     with open(outfile, 'w') as outf:
-        outf.write(matrix_pos_data + '};\n\n\n' + matrix_pos_true + '};\n\n\n' + matrix_glob_data + '};\n\n\n' + matrix_glob_true + '};\n\n\n')
+        outf.write(matrix_pos + '};\n\n\n' + matrix_glob + '};\n\n\n')
 
 
 
@@ -238,12 +230,12 @@ def array_to_hyphy_posfreq(f):
     
     
 
-def create_batchfile(basefile, outfile, pos_freqs_data, pos_freqs_true, f61_data, f61_true, f1x4_data, f1x4_true, f3x4_data, f3x4_true):
+def create_batchfile(basefile, outfile, pos_freqs, f61, f1x4, f3x4):
     ''' sed in the frequency specifications to create an output batchfile from the base/raw batchfile framework.'''
     cp_batch = subprocess.call("cp " + basefile + " " + outfile, shell=True)
     assert(cp_batch == 0), "couldn't copy batchfile"
     shutil.copy(basefile, outfile)
-    flist = ['pos_freqs_data', 'pos_freqs_true', 'f61_data', 'f61_true', 'f1x4_data', 'f1x4_true', 'f3x4_data', 'f3x4_true']
+    flist = ['pos_freqs', 'f61', 'f1x4', 'f3x4']
     for i in range( len(flist) ):
         hyf = eval(flist[i])
         insert = flist[i].upper()
@@ -256,7 +248,7 @@ def create_batchfile(basefile, outfile, pos_freqs_data, pos_freqs_true, f61_data
 
 def main():
     # First, we determine the equilibrium frequencies of the system on a per site basis. As we use amino acid preference data, we assign all synonymous codons the same fitness.
-    # Second, we find the global F61, F3x4 frequencies, as well as the Fnuc matrix. These use the average dataset frequencies.
+    # Second, we find the global F61, F1x4, F3x4 frequencies, as well as the Fnuc matrix. These use the average dataset frequencies.
     # Third, we find the so-called "true" (absence of selection) F61, F3x4, and Fnuc parameterizations.
     # Finally, we set up the hyphy batch file which makes use of these frequencies. Note that the Fnuc matrices are saved to a separate matrix file, and are not placed directly into the hyphy batchfiles.
     
@@ -286,41 +278,26 @@ def main():
         final_codon_freqs = np.loadtxt(cf_outfile)
 
 
-    # Calculate frequency parameterizations using the global data set.
-    print "Calculating F61, data"
-    f61_freqs_data = np.mean(final_codon_freqs, axis=0)
-    f61_data = array_to_hyphy_freq(f61_freqs_data)
+    # Calculate frequency parameterizations
+    print "Calculating frequency parameterizations F61, F1x4, F3x4."
+    f61_freqs = np.mean(final_codon_freqs, axis=0)
+    nuc_freqs, pos_nuc_freqs = codon_to_nuc(f61_freqs)
+    f1x4_freqs = calc_f1x4_freqs(nuc_freqs)
+    f3x4_freqs = calc_f3x4_freqs(pos_nuc_freqs)
     
-    print "Calculating F1x4 and F3x4, data"
-    nuc_freqs_data, pos_nuc_freqs_data = codon_to_nuc(f61_freqs_data)
-    pos_freqs_data_hyf = array_to_hyphy_posfreq(pos_nuc_freqs_data)
-    f1x4_freqs_data = calc_f1x4_freqs(nuc_freqs_data)
-    f3x4_freqs_data = calc_f3x4_freqs(pos_nuc_freqs_data)
-    f1x4_data = array_to_hyphy_freq(f1x4_freqs_data)
-    f3x4_data = array_to_hyphy_freq(f3x4_freqs_data)
-        
-
-    # Calculate frequency parameterizations using frequencies in absence of selection.
-    print "Calculating F61, true"
-    f61_freqs_true =  get_eq_freqs(np.ones(20) * 0.05 , mudict)
-    f61_true = array_to_hyphy_freq(f61_freqs_true)
-    
-    print "Calculating F1x4 and F3x4, true"
-    nuc_freqs_true, pos_nuc_freqs_true = codon_to_nuc(f61_freqs_true) 
-    pos_freqs_true_hyf = array_to_hyphy_posfreq(pos_nuc_freqs_true)
-    f1x4_freqs_true = calc_f1x4_freqs(nuc_freqs_true)
-    f3x4_freqs_true = calc_f3x4_freqs(pos_nuc_freqs_true)
-    f1x4_true = array_to_hyphy_freq(f1x4_freqs_true)
-    f3x4_true = array_to_hyphy_freq(f3x4_freqs_true)
-    
-    
-    print "Creating HyPhy batchfile."
-    create_batchfile(raw_batchfile, batch_outfile, pos_freqs_data_hyf, pos_freqs_true_hyf, f61_data, f61_true, f1x4_data, f1x4_true, f3x4_data, f3x4_true)
+    # Convert frequency arrays to hyphy strings
+    f61 = array_to_hyphy_freq(f61_freqs)
+    f1x4 = array_to_hyphy_freq(f1x4_freqs)
+    f3x4 = array_to_hyphy_freq(f3x4_freqs)
+    pos_freqs_hyf = array_to_hyphy_posfreq(pos_nuc_freqs)
+ 
+    # Create the hyphy batchfile to include the frequencies calculated here. Note that we need to do this since no actual alignment exists which includes all protein positions, so cannot be read in by hyphy file.       
+    create_batchfile(raw_batchfile, batch_outfile, pos_freqs_hyf, f61, f1x4, f3x4)
           
-    print "Building and saving the Fnuc matrices for true and data frequencies"
-    fnuc_matrices = build_fnuc_matrices(nuc_freqs_data, nuc_freqs_true, pos_nuc_freqs_data, pos_nuc_freqs_true, fnuc_outfile)
+    # Use nucleotide and positional nucleotide frequencies to construct Fnuc matrices
+    print "Building and saving the Fnuc matrices"
+    fnuc_matrices = build_fnuc_matrices(nuc_freqs, pos_nuc_freqs, fnuc_outfile)
 
-    
     
 main() 
 
