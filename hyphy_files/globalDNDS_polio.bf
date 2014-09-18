@@ -162,7 +162,7 @@ UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn11 = (filt_data, Tree01);
 Optimize (paramValues, LikFn11);
-fprintf ("fnuc_glob_hyout.txt", LikFn11);
+fprintf ("fnuc_glob_true_hyout.txt", LikFn11);
 
 
 ////////////// Fnuc_glob DATA MODEL //////////////
