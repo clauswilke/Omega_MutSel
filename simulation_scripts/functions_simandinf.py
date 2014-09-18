@@ -301,7 +301,7 @@ def parse_output_GY94(file):
         hylines = hyout.readlines()
     lnlik = None; hyphy_w = None; hyphy_k = None;
     for line in hylines:
-        findlk = re.search("^Likelihood Function's Current Value = (-\d+\.*\d*)", line)
+        findlk = re.search("^Likelihood Function's Current Value\s+=\s+(-\d+\.*\d*)", line)
         if findlk:
             lnlik = float(findlk.group(1))
         findw = re.search("^w=(\d+\.*\d*)", line)
