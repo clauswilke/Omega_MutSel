@@ -258,7 +258,7 @@ def main():
     cf_outfile    = data_dir + dataset + "_codon_eqfreqs.txt"
     raw_batchfile = "globalDNDS_raw_exp.bf"
     batch_outfile = '../hyphy_files/globalDNDS_' + dataset + '.bf'
-    fnuc_outfile  = '../hyphy_files/fnuc_' + dataset + '.mdl'
+    fnuc_outfile  = '../hyphy_files/Fnuc_' + dataset + '.mdl'
     
     # Load amino acid preference data, if compute is True
     # np_prefs are those taken from Bloom 2014 MBE paper. The np_prefs are directly from the paper's Supplementary_file_1.xls and refer to equilbrium amino acid propenisties. The best interpretation of these experimental propensities is metropolis.
