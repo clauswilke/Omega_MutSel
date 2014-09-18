@@ -135,26 +135,35 @@ def run_hyphy(batchfile, cpu, seqfile, fspecs):
     
     lnliks = np.zeros(len(fspecs)) # log likelihood values
     numparams = np.zeros(len(fspecs)) # free parameters in model
-    
+    omegas = np.zeros(len(fspecs))
+    kappas = np.zeros(len(fspecs))
     count = 0
     for suffix in fspecs:
         file = suffix + '_hyout.txt'  
-        numparams[count], lnliks[count] = parse_output_GY94(file)
+        omegas[count], kappas[count], lnliks[count], numparams[count] = parse_output_GY94(file)
         count += 1
-    return 2*(numparams - lnliks)
+    return omegas, kappas, lnliks, numparams
      
     
 def parse_output_GY94(file):
     with open(file, 'r') as hyout:
         hylines = hyout.readlines()
-    numparams = float(len(hylines)-1)
-    lnlik = None;
+    numparams = float(len(hylines) - 1)
+    lnlik = None; hyphy_w = None; hyphy_k = None;
     for line in hylines:
-        findlk = re.search("^Likelihood Function's Current Value = (-\d+\.*\d*)", line)
+        findlk = re.search("^Likelihood Function's Current Value\s+=\s+(-\d+\.*\d*)", line)
         if findlk:
             lnlik = float(findlk.group(1))
+        findw = re.search("^w=(\d+\.*\d*)", line)
+        if findw:
+            hyphy_w = float(findw.group(1))
+        findk = re.search("^k=(\d+\.*\d*)", line)
+        if findk:
+            hyphy_k = float(findk.group(1))
     assert(lnlik is not None),   "Couldn't retrieve log likelihood from hyphy output file."
-    return numparams, lnlik
+    assert(hyphy_w is not None), "Couldn't retrieve omega from hyphy output file."
+    assert(hyphy_k is not None), "Couldn't retrieve kappa from hyphy output file."
+    return hyphy_w, hyphy_k, lnlik, numparams
 
         
 
@@ -163,7 +172,7 @@ def main():
     rep = sys.argv[1]
     cpu = sys.argv[2]
     seqfile = "gpcr"+rep+".fasta"
-    outfile = "output"+rep+".txt"
+    outfile = "outfile"+rep+".txt"
     
     # Build the Fnuc matrices
     rm_tree = subprocess.call("sed '$d' " + seqfile + " > notree.fasta", shell=True)
@@ -174,13 +183,16 @@ def main():
     build_fnuc_matrices(nuc_freqs, pos_nuc_freqs, "fnuc.mdl")
         
     # Call hyphy
-    AICs = run_hyphy("globalDNDS_gpcr.bf", cpu, seqfile, ['f61', 'f3x4', 'cf3x4', 'f1x4', 'fnuc_pos', 'fnuc_glob'])
+    fspecs = ['f61', 'f3x4', 'cf3x4', 'f1x4', 'fnuc_pos', 'fnuc_glob']
+    omegas, kappas, lnliks, numparams = run_hyphy("globalDNDS_gpcr.bf", cpu, seqfile, fspecs)
+    AICs = 2*(numparams - lnliks)
     
-    outstring = rep
-    for aic in AICs:
-        outstring += '\t' + str(aic)
-    with open(outfile, 'w') as outf:
-        outf.write(outstring + '\n')
+    outstring = ''
+    for x in range(len(fspecs)):
+        outstring += rep + '\t' + fspecs[x] + '\t' + str(omegas[x]) + '\t' + str(kappas[x]) + '\t' + str(numparams[x]) + '\t' + str(lnliks[x]) + '\t' + str(AICs[x]) + '\n'
+    
+    with open(outfile, 'w') as outf:    
+        outf.write(outstring)
         
         
         
