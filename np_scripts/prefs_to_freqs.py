@@ -177,8 +177,8 @@ def build_fnuc_matrices(nuc_freqs, pos_nuc_freqs, outfile):
               glob means "global", we use 4 global (position-free) nucleotide frequencies. Goes with F1x4 stationary distribution.
     ''' 
 
-    matrix_pos  = 'Fnuc_pos = {61, 61, \n'
-    matrix_glob = 'Fnuc_glob = {61, 61, \n'
+    matrix_pos  = 'Fnuc3 = {61, 61, \n' # Fnuc3 = goes with F3x4 stationary frequencies
+    matrix_glob = 'Fnuc1 = {61, 61, \n' # Fnuc1 = goes with F1x4 stationary frequencies
     
     for i in range(61):
         source = codons[i]

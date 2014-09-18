@@ -40,26 +40,26 @@ write_treefile(treefile)
 
 # Read in equilibrium frequencies and determine entropy
 eq_codon_freqs = np.loadtxt(dataset + "_codon_eqfreqs.txt")
-codon_freqs_true = eq_codon_freqs[ int(rep) - 1 ]
-codon_freqs_true_dict = dict(zip(codons, codon_freqs_true))
-entropy = calc_entropy(codon_freqs_true)
+codon_freqs = eq_codon_freqs[ int(rep) - 1 ]
+codon_freqs_dict = dict(zip(codons, codon_freqs))
+entropy = calc_entropy(codon_freqs)
 
 
 # Simulate according to MutSel model along phylogeny
-#print "Simulating"
-#simulate(codon_freqs_true, seqfile, treefile, mu_dict, seqlength)
+print "Simulating"
+simulate(codon_freqs, seqfile, treefile, mu_dict, seqlength)
 
 
 # Derive omega from eq freqs
 print "Deriving omega from equilibrium codon frequencies"
-dnds = derive_dnds(codon_freqs_true_dict, mu_dict)
+dnds = derive_dnds(codon_freqs_dict, mu_dict)
 
 
 # Maximum likelihood omega inference across a variety of frequency specifications.
 print "Conducting ML inference with HyPhy"
 
-fspecs = ['f61_true', 'f61_data', 'f1x4_true', 'f1x4_data', 'f3x4_true', 'f3x4_data', 'cf3x4_true', 'cf3x4_data', 'fnuc_pos_true', 'fnuc_pos_data', 'fnuc_glob_true', 'fnuc_glob_data']
-k = 3. # all models have 3 free parameters (k,t,w)
+fspecs = ['f61',  'f1x4',  'f3x4',  'cf3x4',  'fnuc1',  'fnuc3']
+k = 3. # all models have 3 free parameters (w,k,t). note that t is ok to be global, because simulation trees all have same branch lengths, so in fact t should be a global (not local/branch-specific) parameter.
 lnliks, omegas, kappas = run_hyphy_nyp(batchfile, seqfile, treefile, cpu, fspecs)  
 AICs = 2*(k - lnliks)
 omega_errors = (dnds - omegas) / dnds

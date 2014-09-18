@@ -1,6 +1,6 @@
 /* SJS. 
 Hyphy inference for an "experimental" dataset. Name of file indicates the mutation scheme.
-Perform 6 total inferences, one for each of the following parameterizations: F61, F1x4, F3x4, CF3x4, Fnuc_pos, Fnuc_glob.
+Perform 6 total inferences, one for each of the following parameterizations: F61, F1x4, F3x4, CF3x4, Fnuc1 (goes w/ F1x4), Fnuc3 (goes w/ F3x4).
 */
 
 
@@ -82,21 +82,21 @@ fprintf ("cf3x4_hyout.txt", LikFn4);
 
 ////////////// Fnuc_f1x4 //////////////
 global w; global k; global t;
-Model MyModel = (Fnuc_glob, F1x4, 0);
+Model MyModel = (Fnuc1, F1x4, 0);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn5 = (filt_data, Tree01);
 Optimize (paramValues, LikFn5);
-fprintf ("fnuc_glob_hyout.txt", LikFn5);
+fprintf ("fnuc1_hyout.txt", LikFn5);
 
 
 ////////////// Fnuc_f3x4 //////////////
 global w; global k; global t;
-Model MyModel = (Fnuc_pos, F3x4, 0);
+Model MyModel = (Fnuc3, F3x4, 0);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn6 = (filt_data, Tree01);
 Optimize (paramValues, LikFn6);
-fprintf ("fnuc_pos_hyout.txt", LikFn6);
+fprintf ("fnuc3_hyout.txt", LikFn6);
