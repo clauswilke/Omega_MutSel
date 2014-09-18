@@ -30,7 +30,7 @@ F1x4 = INSERT_F1X4
 F3x4 = INSERT_F3X4
 
 pos_freqs = INSERT_POS_FREQS
-CF3x4 = BuildCodonFrequencies(CF3x4(pos_freqs, "TAA,TAG,TGA"));
+CF3x4_ = BuildCodonFrequencies(CF3x4(pos_freqs, "TAA,TAG,TGA"));
 
 
 /* Optimize likelihoods for each frequency specification */
@@ -72,7 +72,7 @@ fprintf ("f3x4_hyout.txt", LikFn3);
 
 ////////////// CF3x4 FREQUENCIES //////////////
 global w; global k; global t;
-Model MyModel = (GY94, CF3x4, 1);
+Model MyModel = (GY94, CF3x4_, 1);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
