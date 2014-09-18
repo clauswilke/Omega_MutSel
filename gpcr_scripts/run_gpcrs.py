@@ -130,7 +130,7 @@ def run_hyphy(batchfile, cpu, seqfile, fspecs):
     shutil.copy(seqfile, "temp.fasta")
 
     # Run hyphy.
-    runhyphy = subprocess.call("./HYPHYMP CPU="cpu + " " + batchfile, shell = True)
+    runhyphy = subprocess.call("./HYPHYMP CPU="+ cpu + " " + batchfile, shell = True)
     assert (runhyphy == 0), "hyphy fail"
     
     lnliks = np.zeros(len(fspecs)) # log likelihood values
