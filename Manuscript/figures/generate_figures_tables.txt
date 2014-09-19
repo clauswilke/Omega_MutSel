@@ -1,0 +1,254 @@
+
+nobias <- read.table('../../datasets/nobias.txt', header=T)
+bias <- read.table('../../datasets/bias.txt', header=T)
+conv <- read.table('../../datasets/conv.txt', header=T)
+np <- read.table('../../datasets/np.txt', header=T)
+yeast<- read.table('../../datasets/yeast.txt', header=T)
+polio <- read.table('../../datasets/polio.txt', header=T)
+
+
+############### Regression and convergence plot, to be combined w/ the approach flowchart. ###############
+pdf('MainText/regression_convergence_raw.pdf', width=9.5, height=4.5, useDingbats=F)
+par(mfrow=c(1,2))
+par(mar=c(4.4,5.5,2.5,2)) #bottom, left, top, right
+dnds <- c(nobias$dnds, bias$dnds)
+omega <- c(nobias$omega, bias$omega)
+
+plot(dnds, omega, pch=20, cex = 1.2, cex.lab=1.75, xlab = expression(dN/dS), ylab = '', xlim=c(0,2), ylim=c(0,2), xaxt='n', yaxt='n', frame.plot=F)
+axis(side = 1, at = c(0, 0.5, 1, 1.5, 2), cex.axis = 1.7, lwd=3)
+axis(side = 2, at = c(0, 0.5, 1, 1.5, 2), cex.axis = 1.7, lwd=3)
+text(1.6, 1, expression(paste(r^2, " = 0.994")), cex=1.65)
+mtext(expression(omega), side = 2, at = 1, cex=2.5, line=2.75)
+lines(c(0,1.95), c(0,1.95) ,col='red', lwd=2.25)
+mtext('B', side = 3, at = -0.55, cex = 3)
+
+conv2 <- conv[conv$seqlen <=5e5,]
+plot(conv2$seqlen, conv2$w_err, pch=20, cex=1.2, cex.lab=1.7, xlab = 'Alignment Length', ylab = 'Relative Error', log='x', ylim=c(-1, 1), xaxt='n', yaxt='n', frame.plot=F)
+axis(side = 1, at = c(5e2, 5e3, 5e4, 5e5), cex.axis = 1.4, lwd=2.5)
+axis(side = 2, at = c(-1, -0.5, 0, 0.5, 1), cex.axis = 1.54, lwd=2.5)
+lines(c(5e2-100,1e6-100), c(0,0) ,col='red', lwd=2.25)
+mtext('C', side = 3, at = 80, cex = 3)
+dev.off()
+
+
+
+
+
+
+
+
+###################### sigma^2 and dn/ds. single plot with one panel no bias, one panel bias ###########
+pdf('MainText/dnds_variance.pdf', width=9, height=4, useDingbats=F)
+par(mfrow=c(1,2))
+par(mar=c(4.25,4.75,1.6,2)) #bottom, left, top, right
+
+plot(nobias$sd, nobias$dnds, xlim=c(0,4), ylim=c(0,2), cex=1.3, cex.lab=1.35, cex.axis=1.5, pch=20, ylab='', xlab = expression(paste("Variance of selection strength (",sigma^2,")")), frame.plot = F)
+mtext(expression(dN/dS), side = 2, at = 1, cex=1.7, las=0, line=2.5)
+abline(h=1, col='gray25', lwd=2.5)
+mtext('A', side = 3, at = -1, cex = 2.2)
+text(2, 1.98, 'No Codon Bias', cex=1.5)
+
+plot(bias$sd, bias$dnds, xlim=c(0,4), ylim=c(0,2), cex=1.3, cex.lab = 1.35, cex.axis = 1.5, pch=20, ylab='', xlab = expression(paste("Variance of selection strength (",sigma^2,")")), frame.plot = F)
+mtext(expression(dN/dS), side = 2, at = 1, cex=1.7, las=0, line=2.5)
+abline(h=1, col='gray25', lwd=2.5)
+mtext('B', side = 3, at = -1, cex = 2.2)
+text(2, 2, 'Codon Bias', cex=1.5)
+
+dev.off()
+
+
+
+
+
+
+
+
+
+
+
+
+############################ nucleoprotein, yeast, polio r^2 and bias plots #############################
+fspecs <- c("f61", "f3x4", "cf3x4", "f1x4", "fnuc3", "fnuc1")
+names <- c("F61", "F3x4", "CF3x4", "F1x4", "Fnuc3", "Fnuc1")
+np_r2 <- c(); yeast_r2 <- c(); polio_r2 <- c(); np_bias <- c(); yeast_bias <- c(); polio_bias <- c()
+
+for (i in 1:length(fspecs))
+{
+    temp <- np[np$fspec == fspecs[i],]
+    np_r2 <- c( np_r2, cor(temp$dnds, temp$omega)^2)
+    np_bias <- c( np_bias, glm(omega ~ offset(dnds), data=temp)$coefficients )    
+    temp <- yeast[yeast$fspec == fspecs[i],]
+    yeast_r2 <- c( yeast_r2, cor(temp$dnds, temp$omega)^2)
+    yeast_bias <- c( yeast_bias, glm(omega ~ offset(dnds), data=temp)$coefficients )
+    temp <- polio[polio$fspec == fspecs[i],]
+    polio_r2 <- c( polio_r2, cor(temp$dnds, temp$omega)^2)
+    polio_bias <- c( polio_bias, glm(omega ~ offset(dnds), data=temp)$coefficients )
+
+}
+
+pdf('MainText/nyp_bias_r2.pdf', width=3.75, height=5.625, useDingbats=F)
+par(mfrow=c(2,1), mar=c(2, 3.6, 1.25, 0.6)) #bottom, left, top, right
+point_size = 1.75
+ylab_size = 1.25
+xlab_size = 0.85
+axis_size = 1.
+panel_size = 1.5
+axis_lwd = 2.25
+
+# top panel, bias
+plot(1:length(fspecs), np_bias, pch=20, xaxt='n', yaxt='n', ylim=c(-0.2,0.2), xlab='', ylab = '', cex=point_size, cex.axis=axis_size, frame.plot=F)
+axis(side=1, at=1:length(fspecs), labels = names, las=1, cex.axis=xlab_size, lwd=axis_lwd)
+axis(side=2, at=c(-0.2, -0.1, 0, 0.1, 0.2), cex.axis=axis_size, lwd=axis_lwd)
+mtext("Estimator Bias", side = 2, at = 0, cex=ylab_size, las=0, line=2.25)
+points(1:length(fspecs), yeast_bias, col='red', pch=20, cex=point_size)
+points(1:length(fspecs), polio_bias, col='blue', pch=20, cex=point_size)
+abline(h=0, lwd=2)
+mtext("A", side = 3, at = -0.15, cex = panel_size)
+
+#legend
+points(5.25, 0.2, pch=20, cex=1)
+points(5.25, 0.16, pch=20, cex=1, col='red')
+points(5.25, 0.12, pch=20, cex=1, col='blue')
+text(5.6, 0.2, 'NP', cex=1)
+text(5.75, 0.16, 'Yeast', cex=1)
+text(5.72, 0.12, 'Polio', cex=1)
+
+# bottom panel, r^2
+plot(1:length(fspecs), polio_r2, xaxt='n', yaxt='n', col='blue', ylab='', pch=20, cex=point_size, ylim=c(0,1), xlab='', cex.axis=axis_size, frame.plot=F) #ylab = expression(r^2),
+axis(side=1, at=1:length(fspecs), labels = names, las=1, cex.axis=xlab_size, lwd=axis_lwd)
+axis(side=2, at=c(0, 0.2, 0.4, 0.6, 0.8, 1.0), cex.axis=axis_size, lwd=axis_lwd)
+mtext(expression(r^2), side = 2, at = 0.5, cex=ylab_size+0.25, las=0, line=2.1)
+points(2:length(fspecs), np_r2[2:length(fspecs)], pch=20, cex=point_size)
+points(2:length(fspecs), yeast_r2[2:length(fspecs)], col='red', pch=20, cex=point_size)
+points(0.95, np_r2[1], pch=20, cex=point_size)
+points(1.15, yeast_r2[1], pch=20, col='red', cex=point_size)
+
+mtext("B", side = 3, at = -0.15, cex = panel_size)
+
+dev.off()
+
+
+############################ SI Fig1 - FULL nucleoprotein, yeast, polio dnds vs omega regressions. One for data and one for true. #############################
+panels1 <- c('A', 'B', 'C', 'D', 'E', 'F')
+panels2 <- c('G', 'H', 'I', 'J', 'K', 'L')
+panels3 <- c('M', 'N', 'O', 'P', 'Q', 'R')
+
+plot_nyp_fspec<- function(df, panels, fspecs)
+{
+    for (i in 1:length(fspecs)){
+        temp <- df[df$fspec == fspecs[i],]
+        plot(temp$dnds, temp$omega, pch=20, cex.lab=2.5, xlim=c(0.1,1.1), ylim=c(0.1,1.1), xaxt='n', yaxt='n', xlab='dN/dS', ylab = '', frame.plot = F)
+        axis(side = 1, at=c(0.1, 0.3, 0.5, 0.7, 0.9, 1.1), cex.axis=1.9) 
+        axis(side = 2, at=c(0.1, 0.3, 0.5, 0.7, 0.9, 1.1), cex.axis=1.8) 
+        mtext(expression(omega), side = 2, at = 0.6, cex=2, line=3)
+        mtext(panels[i], side = 3, at = -0.15, cex = 2)
+        lines(c(0.1,1.1), c(0.1,1.1), col='red', lwd=2)
+
+    }
+}
+
+make_labels <- function(size)
+{
+mtext('NP', side = 2, outer=TRUE, las=1, at=0.85, cex=size, line=1.75)
+mtext('Yeast', side = 2, outer=TRUE, las=1, at=0.53, cex=size, line=0.75)
+mtext('Polio', side = 2, outer=TRUE, las=1, at=0.2, cex=size, line=0.75)
+
+mtext(names[1], side = 3, outer=TRUE, at = 0.095, cex=size)
+mtext(names[2], side = 3, outer=TRUE, at = 0.26, cex=size)
+mtext(names[3], side = 3, outer=TRUE, at = 0.43, cex=size)
+mtext(names[4], side = 3, outer=TRUE, at = 0.59, cex=size)
+mtext(names[5], side = 3, outer=TRUE, at = 0.76, cex=size)
+mtext(names[6], side = 3, outer=TRUE, at = 0.925, cex=size)
+
+}
+
+
+pdf('SI/nyp_regression.pdf', width=25, height=11, useDingbats=F)
+par(mfrow=c(3,6))
+par(mar=c(5.5, 5.5, 2.5, 2.5)) #bottom, left, top, right
+par(oma=c(0,8,3,0))
+plot_nyp_fspec(np, panels1, fspecs)
+plot_nyp_fspec(yeast, panels2, fspecs)
+plot_nyp_fspec(polio, panels3, fspecs)
+make_labels(2.25)
+dev.off()
+
+
+##################################################################################################
+##################################################################################################
+###### make latex tables!
+# Both the MainText and SI tables are made here and all tables go into latex_tables.txt. 
+
+fspecs <- c("fnuc1",  "fnuc3", "f1x4", "cf3x4", "f3x4", "f61")
+rownames <- c("Fnuc1", "Fnuc3", "F1x4", "CF3x4", "F3x4", "F61")
+
+sink("latex_tables.txt")
+cat("%%%% Latex tables for 'The relationship between dN/dS and scaled selection coefficients' (SJS, COW). %%%%%\n\n\n\n\n\n")
+
+
+############################# NYP Estimator bias and r^2 tables ###################################
+
+fspecs <- c("fnuc1", "fnuc3", "f1x4", "cf3x4", "f61", "f3x4")
+np_r2 <- c(); yeast_r2 <- c(); polio_r2 <- c(); np_bias <- c(); yeast_bias <- c(); polio_bias <- c()
+
+for (i in 1:length(fspecs))
+{
+    temp <- np[np$fspec == fspecs[i],]
+    np_r2 <- c( np_r2, cor(temp$dnds, temp$omega)^2)
+    np_bias <- c( np_bias, glm(omega ~ offset(dnds), data=temp)$coefficients )    
+    temp <- yeast[yeast$fspec == fspecs[i],]
+    yeast_r2 <- c( yeast_r2, cor(temp$dnds, temp$omega)^2)
+    yeast_bias <- c( yeast_bias, glm(omega ~ offset(dnds), data=temp)$coefficients )
+    temp <- polio[polio$fspec == fspecs[i],]
+    polio_r2 <- c( polio_r2, cor(temp$dnds, temp$omega)^2)
+    polio_bias <- c( polio_bias, glm(omega ~ offset(dnds), data=temp)$coefficients )
+
+}
+
+make_bias_r2_table <- function(np_list, yeast_list, polio_list)
+{
+row <- "NP"
+for (entry in np_list){ row <- paste(row, round(entry,3), sep=" & ") }
+cat(row)
+cat(' \\\\ \n')
+row <- "Yeast"
+for (entry in yeast_list){ row <- paste(row, round(entry,3), sep=" & ") }
+cat(row)
+cat(' \\\\ \n')
+row <- "Polio"
+for (entry in polio_list){ row <- paste(row, round(entry,3), sep=" & ") }
+cat(row)
+cat(' \\\\ \n')
+}
+
+
+cat("%%%%%%%%%  nyp bias  %%%%%%%%%%\n")
+make_bias_r2_table(np_bias, yeast_bias, polio_bias)
+
+cat("\n\n\n%%%%%%%%%  nyp r^2  %%%%%%%%%\n")
+make_bias_r2_table(np_r2, yeast_r2, polio_r2)
+
+cat("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n")
+
+
+############################# NYP dAIC tables ###################################
+make_daic_table <- function(dat, fspecs, rownames)
+{
+}
+
+cat("\n\n\n\n%%%%%%%%% dAIC table  %%%%%%%%%%\n")
+fspecs <- c("f61", "cf3x4", "fnuc1", "f1x4", "fnuc3", "f3x4")
+rownames <- c("F61", "CF3x4", "Fnuc1", "F1x4", "Fnuc3", "F3x4")
+for (i in seq(1,6)){
+    daic_np <- round( mean(np$aic[np$fspec==fspecs[1]] - np$aic[np$fspec==fspecs[i]]), 2)
+    daic_yeast <- round( mean(yeast$aic[yeast$fspec==fspecs[1]] - yeast$aic[yeast$fspec==fspecs[i]]), 2)
+    daic_polio <- round( mean(polio$aic[polio$fspec==fspecs[1]] - polio$aic[polio$fspec==fspecs[i]]), 2)
+    cat(paste(rownames[i], daic_np, daic_yeast, daic_polio, sep=' & '))
+    cat(' \\\\ \n')
+}
+
+sink()
+
+
+
+

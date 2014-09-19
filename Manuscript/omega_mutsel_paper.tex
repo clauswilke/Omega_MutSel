@@ -249,9 +249,9 @@ where $\kappa$ is the transition-transversion bias, $\pi_j$ is the equilibrium f
 
 
 \section*{Appendix 1}
-In this appendix, we prove that, when calculated from scaled selection coefficients, $dN/dS \leq 1$. We assume that nucleotide mutation rates are symmetric ($\mu_{xy} = \mu_{yx}$) and that synonymous codons have the same fitness (synonymous changes are neutral). As described in the main text of this paper, these assumptions yield $dS = 1$, and hence we have to show that $dN = 	\frac{K_\text{N}}{L_\text{N}} \leq 1$. To demonstrate this, we note that the $dN$ calculation consists of a series pairwise sums of the evolutionary rate between a given pair of nonsynonymous codons, normalized by the sum of the frequencies of these codons. Therefore, we will now show that each of these pairwise sums is less than 1, and hence $dN$ must be less than 1.
+In this appendix, we prove that, when calculated from scaled selection coefficients, $dN/dS \leq 1$. We assume that nucleotide mutation rates are symmetric ($\mu_{xy} = \mu_{yx}$) and that synonymous codons have the same fitness (synonymous changes are neutral). As described in the main text of this paper, these assumptions yield $dS = 1$, and hence we have to show that $dN = 	K_\text{N}\big{/}L_\text{N} \leq 1$. [we can rearrange the summation series such that you always have the prob in one direction and corresponding back and sum together. for these pairs, it can be shown les than 1.]To demonstrate this, we note that the $dN$ calculation consists of a series pairwise sums of the evolutionary rate between a given pair of nonsynonymous codons, normalized by the sum of the frequencies of these codons. Therefore, we will now show that each of these pairwise sums is less than 1, and hence $dN$ must be less than 1.
 
-For this proof, we consider the pair of nonsynonymous codons $i$ and $j$, where $P_i \leq P_j$ that $P_j > 0$ ($P_i$ represents the stationary frequency of codon $i$). Moreover, as we assume $\mu_{ij} = \mu_{ji}$, we will simply write $\mu$ for each of these quantities throughout the following. As follows from equation \eqref{eq:KN}, the sum of the probability weights of evolving from codon $i$ to $j$ and from codon $j$ to $i$ is,
+For this proof, we consider the pair of nonsynonymous codons $i$ and $j$, where $P_i \leq P_j$ that $P_j > 0$ ($P_i$ represents the stationary frequency of codon $i$). Moreover, as we assume $\mu_{ij} = \mu_{ji}$, we will simply write $\mu$ for each of these quantities throughout the following. As follows from equation \eqref{eq:KN}, the sum of the probability weights of evolving from codon $i$ to $j$ and from codon $j$ to $i$ is
 \begin{equation}
 N_e\mu \big{(} P_iu_{ij} + P_ju_{ji} \big{)} = \frac{2P_iP_j(\log(P_i) - \log(P_j))}{P_i - P_j} \,.
 \end{equation}
@@ -352,6 +352,26 @@ where where $i_1$, $i_2$, and $i_3$ are the three nucleotides of codon $i$, and 
 	\caption{\label{nyp_bias_r2} (A) Estimator bias and (B) $r^2$ values between $dN/dS$ and $\omega$ MLEs across M0 codon frequency parameterizations, for each set of nucleotide mutation rates. Note that negative biases indicate $\omega$ values that are, on average, lower than $dN/dS$. All bias and $r^2$ values are highly statistically significant, with all $p < 10^{-12}$. In this figure, we see that $\omega$-based models tend to systematically underestimate $dN/dS$, across all codon frequency parameterizations. Generally, F\protect\xline equal features the least amount of bias, and has very high $r^2$ values for both NP and yeast mutation rates. Although Fequal yields lower $r^2$ values for polio mutation rates than do F61, F3x4, and CF3x4, the latter three estimators also have relatively high biases, demonstrating that they systematically underestimate $dN/dS$. That Ftrue, which assigns codon frequencies to those which would exist in the absence of amino-acid level selection, also underestimates $dN/dS$ implies that codon frequency parameters are ill-suited to accomodate mutation-induced nucleotide compositional bias.}	
 \end{figure}
 
+\vspace{2cm}
+
+\noindent Table 1. 
+\begin{table}[htbp]
+	\caption {\label{tab:dAIC} Mean $\Delta$AIC for datasets simulated with NP, Yeast, or Polio mutation rates.}
+	\begin{tabular}{l c c c}
+		\hline\noalign{\smallskip}
+		\multicolumn{1}{c}{Frequencies} & NP & Yeast & Polio \\
+		\noalign{\smallskip}\hline\noalign{\smallskip}
+		F61 & 0 & 0 & 0 \\ 
+		CF3x4 & -9629.8 & -7563.2 & -7456.3 \\ 
+		Fnuc1 & -13312.4 & -9216.3 & -4067.7 \\ 
+		F1x4 & -13500.9 & -12624.8 & -14605.1 \\ 
+		Fnuc3 & -14439.6 & -12627.4 & -7740.2 \\ 
+		F3x4 & -14832.9 & -16951.2 & -18663.3 \\ 
+		\noalign{\smallskip}\hline\noalign{\smallskip} 
+	\end{tabular}
+	Note that all models have 3 free parameters. All values in table are the mean dAIC with F61 as the reference, as in best model fit. The ranking shown in table is the order for NP and Yeast, but note that polio is different. Even so, F61 provides the best model fit, although it certainly does not infer the most accurate $\omega$ values.
+\end{table}
+
 
 \clearpage
 
@@ -389,26 +409,6 @@ where where $i_1$, $i_2$, and $i_3$ are the three nucleotides of codon $i$, and 
 	\end{tabular}
 \end{table}	
 
-
-\vspace{2cm}
-
-
-\noindent Table S3. Mean $\Delta$AIC for datasets simulated with NP, Yeast, or Polio mutation rates..
-\begin{table}[htbp]
-	\begin{tabular}{l c c c}
-		\hline\noalign{\smallskip}
-		\multicolumn{1}{c}{Frequencies} & NP & Yeast & Polio \\
-		\noalign{\smallskip}\hline\noalign{\smallskip}
-		F61 & 0 & 0 & 0 \\ 
-		CF3x4 & -9629.8 & -7563.2 & -7456.3 \\ 
-		Fnuc1 & -13312.4 & -9216.3 & -4067.7 \\ 
-		F1x4 & -13500.9 & -12624.8 & -14605.1 \\ 
-		Fnuc3 & -14439.6 & -12627.4 & -7740.2 \\ 
-		F3x4 & -14832.9 & -16951.2 & -18663.3 \\ 
-		\noalign{\smallskip}\hline\noalign{\smallskip} 
-	\end{tabular}
-	Note that all models have 3 free parameters. All values in table are the mean dAIC with F61 as the reference. The ranking shown in table is the order for NP and Yeast, but note that polio is different. Even so, F61 provides the best model fit, although it certainly does not infer the most accurate $\omega$ values.
-\end{table}
 
 
 \newpage
