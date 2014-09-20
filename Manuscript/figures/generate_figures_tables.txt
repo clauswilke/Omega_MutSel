@@ -87,12 +87,12 @@ for (i in 1:length(fspecs))
 }
 
 pdf('MainText/nyp_bias_r2.pdf', width=3.75, height=5.625, useDingbats=F)
-par(mfrow=c(2,1), mar=c(2, 3.6, 1.25, 0.6)) #bottom, left, top, right
+par(mfrow=c(2,1), mar=c(2, 3.6, 1.35, 0.55)) #bottom, left, top, right
 point_size = 1.75
 ylab_size = 1.25
-xlab_size = 0.85
+xlab_size = 0.87
 axis_size = 1.
-panel_size = 1.5
+panel_size = 1.75
 axis_lwd = 2.25
 
 # top panel, bias
@@ -103,7 +103,7 @@ mtext("Estimator Bias", side = 2, at = 0, cex=ylab_size, las=0, line=2.25)
 points(1:length(fspecs), yeast_bias, col='red', pch=20, cex=point_size)
 points(1:length(fspecs), polio_bias, col='blue', pch=20, cex=point_size)
 abline(h=0, lwd=2)
-mtext("A", side = 3, at = -0.15, cex = panel_size)
+mtext("A", side = 3, at = -0.3, cex = panel_size)
 
 #legend
 points(5.25, 0.2, pch=20, cex=1)
@@ -123,7 +123,7 @@ points(2:length(fspecs), yeast_r2[2:length(fspecs)], col='red', pch=20, cex=poin
 points(0.95, np_r2[1], pch=20, cex=point_size)
 points(1.15, yeast_r2[1], pch=20, col='red', cex=point_size)
 
-mtext("B", side = 3, at = -0.15, cex = panel_size)
+mtext("B", side = 3, at = -0.3, cex = panel_size)
 
 dev.off()
 
