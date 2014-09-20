@@ -21,7 +21,11 @@ family_size = [4., 2., 2., 2., 2., 4., 2., 3., 2., 6., 1., 2., 4., 2., 6., 6., 4
 
 
 
-
+def write_treefile(filename):
+    ''' write file containing 4-taxon tree'''
+    treef = open(filename, 'w')
+    treef.write("((t4:0.01,t1:0.01):0.01,(t3:0.01,t2:0.01):0.01);\n")
+    treef.close()
 
 ###################################### SIMULATION CODE ##############################################
 def simulate(f, seqfile, tree, mu_dict, length, simulator_path):
