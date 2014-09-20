@@ -14,7 +14,7 @@ source ~/.bash_profile
 
 
 # Set up directories
-SIMDIR=/home/sjs3495/MutSel/Simulator/src
+SIMDIR=/home/sjs3495/MutSel/src
 SCRIPTDIR=/home/sjs3495/Omega_MutSel/scripts/simulation_scripts
 WDIR=/share/WilkeLab/work/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
 RDIR=/home/sjs3495/$JOB_NAME
