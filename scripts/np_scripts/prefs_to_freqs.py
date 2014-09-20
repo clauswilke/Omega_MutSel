@@ -55,22 +55,23 @@ def get_nuc_diff(source, target, grab_position = False):
 
 def build_metropolis_matrix(amino_prop_dict, mu_dict):
     ''' metropolis only, as this matrix definition more suits experimental propensities according to Bloom 2014. '''
-    matrix = np.ones([61,61])
+    matrix = np.zeros([61,61])
     
     # off-diagonal entries
     for x in range(61):
-        source = codons[x]
-        fx = amino_prop_dict[codon_dict[source]]
+        x_codon = codons[x]
+        x_aa = codon_dict[x_codon]
+        fx = amino_prop_dict[x_aa]
         for y in range(61):
-            target = codons[y]
-            fy = amino_prop_dict[codon_dict[target]]
-            diff = get_nuc_diff(source, target)
+            y_codon = codons[y]
+            y_aa = codon_dict[y_codon]
+            fy = amino_prop_dict[y_aa]
+            diff = get_nuc_diff(x_codon, y_codon)
             if len(diff)==2:
-                if fx < fy:
-                    matrix[x][y] = fy / fx  
-                matrix[x][y] *= mu_dict[diff]
-            else:
-                matrix[x][y] = 0.      
+                if x_aa == y_aa or fy >= fx:
+                    matrix[x][y] =  mu_dict[diff]
+                else:
+                    matrix[x][y] = fy / fx  * mu_dict[diff]    
     # diagonal entries
     for i in range(61):
         matrix[i][i] = -1. * np.sum(matrix[i]) 
@@ -80,7 +81,7 @@ def build_metropolis_matrix(amino_prop_dict, mu_dict):
 
 
 def get_eq_from_eig(m):   
-    ''' get the equilibrium frequencies from the matrix. the eq freqs are the left eigenvector corresponding to eigenvalue of 0. 
+    ''' get the equilibrium frequencies from the matrix. the eq freqs are the *left* eigenvector corresponding to eigenvalue of 0. 
         Code here is largely taken from Bloom. See here - https://github.com/jbloom/phyloExpCM/blob/master/src/submatrix.py, specifically in the fxn StationaryStates
     '''
     (w, v) = linalg.eig(m, left=True, right=False)
@@ -94,6 +95,8 @@ def get_eq_from_eig(m):
     max_v = v[:,max_i]
     max_v /= np.sum(max_v)
     max_v = max_v.real # these are the stationary frequencies
+    assert( abs(np.sum(max_v) - 1.) < 1e-8), "Eigenvector of equilibrium frequencies doesn't sum to 1."
+
     # SOME SANITY CHECKS
     assert np.allclose(np.zeros(61), np.dot(max_v, m)) # should be true since eigenvalue of zero
     pi_inv = np.diag(1.0 / max_v)
@@ -106,9 +109,7 @@ def get_eq_from_eig(m):
             pi_j = max_v[j]
             forward  = pi_i * m[i][j] 
             backward = pi_j * m[j][i]
-            assert(-1e-5 < abs(forward - backward) < 1e-5), "Detailed balance violated."  # note that we need to use high thresholds here because the propensities have very few digits so we encounter more FLOP problems.
-    
-    assert( abs(np.sum(max_v) - 1.) < 1e-8), "Eigenvector of equilibrium frequencies doesn't sum to 1."
+            assert(abs(forward - backward) < 1e-6), "Detailed balance violated."  # note that we need to use high tolerance here because the propensities have very few digits so we encounter more FLOP problems.
     return max_v
 
 
@@ -248,19 +249,18 @@ def create_batchfile(basefile, outfile, pos_freqs, f61, f1x4, f3x4):
 
 def main():
     # First, we determine the equilibrium frequencies of the system on a per site basis. As we use amino acid preference data, we assign all synonymous codons the same fitness.
-    # Second, we find the global F61, F1x4, F3x4 frequencies, as well as the Fnuc matrix. These use the average dataset frequencies.
-    # Third, we find the so-called "true" (absence of selection) F61, F3x4, and Fnuc parameterizations.
-    # Finally, we set up the hyphy batch file which makes use of these frequencies. Note that the Fnuc matrices are saved to a separate matrix file, and are not placed directly into the hyphy batchfiles.
+    # Second, we find the F61, F1x4, F3x4 frequencies, as well as the Fnuc1 and Fnux3 matrices. These use the average dataset frequencies, analogous to taking global alignment frequencies.
+    # Third, we set up the hyphy batch file which makes use of these frequencies. Note that the Fnuc matrices are saved to a separate matrix file, and are not placed directly into the hyphy batchfiles.
     
     # Parse input arguments and set up input/outfile files accordingly
     dataset, mudict, compute = parse_input(sys.argv)    
     data_dir      = "../experimental_data/"
-    cf_outfile    = data_dir + dataset + "_codon_eqfreqs.txt"
+    codon_freqs_outfile    = data_dir + dataset + "_codon_eqfreqs.txt"
     raw_batchfile = "globalDNDS_raw_exp.bf"
-    batch_outfile = '../hyphy_files/globalDNDS_' + dataset + '.bf'
-    fnuc_outfile  = '../hyphy_files/Fnuc_' + dataset + '.mdl'
+    batch_outfile = '../../hyphy_files/globalDNDS_' + dataset + '.bf'
+    fnuc_outfile  = '../../hyphy_files/Fnuc_' + dataset + '.mdl'
     
-    # Load amino acid preference data, if compute is True
+    # Compute codon equilibrium frequencies from amino acid preference data, if compute is True. Else, load the files of eq freqs which have already been calculated.
     # np_prefs are those taken from Bloom 2014 MBE paper. The np_prefs are directly from the paper's Supplementary_file_1.xls and refer to equilbrium amino acid propenisties. The best interpretation of these experimental propensities is metropolis.
     if compute:
         np_prefs = np.loadtxt(data_dir + 'nucleoprotein_amino_preferences.txt')
@@ -270,12 +270,11 @@ def main():
         print "Calculating and saving site-wise equilibrium frequencies"
         final_codon_freqs = np.zeros([nsites, 61])
         for i in range(nsites):
-            print i
             final_codon_freqs[i] = get_eq_freqs(np_prefs[i], mudict)
-        np.savetxt(cf_outfile, final_codon_freqs)
+        np.savetxt(codon_freqs_outfile, final_codon_freqs)
     else:
         print "Loading equilibrium frequency data"
-        final_codon_freqs = np.loadtxt(cf_outfile)
+        final_codon_freqs = np.loadtxt(codon_freqs_outfile)
 
 
     # Calculate frequency parameterizations
@@ -284,15 +283,17 @@ def main():
     nuc_freqs, pos_nuc_freqs = codon_to_nuc(f61_freqs)
     f1x4_freqs = calc_f1x4_freqs(nuc_freqs)
     f3x4_freqs = calc_f3x4_freqs(pos_nuc_freqs)
-    
+
     # Convert frequency arrays to hyphy strings
     f61 = array_to_hyphy_freq(f61_freqs)
     f1x4 = array_to_hyphy_freq(f1x4_freqs)
     f3x4 = array_to_hyphy_freq(f3x4_freqs)
     pos_freqs_hyf = array_to_hyphy_posfreq(pos_nuc_freqs)
  
+ 
     # Create the hyphy batchfile to include the frequencies calculated here. Note that we need to do this since no actual alignment exists which includes all protein positions, so cannot be read in by hyphy file.       
     create_batchfile(raw_batchfile, batch_outfile, pos_freqs_hyf, f61, f1x4, f3x4)
+          
           
     # Use nucleotide and positional nucleotide frequencies to construct Fnuc matrices
     print "Building and saving the Fnuc matrices"
