@@ -10,12 +10,6 @@ import numpy as np
 from random import randint, shuffle
 from scipy import linalg
 
-# Simulation code
-from misc import *
-from newick import *
-from stateFreqs import *
-from matrixBuilder import *
-from evolver import *
 
 # Globals
 ZERO = 1e-8
@@ -26,37 +20,39 @@ genetic_code = [["GCA", "GCC", "GCG", "GCT"], ["TGC","TGT"], ["GAC", "GAT"], ["G
 family_size = [4., 2., 2., 2., 2., 4., 2., 3., 2., 6., 1., 2., 4., 2., 6., 6., 4., 4., 1., 2.] # alphabetical according to amino acids.
 
 
-def write_treefile(filename):
-    ''' write file containing 4-taxon tree'''
-    treef = open(filename, 'w')
-    treef.write("((t4:0.01,t1:0.01):0.01,(t3:0.01,t2:0.01):0.01);\n")
-    treef.close()
 
-######################################################################################################################################
 
-########################################################## SIMULATION ################################################################
-def simulate(f, seqfile, tree, mu_dict, length):
+
+###################################### SIMULATION CODE ##############################################
+def simulate(f, seqfile, tree, mu_dict, length, simulator_path):
     ''' Simulate single partition according homogeneous mutation-selection model.
     '''
+    sys.path.append(simulator_path)
+    import misc
+    import newick
+    import matrix_builder
+    import evolver
+    
     try:
-        my_tree = readTree(file = tree, flags = False)
+        my_tree = newick.read_tree(file = tree, flags = False)
     except:
-        my_tree = readTree(tree = tree, flags = False) 
+        my_tree = newick.read_tree(tree = tree, flags = False) 
           
-    model = Model()
-    params = {'stateFreqs':f, 'alpha':1.0, 'beta':1.0, 'mu': mu_dict}
+    model = misc.Model()
+    params = {'state_freqs':f, 'mu': mu_dict}
     model.params = params
-    mat = mutSel_MatrixBuilder(model)
+    mat = matrix_builder.mutSel_Matrix(model)
     model.Q = mat.buildQ()
     
     # Confirm, before simulating, that detailed balance is satisfied 
     eigen_freqs = get_eq_from_eig(model.Q)
     assert((f/eigen_freqs).all()  == 1), "Detailed balance not satisfied"
     
-    partitions = [(length, {"rootModel":model})]        
-    myEvolver = Evolver(partitions, "rootModel" )
+    partitions = [(length, {"root_model":model})]        
+    myEvolver = evolver.Evolver(partitions, "root_model" )
     myEvolver.simulate(my_tree)
-    myEvolver.writeSequences(outfile = seqfile)
+    myEvolver.write_sequences(outfile = seqfile)
+    
 
 def get_eq_from_eig(m):   
     ''' get the equilibrium frequencies from the matrix. the eq freqs are the left eigenvector corresponding to eigenvalue of 0. 
@@ -87,13 +83,8 @@ def get_eq_from_eig(m):
             pi_j = eq_freqs[j]
             forward  = pi_i * m[i][j] 
             backward = pi_j * m[j][i]
-            assert(-1e-8 < (forward - backward) < 1e-8), "Detailed balance violated."    
+            assert(-1e-8 < (forward - backward) < ZERO), "Detailed balance violated."    
     return eq_freqs
-
-
-
-######################################################################################################################################
-
 
 ################################### FUNCTIONS TO SET UP SCALED SEL fitness, CODON FREQUENCIES #########################################
 def set_codon_freqs(sd, freqfile, bias):
