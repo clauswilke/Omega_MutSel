@@ -16,7 +16,6 @@ FNUCFILE=Fnuc_${DATASET}.mdl
 source ~/.bash_profile
 
 # Set up directories
-SIMDIR=/home/sjs3495/MutSel/src
 SCRIPTDIR=/home/sjs3495/Omega_MutSel/scripts/simulation_scripts
 WDIR=/share/WilkeLab/work/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
 RDIR=/share/WilkeLab/work/sjs3495/Omega_MutSel_rawdata/${DATASET}
@@ -29,9 +28,9 @@ then
 fi
 cd $WDIR
 
-#cp $RDIR/seqs${SGE_TASK_ID}.fasta .
 
 # Copy scripts, data files
+cp $RDIR/seqs${SGE_TASK_ID}.fasta .
 cp /home/sjs3495/Omega_MutSel/scripts/simulation_scripts/run_nyp.py .
 cp /home/sjs3495/Omega_MutSel/scripts/simulation_scripts/functions_simandinf.py .
 cp /home/sjs3495/Omega_MutSel/scripts/experimental_data/${DATASET}_codon_eqfreqs.txt .
@@ -45,10 +44,9 @@ cp /home/sjs3495/Omega_MutSel/hyphy_files/$FNUCFILE fnuc.mdl
 
 # Run
 module load python
-python run_nyp.py $SGE_TASK_ID $SIMDIR $CPU $DATASET
+python run_nyp.py $SGE_TASK_ID $CPU $DATASET
 
 # Cleanup
 mkdir -p $RDIR
 cp params* $RDIR
-cp seqs* $RDIR
 rm -rf $WDIR
