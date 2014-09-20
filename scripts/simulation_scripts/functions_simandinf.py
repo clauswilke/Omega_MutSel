@@ -26,7 +26,21 @@ def write_treefile(filename):
     treef = open(filename, 'w')
     treef.write("((t4:0.01,t1:0.01):0.01,(t3:0.01,t2:0.01):0.01);\n")
     treef.close()
-
+    
+def set_mu_dict(dataset):
+    ''' Set up mutation rate dictionary for NP, yeast, or polio runs.'''
+    if dataset == 'np':
+        mu_dict = {'AG':2.4e-5, 'TC':2.4e-5, 'GA':2.3e-5, 'CT':2.3e-5, 'AC':9.0e-6, 'TG':9.0e-6, 'CA':9.4e-6, 'GT':9.4e-6, 'AT':3.0e-6, 'TA':3.0e-6, 'GC':1.9e-6, 'CG':1.9e-6}
+    elif dataset == 'yeast':
+        mu = 1.67e-10 # this is the mean per generation per nucleotide mutation rate. 
+        mu_dict = {'AG':0.144/2*mu, 'TC':0.144/2*mu, 'GA':0.349/2*mu, 'CT':0.349/2*mu, 'AC':0.11/2*mu, 'TG':0.11/2*mu, 'CA':0.182/2*mu, 'GT':0.182/2*mu, 'AT':0.063/2*mu, 'TA':0.063/2*mu, 'GC':0.152/2*mu, 'CG':0.152/2*mu}
+    elif dataset == 'polio':
+        mu_dict = {'AG':2.495e-5, 'TC':6.886e-05, 'GA':1.259e-04, 'CT':2.602e-04, 'AC':1.721e-06, 'TG':1.177e-06, 'CA':9.072e-06, 'GT':1.472e-05, 'AT':3.812e-06, 'TA':3.981e-06, 'GC':6.301e-06, 'CG':1.633e-06}
+    else:
+        raise AssertionError("Dataset has to be np, yeast, or polio.")
+    return mu_dict
+    
+    
 ###################################### SIMULATION CODE ##############################################
 def simulate(f, seqfile, tree, mu_dict, length, simulator_path):
     ''' Simulate single partition according homogeneous mutation-selection model.
