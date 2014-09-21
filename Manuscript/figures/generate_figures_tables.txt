@@ -122,7 +122,6 @@ points(2:length(fspecs), np_r2[2:length(fspecs)], pch=20, cex=point_size)
 points(2:length(fspecs), yeast_r2[2:length(fspecs)], col='red', pch=20, cex=point_size)
 points(0.95, np_r2[1], pch=20, cex=point_size)
 points(1.15, yeast_r2[1], pch=20, col='red', cex=point_size)
-
 mtext("B", side = 3, at = -0.3, cex = panel_size)
 
 dev.off()
@@ -188,7 +187,6 @@ cat("%%%% Latex tables for 'The relationship between dN/dS and scaled selection 
 
 ############################# NYP Estimator bias and r^2 tables ###################################
 
-fspecs <- c("fnuc1", "fnuc3", "f1x4", "cf3x4", "f61", "f3x4")
 np_r2 <- c(); yeast_r2 <- c(); polio_r2 <- c(); np_bias <- c(); yeast_bias <- c(); polio_bias <- c()
 
 for (i in 1:length(fspecs))
