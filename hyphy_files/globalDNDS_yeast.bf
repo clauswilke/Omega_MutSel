@@ -100,3 +100,14 @@ Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn6 = (filt_data, Tree01);
 Optimize (paramValues, LikFn6);
 fprintf ("fnuc3_hyout.txt", LikFn6);
+
+
+////////////// CNF //////////////
+global w; global k; global t;
+Model MyModel = (CNF, F61, 0);
+UseModel (USE_NO_MODEL);
+UseModel(MyModel);
+Tree    Tree01 = DATAFILE_TREE;
+LikelihoodFunction  LikFn7 = (filt_data, Tree01);
+Optimize (paramValues, LikFn7);
+fprintf ("cnf_hyout.txt", LikFn7);
