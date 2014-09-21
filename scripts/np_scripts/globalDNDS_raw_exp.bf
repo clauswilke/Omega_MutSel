@@ -102,12 +102,22 @@ Optimize (paramValues, LikFn6);
 fprintf ("fnuc3_hyout.txt", LikFn6);
 
 
-////////////// CNF //////////////
+////////////// CNF F61 //////////////
 global w; global k; global t;
-Model MyModel = (CNF, F61, 0);
+Model MyModel = (CNF61, F61, 0);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn7 = (filt_data, Tree01);
 Optimize (paramValues, LikFn7);
-fprintf ("cnf_hyout.txt", LikFn7);
+fprintf ("cnf61_hyout.txt", LikFn7);
+
+////////////// CNF F1x4 //////////////
+global w; global k; global t;
+Model MyModel = (CNF1x4, F1x4, 0);
+UseModel (USE_NO_MODEL);
+UseModel(MyModel);
+Tree    Tree01 = DATAFILE_TREE;
+LikelihoodFunction  LikFn8 = (filt_data, Tree01);
+Optimize (paramValues, LikFn8);
+fprintf ("cnf61_hyout.txt", LikFn8);

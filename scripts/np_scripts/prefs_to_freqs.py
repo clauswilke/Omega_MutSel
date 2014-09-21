@@ -171,7 +171,7 @@ def is_TI(source, target):
     else:
         return False
         
-def calc_cnf_denom(target, x, f61_freqs):
+def calc_cnf_denom(target, x, codon_freqs):
     ''' target = target codon. x = position that changes'''
     target = list(target)
     target[x] = '\w'
@@ -179,19 +179,21 @@ def calc_cnf_denom(target, x, f61_freqs):
     total = 0.
     for codon in codons:
         if my_match.match(codon):
-            total += f61_freqs[codons.index(codon)]  
+            total += codon_freqs[codons.index(codon)]  
     return total
 
 
-def build_fnuc_matrices(nuc_freqs, pos_nuc_freqs, outfile, f61_freqs):
+def build_fnuc_matrices(nuc_freqs, pos_nuc_freqs, outfile, f61_freqs, f1x4_freqs):
     ''' Create matrices which use target nucleotide frequencies (not codon frequencies). 
         Note: pos means "positional", we use 12 positional nucleotide frequencies. Goes with F3x4 stationary distribution.
               glob means "global", we use 4 global (position-free) nucleotide frequencies. Goes with F1x4 stationary distribution.
     ''' 
 
-    matrix_fnuc1 = 'Fnuc1 = {61, 61, \n' # MG94
-    matrix_fnuc3 = 'Fnuc3 = {61, 61, \n' # MG94, positional
-    matrix_cnf   = 'CNF   = {61, 61, \n' # Yap 2010, uses positional nuc freqs
+    matrix_fnuc1  = 'Fnuc1 = {61, 61, \n' # MG94
+    matrix_fnuc3  = 'Fnuc3 = {61, 61, \n' # MG94, positional
+    matrix_cnf61  = 'CNF61 = {61, 61, \n' # Yap 2010 with F61
+    matrix_cnf1x4 = 'CNF1x4 = {61, 61, \n' # Yap 2010 with F1x4
+
     
     for i in range(61):
         source = codons[i]
@@ -202,9 +204,10 @@ def build_fnuc_matrices(nuc_freqs, pos_nuc_freqs, outfile, f61_freqs):
             if len(diff) == 2:
                 assert(len(str(x)) == 1), "Problem with determining nucleotide difference between codons"
                 target_index = nucindex[diff[1]]   
-                fnuc1 = str(nuc_freqs[nucindex[diff[1]]]) 
-                fnuc3 = str(pos_nuc_freqs[nucindex[diff[1]]][x])
-                cnf   = str(f61_freqs[j] / calc_cnf_denom(target, x, f61_freqs))
+                fnuc1  = str(nuc_freqs[nucindex[diff[1]]]) 
+                fnuc3  = str(pos_nuc_freqs[nucindex[diff[1]]][x])
+                cnf61  = str(f61_freqs[j] / calc_cnf_denom(target, x, f61_freqs))
+                cnf1x4 = str(f1x4_freqs[j] / calc_cnf_denom(target, x, f1x4_freqs))
                 
     
                 # Create string for matrix element
@@ -213,13 +216,14 @@ def build_fnuc_matrices(nuc_freqs, pos_nuc_freqs, outfile, f61_freqs):
                     element += '*k'
                 if codon_dict[source] != codon_dict[target]:
                     element += '*w' 
-                matrix_fnuc1 += element + '*' + fnuc1 + '}\n'
-                matrix_fnuc3 += element + '*' + fnuc3 + '}\n'
-                matrix_cnf   += element + '*' + cnf + '}\n'
+                matrix_fnuc1  += element + '*' + fnuc1 + '}\n'
+                matrix_fnuc3  += element + '*' + fnuc3 + '}\n'
+                matrix_cnf61  += element + '*' + cnf61 + '}\n'
+                matrix_cnf1x4 += element + '*' + cnf1x4 + '}\n'
 
     # And save to file.
     with open(outfile, 'w') as outf:
-        outf.write(matrix_fnuc1 + '};\n\n\n' + matrix_fnuc3 + '};\n\n\n' + matrix_cnf + '};\n\n\n')
+        outf.write(matrix_fnuc1 + '};\n\n\n' + matrix_fnuc3 + '};\n\n\n' + matrix_cnf61 + '};\n\n\n' + matrix_cnf1x4 + '};\n\n\n')
 
 
 
@@ -312,7 +316,7 @@ def main():
           
     # Use nucleotide and positional nucleotide frequencies to construct Fnuc matrices
     print "Building and saving the Fnuc matrices"
-    fnuc_matrices = build_fnuc_matrices(nuc_freqs, pos_nuc_freqs, fnuc_outfile, f61_freqs)
+    fnuc_matrices = build_fnuc_matrices(nuc_freqs, pos_nuc_freqs, fnuc_outfile, f61_freqs, f1x4_freqs)
 
     
 main() 
