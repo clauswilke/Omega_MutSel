@@ -25,8 +25,9 @@
 
 \begin{article}
 		
-\begin{abstract} %PNAS - 250 words. We are currently at 260, but probably this whole abstract is trash :) 
-Two broad classes of Markov-process models have been developed to describe the strength of natural selection in protein-coding sequences in a phylogenetic context. The first and most widely-used modeling framework estimates the evolutionary rate ratio $dN/dS$, which represents the ratio of nonsynonymous to synonymous substitution rates, in a maximum likelihood (ML) framework. These models have been developed to a high level of sophistication and are a staple of modern-day comparative sequence analysis. The second class of models, known as mutation-selection-balance (MutSel) models, explicitly consider the dynamic interplay between mutation and selection. Instead of $dN/dS$ estimates, these models calculate site-specific amino-acid and/or codon scaled selection coefficients, which indicate the extent to which natural selection acts on all possible mutations. However, the extent to which these two modeling frameworks relate to each other is unknown. Do $dN/dS$ estimates reveal similar or distinct information from scaled selection coefficients? To answer this question, we derive a formal mathematical relationship between these two quantities. We find that scaled selection coefficients can  precisely predict $dN/dS$, indicating that $dN/dS$ and MutSel models \textbf{are in complete agreement}. We additionally show that $dN/dS$ calculated from selection coefficients is strictly less than 1, and thus MutSel models inherently cannot describe positive selection and/or adaptive evolution. However, if synonymous mutations are not neutral, it is actually possible for $dN/dS$ to be greater than 1, even though positive selection is not occurring. Finally, we find that ML $dN/dS$ models produce systematically biased $dN/dS$ estimates when nucleotide mutation rates are asymmetric, demonstrating that these models do not properly account for nucleotide compositional bias.
+\begin{abstract} 
+%$dN/dS$ models have been developed to a high level of sophistication and are a staple of modern-day comparative sequence analysis.
+The evolutionary rate ratio $dN/dS$, the ratio of nonsynonymous to synonymous substitution rates, is among the most commonly used metrics used to infer the strength of natural selection in a phylogenetic framework.  Recently, however, mutation-selection-balance (MutSel) models ahve become a popular alternative to the $dN/dS$ framework. MutSel models estimate site-specific amino-acid and/or codon scaled selection coefficients, which indicate the selective response to all possible mutations. However, it remains unknown how these two frameworks relate to one another, in particular whether $dN/dS$ estimates reveal similar or distinct information from scaled selection coefficients. Therefore, we have derive a formal mathematical relationship between these two quantities. We prove that $dN/dS$ values corresponding to MutSel scaled selection coefficients are strictly less than 1, demonstrating that MutSel models inherently cannot accomodate positive, diversifying selection. However, $dN/dS$ can readily be greater than 1 if selection acts on synonymous changes, even though only purifying selection is occuring. Finally, we use this established relationship between models to evaluate performance of $dN/dS$ maximum likelihood (ML) inference frameworks. We find that ML methods yield substantially biased $dN/dS$ estimates when the fitted models do not exactly correspond to the mechanistic process that generated the data. Moreover, we show that the best-fitting model is not the model with the least bias and highest precision for parameter estimates of interest, and thus selecting models based on fit (AIC) can be counterproductive and positively misleading. 
 \end{abstract}
 		
 \keywords{dN/dS | mutation-selection-balance models | scaled selection coefficients | Markov models of sequence evolution}
@@ -43,6 +44,7 @@ Although both $\omega$ and MutSel models describe the same fundamental process o
 		
 Here, we formalize the relationship between $\omega$ and MutSel models by examining the extent to which their respective focal parameters, $dN/dS$ and scaled selection coefficients, yield overlapping information about the evolutionary process. To this end, we derive a mathematical framework to calculate $dN/dS$ values from scaled selection coefficients. We find that $dN/dS$ values can be precisely calculated from scaled selection coefficients, and that $dN/dS$ and the distribution of scaled selection coefficients are strongly related. Furthermore, we prove that, when synonymous mutations are neutral, $dN/dS$ calculated from selection coefficients is necessarily less than 1. This proof demonstrates that MutSel models are inherently only able to model purifying selection, and therefore would be an inappropriate model choice if positive selection is expected. However, we also find that, when synonymous codons have different fitnesses, it is possible to recover $dN/dS$ values above 1, even though no positive selection is occurring. 
 
+\textbf{REWRITE PARAGRAPH}
 Finally, we are able to use this robust relationship to assess the performance of $\omega$ models. If $\omega$ models are behaving as expected, we expect that they will yield the same $dN/dS$ estimates as our calculations. We find that, in the absence of nucleotide compositional bias, $dN/dS$ values inferred in an ML framework agree precisely with those calculated from scaled selection coefficients, meaning that MutSel and $dN/dS$ models are in complete agreement. However, we found that, in the presence of mutational or nucleotide biases, ML inference frameworks produce systematically biased $dN/dS$ estimates. 
 		
 		
@@ -127,32 +129,34 @@ We acknowledge that it is unlikely that this result will have a strong influence
 
 \subsection*{dN/dS calculated from ssc's as a model benchmark.}
 
-As a consequence of the relationship between $dN/dS$ and scaled selection coefficients, we have a unique opportunity to assess the robustness of $dN/dS$ inference methods. It is conventional practice in model development to benchmark the model against data simulated according to the model itself. While this strategy is crucial for testing whether a model was implemented correctly, it is inherently incapable of discerning limitations and properties of the inference framework under more general conditions. Moreover, it cannot confirm that the underlying model accurately represents the evolutionary process. Therefore, we apply a novel benchmarking approach which uses the theoretical relationship among modeling frameworks to assess the accuracy and specific utility of those models. This approach, outlined in Figure~\ref{reg_conv}A, entails comparing $dN/dS$ values calculated from selection coefficients to those inferred by an $\omega$-based model, in order to benchmark the model's accuracy.
+The relationship we have established between $dN/dS$ and scaled selection coefficients offers a unique opportunity to assess the robustness of $dN/dS$ inference methods. It is conventional practice in model development to benchmark models against data simulated according to the model itself. While this strategy is crucial for testing whether correct model implementation, it is inherently incapable of discerning limitations and properties of the inference framework under more general conditions. Moreover, it cannot confirm that the underlying model accurately represents the evolutionary process. Therefore, we apply a novel benchmarking approach which uses the theoretical relationship among modeling frameworks to assess the accuracy and specific utility of those models. This approach, outlined in Figure~\ref{reg_conv}A, entails comparing $dN/dS$ values calculated from selection coefficients to those inferred by an $\omega$-based model, in order to benchmark the model's accuracy. 
+NOTE: this approach is not possible without our relationship, because we simltaneously know the true underlying value without having data that conforms exactly to the model. Confounding effects are therefore removed.
 
-Using the selection coefficients and mutation rates derived in the previous subsection, we simulated alignments using standard methods \cite{Yang2006} according the Halpern-Bruno MutSel model \cite{HalpernBruno1998}. We then inferred $dN/dS$ for each alignment using the M0 model \cite{GoldmanYang1994,Yangetal2000}, as implemented in the HyPhy batch language \cite{KosakovskyPondetal2005}. This model uses the GY94 instantaneous rate matrix, which includes parameters for transition/transversion bias ($\kappa$), equilibrium codon frequencies ($\pi$), and finally the $dN/dS$ rate ratio ($\omega$) (see equation \eqref{eq:GY94}). Throughout the remaining text, we refer to $dN/dS$ as inferred by M0 as $\omega$, and to $dN/dS$ computed using equations \eqref{eq:u_ij} - \eqref{eq:dS} simply as $dN/dS$. 
+Using the selection coefficients and mutation rates used in the previous subsection, we simulated alignments using standard methods \cite{Yang2006} according the Halpern-Bruno MutSel model \cite{HalpernBruno1998}. We then inferred $dN/dS$ for each alignment using the M0 model \cite{GoldmanYang1994,Yangetal2000}, as implemented in the HyPhy batch language \cite{KosakovskyPondetal2005}. The M0 model uses the GY94 instantaneous rate matrix, which includes parameters for transition/transversion bias ($\kappa$), equilibrium codon frequencies ($\pi$), and finally the $dN/dS$ rate ratio ($\omega$) (see equation \eqref{eq:GY94}). Throughout the remaining text, we refer to $dN/dS$ as inferred by M0 as $\omega$, and to $dN/dS$ computed using equations \eqref{eq:u_ij} - \eqref{eq:dS} simply as $dN/dS$. 
+
 
 We found that $dN/dS$ values agree nearly perfectly with $\omega$ values (Figure~\ref{reg_conv}B). This agreement was neither influenced by the presence of codon bias, nor by nucleotide compostitional bias; indeed, simulated alignments featured a wide range (0.21-0.89) of GC contents. Additionally, in Figure~\ref{reg_conv}C, we demonstrate that $\omega$ converges to the true $dN/dS$ value as the size of the data set, represented by simulated alignment length, increases. These results unequivocally show that the $dN/dS$ quantity is fully contained within MutSel model parameters, and importantly that $\omega$-based model inference methods behave exactly as expected, yielding precise $dN/dS$ estimates. This finding has important implications for modeling choices; although the MutSel framework might model the sequence evolution in a way that more mechanistically matches the evolutionary process, $\omega$-based models do not dramatically suffer from any modeling limitations. 
 
 
 \subsection*{dN/dS inference with realistic data.}
-Having confirmed that $\omega$-based and MutSel models \textbf{agree} under general conditions, we sought to test the accuracy of $\omega$-based models using more realistic data. To this end, we made use of realistic amino acid fitness and nucleotide mutation rate parameters to construct a series of experimental evolutionary models. In particular, we used influenza nucleoprotein (NP) site-specific amino acid preference values, given by ref. \cite{Bloom2014a}, which consisted of experimentally-determined fitness values for each individual amino acid across all sites in NP, yielding 498 distinct amino acid propensity distributions. We combined these experimental fitness parameters with three sets of experimentally determined mutation rates, either for NP \cite{Bloom2014a}, yeast \cite{Zhu2014}, or polio virus \cite{Acevedo2014}. While each of these mutation matrices is asymmetric, they feature differing degrees of asymmetry, with NP mutation rates being the most symmetric and polio mutation rates the most asymmetric. More precisely, in the absence of amino-acid level selection, the GC contents that the NP, yeast, and polio mutation rates would generate are 0.518, 0.336, and 0.192, respectively. Finally, we built a unique experimentally-informed evolutionary model for all combinations of amino acid fitness distributions and mutation rates using the approach outlined in refs. \cite{Bloom2014a,Bloom2014b}. We calculated stationary codon frequencies for each experimental model, and used these values in combination with their corresponding mutation rates to simulate sequences and infer $dN/dS$ quantities. 
+Having confirmed that $\omega$-based and MutSel models \textbf{agree} under general conditions, we sought to test the accuracy of $\omega$-based models using more realistic data. To this end, we made use of realistic amino acid fitness and nucleotide mutation rate parameters to construct a series of experimental evolutionary models. In particular, we used influenza nucleoprotein (NP) site-specific amino acid preference values, given by ref. \cite{Bloom2014a}, which consisted of experimentally-determined fitness values for each individual amino acid across all sites in NP, yielding 498 distinct amino acid propensity distributions. We combined these experimental fitness parameters with three sets of experimentally determined mutation rates, either for NP \cite{Bloom2014a}, yeast \cite{Zhu2014}, or polio virus \cite{Acevedo2014}. While each of these mutation matrices is asymmetric, they feature differing degrees of asymmetry, with NP mutation rates being the most symmetric and polio mutation rates the most asymmetric. More precisely, in the absence of amino-acid level selection, the GC contents that the NP, yeast, and polio mutation rates would generate are 0.518, 0.336, and 0.192, respectively. Finally, we built a unique experimentally-informed evolutionary model for all combinations of amino acid fitness distributions and mutation rates using the approach outlined in refs. \cite{Bloom2014a,Bloom2014b}. We calculated stationary codon frequencies for each experimental model, and used these values in combination with their corresponding mutation rates to calculate $dN/dS$, and simulate alignments from which $\omega$ may be inferred.
+
+In order to properly accomodate the underlying mutational asymmetry in these alignments, a proper M0 parameterization must be chosen. Two broad frameworks have been proposed to account for such nucleotide biases; first, GY-style models employ target codon frequencies $\pi_i$ \cite{GoldmanYang1994}, whereas MG-style models employ target nucleotide frequencies $\pi_n$ \cite{MuseGaut1994}. For example, the instantaneous rate matrix element giving the substitution probability from codon AAA to AAG would contain the target codon frequency $\pi_\text{AAG}$ under the former framework, and the target nucleotide frequency $\pi_\text{G}$ under the latter framework. Previous works have shown that MG-style and GY-style models can yield different $\omega$  estimates \cite{KosakovskyPondMuse2005,Yap2010} and thus we inferred $\omega$ according to a variety of frequency parameterizations. Frequency parameterizations for GY-style models included the frequency estimators F61 \cite{GoldmanYang1994}, F3x4 \cite{GoldmanYang1994}, CF3x4 \cite{KosakovskyPond2010}, and finally F1x4 \cite{MuseGaut1994}. For MG-style models, we considered both a parameterization in which four global nucleotide frequency parameters were used \cite{MuseGaut1994}, and a parameterization which employed twelve nucleotide frequency parameters to allow for different frequencies at each codon position (MG3) \cite{KosakovskyPondMuse2005}. We term the former framework MG1, and the latter MG3.
+
+%Note that MG1 and MG3 correspond precisely to the frequency parameterizations used in refs. \cite{MuseGaut1994} and \cite{KosakovskyPondMuse2005}, respectively.
+
+Figure~\ref{nyp_bias_r2} shows the resulting relationships between $dN/dS$ and $\omega$ MLEs for each set of mutation rates (NP, yeast and polio), across M0 model frequency parameterizations (full regression plots are shown in Figure S1). Figure~\ref{nyp_bias_r2}A displays the estimator bias, or the systematic discrepency between the true $dN/dS$ value and the $\omega$ MLEs, and Figure~\ref{nyp_bias_r2}B displays $r^2$ values between $dN/dS$ and $\omega$. Note that the precise bias and $r^2$ values are shown in Tables S1 and S2, respectively.
+
+Two distinct trends emerge from Figure~\ref{nyp_bias_r2}. First, increasing asymmetry in the mutational process induces substantial and statistically significant bias in M0 $\omega$ estimates. Most often, the M0 model underestimates $\omega$ relative to the true $dN/dS$ value.  Indeed, for all frequency parameterizations, $\omega$ estimates are most accurate under NP mutation rates, and both accuracy and precision tend to decrease as asymmetry progresses from yeast to polio mutation rates. Second, frequency parameterizations which more closely match the mechanistic process that generated the data (MG1, MG3) strongly outperform all other frequency estimators. \textbf{how to explain f1x4 vs f3x4?}. Moreover, it is clear that the MG1 parameterization yields the overall best performance of all frequency estimators considered, and in particular it features by far the least amount of bias for the highly asymmetric polio mutation rates. 
+
+Strikingly, when we examined model fit, using AIC scores \cite{Akaike1974}, for the different frequency parameterization, we found that the F61 parameterization was unequivocally the best performing model, on average, for all datasets (Table~\ref{tab:dAIC}). This result dramatically juxtaposes the substantial inaccuracy and imprecision that F61 typically yields. Indeed, as Figure~\ref{nyp_bias_r2} shows, F61 has the most estimator bias for NP datasets as well as the least precision for both NP and polio datasets. This result shows reveals that selecting models based strictly on model fit can be counterproductive, as model fit is clearly at odds with model performance. Previous studies which have examined how the choice of frequency estimators influenced model fit have found that F61 offers improvements over F3x4 \cite{GoldmanYang1994}, and that MG3 was largely comparable to F3x4 \cite{KosakovskyPondMuse2005}. However, the unique approach of our study, in which the alignments are simulated according to the distinct MutSel model, reveals that these differences in model fit are not informative, but rather misleading.
+
+%Frequently, AIC is not useful in simulation studies because the simulated data typically conforms to the inference model, and therefore, model fit tends to reflect this equivalency(?). Here, our novel approach simulates with an entirely different model, and thus our AIC scores are not merely a product of inferring according to the exact dataset conditions.
 
 
-In particular, two general frameworks have been propsed to deal with underlying nucleotide and/or codon biases: target codon frequencies and target nucleotide frequencies. The first is what was proposed in GY, and the latter flavor in MG. As these parameterizations are known to influence, 
-As different M0 model parameterizations are known to yield distinct $\omega$ estimates \cite{KosakovskyPondMuse2005,ZhangYu2006,Yang2006}, we inferred $\omega$ using a variety of diffferent frequency estimators. First, estimators which use target codon frequencies, and second those which use target nucleotide frequencies. 
-
-the commonly-used frequency estimators F61 \cite{GoldmanYang1994}, F3x4 \cite{GoldmanYang1994}, CF3x4 \cite{KosakovskyPond2010}, and finally F1x4 \cite{MuseGaut1994}. F61 determines codon frequency parameters $\pi_i$ directly from the alignment's empirical codon frequencies, F1x4 estimate $\pi_i$ values using empirical nucleotide frequencies, and both F3x4 and CF3x4 estimate $\pi_i$ using the empirical nucleotide frequencies at each codon position. 
-
-We found that these results, while still pretty good, were not as good as under symmetric mutation rates. NP, which is the closest to symmetric, yielded very good results, with high correlations and minimal bias. On the other hand, yeast and polio go nuts. Presence of asymmetric mutation rates led all M0 model parameterizations to systematically infer underestimated values. 
-We found that the three frequency estimators performed comparably, $\omega$ estimates are systematically biased downwards as mutation rates become increasingly asymmetric. This trend generally holds regardless of the frequency estimator used (with a single exception, which we discuss below). $\omega$ inferences on alignments with NP mutation rates have the least amount of bias, followed by yeast and finally polio mutation rates, and a parallel trend exists for the correlation strengths. However, using true frequencies (Figure~\ref{nyp_bias_r2}C-D), as opposed to empirical (Figure~\ref{nyp_bias_r2}A-B) frequencies, did reduce the bias (mean absolute decrease of 4.47\%)for simulations which used polio mutation rates, but bias was largely unchanged for NP and yeast mutation rates. Additionally, correlations between $\omega$ and $dN/dS$ were generally higher when empirical frequencies were used instead of true frequencies. Taken together, these results suggest that current codon frequency estimators cannot fully account for strongly asymmetric mutation rates and/or even nucleotide composition introduced by mutation. 
-
-Therefore, we sought to ameliorate this systematic bias by introducing a novel model parameterization, which we term ``Fnuc." Fnuc merges the equilibrium nucleotide and codon frequencies to reveal a distinct target nucleotide frequency for each specific instantaneous change. Therefore, this parameterization takes into account both mutation at the nucleotide level as well as overarching codon frequencies. A derivation of this parameterization is given in \textbf{Appendix 2}. We used the Fnuc parameterization to again infer $\omega$, using both empirical and true frequencies. We found that Fnuc substantially reduces bias while simultaneously increasing precision in $\omega$ estimates, in particular for the yeast mutation rates. While empirical Fnuc did not dramatically improve bias for the polio mutation rate data set, it did offer improvements over all other frequency estimators. We additionally note that the polio mutation rates were strongly asymmetric, and in the absence of selection would lead to the strongly biased A/T content of roughly 80\%. Thus, we recommend that future implementations of $\omega$-based models consider the Fnuc parameterization, as it has the ability to reduce misleading signal induced by asymmetric mutation rates.
-
-%There is a noteworthy exception to the overall trend of $\omega$ underestimation; $\omega$ MLEs for NP mutation rates, when computed using F61, were actually overestimates of $dN/dS$. We attribute this result to the fact that the NP mutation rates were only minimally asymmetric, and in the absence of natural selection, these mutation rates would produce nearly even nucleotide frequencies. Importantly, when nucleotide mutation rates are symmetric, steady-state codon frequencies are controlled only by selection, as there is no opportunity to generate compositional bias through mutation \cite{SellaHirsh2005}. Therefore, because the F61 estimator directly uses empirical codon frequencies, the resulting M0 codon frequency parameters actually contain information about the strength of natural selection. The end result is that selection pressures which should be strictly incorporated in the $\omega$ parameter are inadvertently contained within the codon frequency parameters. Thus, the model infers selection to be weaker than it actually is, producing elevated $\omega$ MLEs. Although the $\omega$ overestimation was relatively small in this particular case, this example highlights that it is crucial to properly parameterize $\omega$-based models. If these models are incorrectly parameterized, the $\omega$ parameter will no longer accurately represent the $dN/dS$ evolutionary rate ratio, but will instead be a meaningless quantity.
 
 
-
-\section*{Future Directions}
+\section*{Conclusions}
 		
 We will conclude with insights gained from our study and recommendations for using $\omega$-based and MutSel modeling frameworks going forward. We have shown that $dN/dS$ be accurately calculated from selection coefficients, revealing that $\omega$-based and MutSel models yield consistent and overlapping information about the strength natural selection. Importantly, our proof that $dN/dS \leq 1$, when calculated from selection coefficients and when synonymous mutations are neutral, indicates that the use of MutSel models is only justified under conditions of strictly purifying selection, or neutral evolution. This restriction is in part indicated by the basic MutSel model assumption of constant selection pressures over time, or in other words a static fitness landscape \cite{HalpernBruno1998,Thorneetal2007,Rodrigue2010,Thorne2012}. 
 
@@ -160,7 +164,7 @@ Thus, if the aim is to identify positive selection, only $\omega$-based models, 
 
 
 
-
+%There is a noteworthy exception to the overall trend of $\omega$ underestimation; $\omega$ MLEs for NP mutation rates, when computed using F61, were actually overestimates of $dN/dS$. We attribute this result to the fact that the NP mutation rates were only minimally asymmetric, and in the absence of natural selection, these mutation rates would produce nearly even nucleotide frequencies. Importantly, when nucleotide mutation rates are symmetric, steady-state codon frequencies are controlled only by selection, as there is no opportunity to generate compositional bias through mutation \cite{SellaHirsh2005}. Therefore, because the F61 estimator directly uses empirical codon frequencies, the resulting M0 codon frequency parameters actually contain information about the strength of natural selection. The end result is that selection pressures which should be strictly incorporated in the $\omega$ parameter are inadvertently contained within the codon frequency parameters. Thus, the model infers selection to be weaker than it actually is, producing elevated $\omega$ MLEs. Although the $\omega$ overestimation was relatively small in this particular case, this example highlights that it is crucial to properly parameterize $\omega$-based models. If these models are incorrectly parameterized, the $\omega$ parameter will no longer accurately represent the $dN/dS$ evolutionary rate ratio, but will instead be a meaningless quantity.
 
 $\omega$-based models are an apt model choice for examining positive, diversifying selection. However, if one desires site-specific point estimates of $dN/dS$, $\omega$-based models   
 
@@ -220,8 +224,6 @@ Q_{ji} = \left\{
 	
 \subsection*{Computation of stationary frequencies for experimental data sets.}
 We used experimentally-determined site-specific amino acid fitness parameters ($F_a$) for influenza nucleoprotein (NP), from Bloom 2014 \cite{Bloom2014a}, in combination with experimental nucleotide mutation rates for either NP \cite{Bloom2014a}, yeast \cite{Zhu2014}, or polio virus \cite{Acevedo2014} to derive realistic distributions of stationary codon frequencies. Bloom 2014 reported 498 distinct site-wise amino acid preference distributions for NP \cite{Bloom2014a}. We combined these 498 amino acid preference sets with each of the three mutation rate matrices sets to construct a total of $498 \times 3 = 1494$ unique experimental evolutionary Markov models, using the approach in refs.\ \cite{Bloom2014a,Bloom2014b}. The instantaneous matrix for these experimental models is given by 
-
-
 \begin{equation}
 Q_{ji} = \left\{ 
 \begin{array}{rl}
@@ -246,14 +248,15 @@ Q_{ji} = \left\{
 	0                      &\mbox{multiple nucleotide changes} \\             
 	\end{array} \right.,
 \end{equation}
-where $\kappa$ is the transition-transversion bias, $\pi_j$ is the equilibrium frequency of the target codon $j$, and $\omega$ represents $dN/dS$ \cite{GoldmanYang1994,NielsenYang1998}. Importantly, this model's $\pi$ parameters are intended to represent those codon frequencies which would exist in absence of selection pressure, but those which would result from mutation alone \cite{GoldmanYang1994,MuseGaut1994,YN00,Yang2006}. Therefore, when inferring $\omega$ for alignments simulated with symmetric mutation rates, used the F\xline equal frequency parameterization, which assigns equal values of $1/61$ for all $\pi_i$ \cite{Yang2006}. F\xline equal gives the exact codon frequencies expected under symmetric mutation, in the absence of selection. 
+where $\kappa$ is the transition-transversion bias, $\pi_j$ is the equilibrium frequency of the target codon $j$, and $\omega$ represents $dN/dS$ \cite{GoldmanYang1994,NielsenYang1998}. Importantly, this model's $\pi$ parameters are intended to represent those codon frequencies which would exist in absence of selection pressure, but those which would result from mutation alone \cite{GoldmanYang1994,MuseGaut1994,YN00,Yang2006}. 
+\textbf{need transition here}
+Therefore, as all codons are equally probable when nucleotide mutation is symmetric, we assigned values of $1/61$ to all codon frequencies $\pi$ for these inferences.
 
-
-\textbf{REWRITE THIS PARAGRAPH}Alternatively, when inferring $\omega$ for alignments simulated with experimental mutation rates, we used 5 different sets of equilibrium frequency parameterizations. First, we inferred $\omega$ by specifying codon frequencies which would arise strictly from mutational processes in the absence of natural selection. We computed these codon frequency values using the same approach as we did in calculating the true steady-state codon frequencies, except instead of using the experimental amino acid preference data, we assigned all amino acids the same preference value of $0.05$. This strategy eliminated amino-acid level selection and allowed mutation rates alone to determine equilibrium codon frequencies. We term this frequency parameterization ``Ftrue." Finally, we used the common frequency estimators F61 \cite{GoldmanYang1994}, F3x4 \cite{MuseGaut1994}, and CF3x4 \cite{Pond2010}. As typical analyses consider model frequency parameters as protein-wide (not site-specific) parameters, we computed these parameter values by pooling, for each set of mutation rates, all 498 steady-state codon frequencies to derive average codon frequencies. This approach yielded a set of global equilibrium frequencies for each set of mutation rates, and we calculated the F61, F3x4, and CF3x4 frequencies from these distributions. Finally, we used $\omega$ with the F\xline equal parameterization.
+\textbf{REWRITE THIS PARAGRAPH}Alternatively, when inferring $\omega$ for alignments simulated with experimental fitness and mutation rates, we used 5 different sets of equilibrium frequency parameterizations. we used the common frequency estimators F61 \cite{GoldmanYang1994}, F3x4 \cite{MuseGaut1994}, and CF3x4 \cite{Pond2010}. As typical analyses consider model frequency parameters as protein-wide (not site-specific) parameters, we computed these parameter values by pooling, for each set of mutation rates, all 498 steady-state codon frequencies to derive average codon frequencies. This approach yielded a set of global equilibrium frequencies for each set of mutation rates, and we calculated the F61, F3x4, and CF3x4 frequencies from these distributions. 
 
 
 \section*{Appendix 1}
-In this appendix, we prove that, when calculated from scaled selection coefficients, $dN/dS \leq 1$. We assume that nucleotide mutation rates are symmetric ($\mu_{xy} = \mu_{yx}$) and that synonymous codons have the same fitness (synonymous changes are neutral). As described in the main text of this paper, these assumptions yield $dS = 1$, and hence we have to show that $dN = 	K_\text{N}\big{/}L_\text{N} \leq 1$. [we can rearrange the summation series such that you always have the prob in one direction and corresponding back and sum together. for these pairs, it can be shown les than 1.]To demonstrate this, we note that the $dN$ calculation consists of a series pairwise sums of the evolutionary rate between a given pair of nonsynonymous codons, normalized by the sum of the frequencies of these codons. Therefore, we will now show that each of these pairwise sums is less than 1, and hence $dN$ must be less than 1.
+Here, we prove that $dN/dS \leq 1$ when calculated from scaled selection coefficients. We assume that nucleotide mutation rates are symmetric ($\mu_{xy} = \mu_{yx}$) and that synonymous codons have the same fitness (synonymous changes are neutral). As described in the main text of this paper, these assumptions yield $dS = 1$, and hence we have to show that $dN = K_\text{N}\big{/}L_\text{N} \leq 1$. To this end, we note that the summation series defining $dN$ can be rearranged such that substitution probability from codon $i$ to $j$ is always added to the substitution probability from codon $j$ to $i$. It can be shown, for each of these pairs, that $dN \leq 1$, and hence $dN/dS \leq 1$.
 
 For this proof, we consider the pair of nonsynonymous codons $i$ and $j$, where $P_i \leq P_j$ that $P_j > 0$ ($P_i$ represents the stationary frequency of codon $i$). Moreover, as we assume $\mu_{ij} = \mu_{ji}$, we will simply write $\mu$ for each of these quantities throughout the following. As follows from equation \eqref{eq:KN}, the sum of the probability weights of evolving from codon $i$ to $j$ and from codon $j$ to $i$ is
 \begin{equation}
@@ -269,7 +272,8 @@ and we will now show that $F(x,y) \geq 0$ for $x \leq y$ and $y \geq 0 $. It is 
 \end{equation}
 We now replace the expression $\log{x} - \log{y}$ by its Taylor expansion, yielding
 \begin{equation}\label{eq:expand}
-	\frac{\partial{F(x,y)}}{\partial{x}} = \frac{\bigg{[} (x-3y)(x-y) - 2y^2\bigg{(}\sum\limits_{n=1}^\infty \frac{(1-x/y)^n}{n}\bigg{)} \bigg{]}}{(x-y)^2} \,.
+	\frac{\partial{F(x,y)}}{\partial{x}} = 
+	\frac{ \bigg{[} (x-3y)(x-y) - 2y^2\bigg{(}\sum\limits_{n=1}^\infty \frac{1}{n} (1-x/y)^n\bigg{)} \bigg{]}}{(x-y)^2} \,.
 \end{equation}
 
 We further note that the first two terms of the Taylor series equal $(x-3y)(x-y)$, and thus expression \eqref{eq:expand} simplifies to 
@@ -283,7 +287,7 @@ which is clearly negative.
 
 
 
-\section*{Appendix 2}
+\section*{Appendix 2 - this whole thing needs to be redone}
 
 We consider mutation as a nucleotide-level, and not a codon-level process. We can generally describe the mutation process by a $4\times4$ symmetric matrix of mutation rates $\mu_xy$ times a vector of equilibrium nucleotide frequencies $\pi_x$, such that the probability of a mutation from nucleotide $x$ to $y$ is $\mu_{xy}\pi_y$. Thus, we desire a framework to incoroporate this mutational information into a codon model of sequence evolution. 
 
@@ -296,7 +300,7 @@ We consider mutation as a nucleotide-level, and not a codon-level process. We ca
 % Importantly, the original MG94 matrix did not fully incorporate nucleotide-level information, but is it readily reformulated to do that....
 
 
-To derive the Fnuc model parameterization, we define $n_{ij}$ as the target nucleotide in a substitution from codon $i$ to codon $j$, and $\pi_x$ as the equilibrium frequency of nucleotide $x$. We begin with a modified version of the MG94 \cite{MuseGaut1994} instantaneous rate matrix 
+To derive the MG model parameterization, we define $n_{ij}$ as the target nucleotide in a substitution from codon $i$ to codon $j$, and $\pi_x$ as the equilibrium frequency of nucleotide $x$. We begin with a modified version of the MG94 \cite{MuseGaut1994} instantaneous rate matrix 
 \begin{equation}\label{eq:MG94_omega}
 Q_{ji} = \left\{ 
 \begin{array}{rl}
@@ -367,9 +371,9 @@ where where $i_1$, $i_2$, and $i_3$ are the three nucleotides of codon $i$, and 
 		\noalign{\smallskip}\hline\noalign{\smallskip}
 		F61 & 0 & 0 & 0 \\ 
 		CF3x4 & -9627.5 & -7951.8 & -7975.9 \\ 
-		Fnuc1 & -13325.5 & -10042.0 & -5147.6 \\ 
+		MG1 & -13325.5 & -10042.0 & -5147.6 \\ 
 		F1x4 & -13524.5 & -13658.5 & -15468.3 \\ 
-		Fnuc3 & -14401.3 & -12851.6 & -8624.9 \\ 
+		MG3 & -14401.3 & -12851.6 & -8624.9 \\ 
 		F3x4 & -14807.2 & -17385.3 & -19384.6 \\ 
 		\noalign{\smallskip}\hline\noalign{\smallskip} 
 	\end{tabular}
@@ -382,17 +386,27 @@ where where $i_1$, $i_2$, and $i_3$ are the three nucleotides of codon $i$, and 
 	
 \section{Supplementary Information}
 
-\vspace{2cm}
 
-\noindent Table S1. Estimator bias between $\omega$ MLEs and the expected, true $dN/dS$ values, for all mutation rates and M0 codon frequency parameterizations examined. Negative bias values indicate that $\omega$ MLEs are, on average, lower than $dN/dS$. All biases are statistically significant, with all $P < 2\times10^{-16}$ except for the estimator bias associated with Yeast mutation rates for Fnuc3, where $P = 5.4\times10^{-5}$.
+
+\begin{landscape}
+	\includegraphics[width=9.75in]{figures/SI/nyp_regression.pdf}
+	\vspace{0.5cm}
+	
+	\hspace{1.2cm} Figure S1. omega vs dn/ds for simulations using experimental parameters.
+\end{landscape}
+
+\newpage
+
+
+\noindent Table S1. Estimator bias between $\omega$ MLEs and the expected, true $dN/dS$ values, for all mutation rates and M0 codon frequency parameterizations examined. Negative bias values indicate that $\omega$ MLEs are, on average, lower than $dN/dS$. All biases are statistically significant, with all $P < 2\times10^{-16}$ except for the estimator bias associated with Yeast mutation rates for MG3, where $P = 5.4\times10^{-5}$.
 \begin{table}[htbp]
 	\begin{tabular}{c c c c c c c}
 		\hline\noalign{\smallskip}
-		Mutation rate & Fnuc1 & F1x4 & Fnuc3 & CF3x4 & F3x4 & F61 \\
+		Mutation rate & MG1 & F1x4 & MG3 & CF3x4 & F3x4 & F61 \\
 		\hline\noalign{\smallskip}
-		NP & -0.014 & -0.020 & -0.007 & -0.009 & 0.019 & -0.007 \\ 
-		Yeast & 0.025 & 0.007 & -0.063 & -0.084 & -0.068 & -0.076 \\ 
-		Polio & -0.049 & -0.103 & -0.088 & -0.148 & -0.136 & -0.161 \\ 
+		NP & -0.014 & -0.02 & -0.007 & -0.009 & -0.007 & 0.019 \\ 
+		Yeast & 0.025 & 0.007 & -0.063 & -0.084 & -0.076 & -0.068 \\ 
+		Polio & -0.049 & -0.103 & -0.088 & -0.148 & -0.161 & -0.136 \\ 
 		\noalign{\smallskip}\hline\noalign{\smallskip}
 	\end{tabular}
 \end{table}	
@@ -404,26 +418,15 @@ where where $i_1$, $i_2$, and $i_3$ are the three nucleotides of codon $i$, and 
 \begin{table}[htbp]
 	\begin{tabular}{c c c c c c c}
 		\hline\noalign{\smallskip}
-		Mutation rate & Fnuc1 & F1x4 & Fnuc3 & CF3x4 & F3x4 & F61 \\
+		Mutation rate & MG1 & F1x4 & MG3 & CF3x4 & F3x4 & F61 \\
 		\hline\noalign{\smallskip}
-		NP & 0.988 & 0.989 & 0.985 & 0.986 & 0.902 & 0.977 \\ 
-		Yeast & 0.943 & 0.917 & 0.905 & 0.897 & 0.889 & 0.864 \\ 
-		Polio & 0.842 & 0.811 & 0.777 & 0.754 & 0.752 & 0.781 \\ 
+		NP & 0.988 & 0.989 & 0.985 & 0.986 & 0.977 & 0.902 \\ 
+		Yeast & 0.943 & 0.917 & 0.905 & 0.897 & 0.864 & 0.889 \\ 
+		Polio & 0.842 & 0.811 & 0.777 & 0.754 & 0.781 & 0.752 \\ 
 		\noalign{\smallskip}\hline\noalign{\smallskip}
 	\end{tabular}
 \end{table}	
 
 
-
-\newpage
-
-\begin{landscape}
-\includegraphics[width=9.75in]{figures/SI/nyp_regression.pdf}
-\vspace{0.5cm}
-
-\hspace{1.2cm} Figure S1. omega vs dn/ds for simulations using experimental parameters.
-\end{landscape}
-
-	
 \end{document}
 
