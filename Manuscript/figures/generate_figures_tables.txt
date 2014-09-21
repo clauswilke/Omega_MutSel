@@ -69,7 +69,7 @@ dev.off()
 
 ############################ nucleoprotein, yeast, polio r^2 and bias plots #############################
 fspecs <- c("f61", "f3x4", "cf3x4", "f1x4", "fnuc3", "fnuc1")
-names <- c("F61", "F3x4", "CF3x4", "F1x4", "Fnuc3", "Fnuc1")
+names <- c("F61", "F3x4", "CF3x4", "F1x4", "MG3", "MG1")
 np_r2 <- c(); yeast_r2 <- c(); polio_r2 <- c(); np_bias <- c(); yeast_bias <- c(); polio_bias <- c()
 
 for (i in 1:length(fspecs))
@@ -90,7 +90,7 @@ pdf('MainText/nyp_bias_r2.pdf', width=3.75, height=5.625, useDingbats=F)
 par(mfrow=c(2,1), mar=c(2, 3.6, 1.35, 0.55)) #bottom, left, top, right
 point_size = 1.75
 ylab_size = 1.25
-xlab_size = 0.87
+xlab_size = 0.9
 axis_size = 1.
 panel_size = 1.75
 axis_lwd = 2.25
@@ -162,7 +162,7 @@ mtext(names[6], side = 3, outer=TRUE, at = 0.925, cex=size)
 }
 
 
-pdf('SI/nyp_regression.pdf', width=25, height=11, useDingbats=F)
+pdf('SI/nyp_regression.pdf', width=23, height=11, useDingbats=F)
 par(mfrow=c(3,6))
 par(mar=c(5.5, 5.5, 2.5, 2.5)) #bottom, left, top, right
 par(oma=c(0,8,3,0))
@@ -179,7 +179,7 @@ dev.off()
 # Both the MainText and SI tables are made here and all tables go into latex_tables.txt. 
 
 fspecs <- c("fnuc1",  "fnuc3", "f1x4", "cf3x4", "f3x4", "f61")
-rownames <- c("Fnuc1", "Fnuc3", "F1x4", "CF3x4", "F3x4", "F61")
+rownames <- c("MG1", "MG3", "F1x4", "CF3x4", "F3x4", "F61")
 
 sink("latex_tables.txt")
 cat("%%%% Latex tables for 'The relationship between dN/dS and scaled selection coefficients' (SJS, COW). %%%%%\n\n\n\n\n\n")
@@ -236,8 +236,8 @@ make_daic_table <- function(dat, fspecs, rownames)
 
 cat("\n\n\n\n%%%%%%%%% dAIC table  %%%%%%%%%%\n")
 fspecs <- c("f61", "cf3x4", "fnuc1", "f1x4", "fnuc3", "f3x4")
-rownames <- c("F61", "CF3x4", "Fnuc1", "F1x4", "Fnuc3", "F3x4")
-for (i in seq(1,6)){
+rownames <- c("F61", "CF3x4", "MG1", "F1x4", "MG3", "F3x4")
+for (i in 1:length(fspecs)){
     daic_np <- round( mean(np$aic[np$fspec==fspecs[1]] - np$aic[np$fspec==fspecs[i]]), 2)
     daic_yeast <- round( mean(yeast$aic[yeast$fspec==fspecs[1]] - yeast$aic[yeast$fspec==fspecs[i]]), 2)
     daic_polio <- round( mean(polio$aic[polio$fspec==fspecs[1]] - polio$aic[polio$fspec==fspecs[i]]), 2)
