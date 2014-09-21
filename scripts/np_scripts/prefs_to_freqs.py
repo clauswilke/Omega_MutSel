@@ -171,29 +171,13 @@ def is_TI(source, target):
     else:
         return False
         
-def calc_cnf_denom(target, x, codon_freqs):
-    ''' target = target codon. x = position that changes'''
-    target = list(target)
-    target[x] = '\w'
-    my_match = re.compile("".join(target))
-    total = 0.
-    for codon in codons:
-        if my_match.match(codon):
-            total += codon_freqs[codons.index(codon)]  
-    return total
 
 
-def build_fnuc_matrices(nuc_freqs, pos_nuc_freqs, outfile, f61_freqs, f1x4_freqs):
-    ''' Create matrices which use target nucleotide frequencies (not codon frequencies). 
-        Note: pos means "positional", we use 12 positional nucleotide frequencies. Goes with F3x4 stationary distribution.
-              glob means "global", we use 4 global (position-free) nucleotide frequencies. Goes with F1x4 stationary distribution.
-    ''' 
+def build_mg_matrices(nuc_freqs, pos_nuc_freqs, outfile):
+    ''' Create MG94-style matrices (use target nucleotide frequencies).  ''' 
 
-    matrix_fnuc1  = 'Fnuc1 = {61, 61, \n' # MG94
-    matrix_fnuc3  = 'Fnuc3 = {61, 61, \n' # MG94, positional
-    matrix_cnf61  = 'CNF61 = {61, 61, \n' # Yap 2010 with F61
-    matrix_cnf1x4 = 'CNF1x4 = {61, 61, \n' # Yap 2010 with F1x4
-
+    matrix_mg1  = 'MG1 = {61, 61, \n' # MG94
+    matrix_mg3  = 'MG3 = {61, 61, \n' # MG94, positional
     
     for i in range(61):
         source = codons[i]
@@ -204,26 +188,22 @@ def build_fnuc_matrices(nuc_freqs, pos_nuc_freqs, outfile, f61_freqs, f1x4_freqs
             if len(diff) == 2:
                 assert(len(str(x)) == 1), "Problem with determining nucleotide difference between codons"
                 target_index = nucindex[diff[1]]   
-                fnuc1  = str(nuc_freqs[nucindex[diff[1]]]) 
-                fnuc3  = str(pos_nuc_freqs[nucindex[diff[1]]][x])
-                cnf61  = str(f61_freqs[j] / calc_cnf_denom(target, x, f61_freqs))
-                cnf1x4 = str(f1x4_freqs[j] / calc_cnf_denom(target, x, f1x4_freqs))
-                
-    
+                mg1  = str(nuc_freqs[nucindex[diff[1]]]) 
+                mg3  = str(pos_nuc_freqs[nucindex[diff[1]]][x])
+  
                 # Create string for matrix element
                 element = '{' + str(i) + ',' + str(j) + ',t'  
                 if is_TI(diff[0], diff[1]):
                     element += '*k'
                 if codon_dict[source] != codon_dict[target]:
                     element += '*w' 
-                matrix_fnuc1  += element + '*' + fnuc1 + '}\n'
-                matrix_fnuc3  += element + '*' + fnuc3 + '}\n'
-                matrix_cnf61  += element + '*' + cnf61 + '}\n'
-                matrix_cnf1x4 += element + '*' + cnf1x4 + '}\n'
+                matrix_mg1  += element + '*' + mg1 + '}\n'
+                matrix_mg3  += element + '*' + mg3 + '}\n'
+
 
     # And save to file.
     with open(outfile, 'w') as outf:
-        outf.write(matrix_fnuc1 + '};\n\n\n' + matrix_fnuc3 + '};\n\n\n' + matrix_cnf61 + '};\n\n\n' + matrix_cnf1x4 + '};\n\n\n')
+        outf.write(matrix_mg1 + '};\n\n\n' + matrix_mg3 + '};\n\n\n')
 
 
 
@@ -268,7 +248,7 @@ def create_batchfile(basefile, outfile, pos_freqs, f61, f1x4, f3x4):
 
 def main():
     # First, we determine the equilibrium frequencies of the system on a per site basis. As we use amino acid preference data, we assign all synonymous codons the same fitness.
-    # Second, we find the F61, F1x4, F3x4 frequencies, as well as the Fnuc1 and Fnux3 matrices. These use the average dataset frequencies, analogous to taking global alignment frequencies.
+    # Second, we find the F61, F1x4, F3x4 frequencies, as well as the MG1 and MG3 matrices. These use the average dataset frequencies, analogous to taking global alignment frequencies.
     # Third, we set up the hyphy batch file which makes use of these frequencies. Note that the Fnuc matrices are saved to a separate matrix file, and are not placed directly into the hyphy batchfiles.
     
     # Parse input arguments and set up input/outfile files accordingly
@@ -277,7 +257,7 @@ def main():
     codon_freqs_outfile    = data_dir + dataset + "_codon_eqfreqs.txt"
     raw_batchfile = "globalDNDS_raw_exp.bf"
     batch_outfile = '../../hyphy_files/globalDNDS_' + dataset + '.bf'
-    fnuc_outfile  = '../../hyphy_files/Fnuc_' + dataset + '.mdl'
+    mg_outfile  = '../../hyphy_files/MG_' + dataset + '.mdl'
     
     # Compute codon equilibrium frequencies from amino acid preference data, if compute is True. Else, load the files of eq freqs which have already been calculated.
     # np_prefs are those taken from Bloom 2014 MBE paper. The np_prefs are directly from the paper's Supplementary_file_1.xls and refer to equilbrium amino acid propenisties. The best interpretation of these experimental propensities is metropolis.
@@ -314,9 +294,9 @@ def main():
     create_batchfile(raw_batchfile, batch_outfile, pos_freqs_hyf, f61, f1x4, f3x4)
           
           
-    # Use nucleotide and positional nucleotide frequencies to construct Fnuc matrices
-    print "Building and saving the Fnuc matrices"
-    fnuc_matrices = build_fnuc_matrices(nuc_freqs, pos_nuc_freqs, fnuc_outfile, f61_freqs, f1x4_freqs)
+    # Use nucleotide and positional nucleotide frequencies to construct MG-style matrices
+    print "Building and saving the MG-style matrices"
+    build_mg_matrices(nuc_freqs, pos_nuc_freqs, mg_outfile)
 
     
 main() 

@@ -80,44 +80,23 @@ LikelihoodFunction  LikFn4 = (filt_data, Tree01);
 Optimize (paramValues, LikFn4);
 fprintf ("cf3x4_hyout.txt", LikFn4);
 
-////////////// Fnuc_f1x4 //////////////
+////////////// MG1 //////////////
 global w; global k; global t;
-Model MyModel = (Fnuc1, F1x4, 0);
+Model MyModel = (MG1, F1x4, 0);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn5 = (filt_data, Tree01);
 Optimize (paramValues, LikFn5);
-fprintf ("fnuc1_hyout.txt", LikFn5);
+fprintf ("mg1_hyout.txt", LikFn5);
 
 
-////////////// Fnuc_f3x4 //////////////
+////////////// MG3 //////////////
 global w; global k; global t;
-Model MyModel = (Fnuc3, F3x4, 0);
+Model MyModel = (MG3, F3x4, 0);
 UseModel (USE_NO_MODEL);
 UseModel(MyModel);
 Tree    Tree01 = DATAFILE_TREE;
 LikelihoodFunction  LikFn6 = (filt_data, Tree01);
 Optimize (paramValues, LikFn6);
-fprintf ("fnuc3_hyout.txt", LikFn6);
-
-
-////////////// CNF F61 //////////////
-global w; global k; global t;
-Model MyModel = (CNF61, F61, 0);
-UseModel (USE_NO_MODEL);
-UseModel(MyModel);
-Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn7 = (filt_data, Tree01);
-Optimize (paramValues, LikFn7);
-fprintf ("cnf61_hyout.txt", LikFn7);
-
-////////////// CNF F1x4 //////////////
-global w; global k; global t;
-Model MyModel = (CNF1x4, F1x4, 0);
-UseModel (USE_NO_MODEL);
-UseModel(MyModel);
-Tree    Tree01 = DATAFILE_TREE;
-LikelihoodFunction  LikFn8 = (filt_data, Tree01);
-Optimize (paramValues, LikFn8);
-fprintf ("cnf61_hyout.txt", LikFn8);
+fprintf ("mg3_hyout.txt", LikFn6);
