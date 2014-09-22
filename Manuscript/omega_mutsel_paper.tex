@@ -1,5 +1,8 @@
 
-\documentclass{pnastwo}
+\documentclass[11pt]{article}
+\usepackage[margin=1.0in]{geometry}
+
+%\documentclass{pnas}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{lscape}
@@ -20,17 +23,17 @@
 	Claus O. Wilke\affil{1}{}
 }
 	
-\contributor{Submitted to Proceedings of the National Academy of Sciences of the United States of America}
-\maketitle
+%\contributor{Submitted to Proceedings of the National Academy of Sciences of the United States of America}
+%\maketitle
 
-\begin{article}
+%\begin{article}
 		
 \begin{abstract} 
 %$dN/dS$ models have been developed to a high level of sophistication and are a staple of modern-day comparative sequence analysis.
 The evolutionary rate ratio $dN/dS$, representing the ratio nonsynonymous to synonymous substitution rates, is among the most commonly used metrics used to infer the strength of natural selection in protein-coding sequences, in a phylogenetic framework.  Recently, mutation-selection-balance (MutSel) models have become a popular alternative to the $dN/dS$ framework. MutSel models estimate site-specific amino-acid and/or codon scaled selection coefficients, which indicates the selective response to particular mutations. However, it remains unknown how these two frameworks relate to one another. Do $dN/dS$ estimates reveal similar or distinct information from scaled selection coefficients? To answer this question, we have derived a formal mathematical relationship between these two quantities such that $dN/dS$ can be calculated from scaled selection coefficients. Using this relationship, we prove that $dN/dS$ values computed from MutSel model scaled selection coefficients are strictly less than 1, demonstrating that MutSel models inherently cannot accomodate positive, diversifying selection. However, $dN/dS$ can readily be greater than 1 if selection acts on synonymous changes, even though only purifying selection is occuring. Finally, we use this established relationship between models to evaluate performance of $dN/dS$ maximum likelihood (ML) inference frameworks. We find that ML methods yield substantially biased $dN/dS$ estimates when the fitted models do not exactly correspond to the mechanistic process that generated the data. Moreover, we show that the best-fitting model is not the model with the least bias and highest precision for parameter estimates of interest, and thus selecting models based on fit (AIC) can be counterproductive and positively misleading. 
 \end{abstract}
 		
-\keywords{dN/dS | mutation-selection-balance models | scaled selection coefficients | Markov models of sequence evolution}
+%\keywords{dN/dS | mutation-selection-balance models | scaled selection coefficients | Markov models of sequence evolution}
 		
 \section*{Introduction}
 		
@@ -285,9 +288,9 @@ which is clearly negative.
 %%\end{equation} where $P_i$ is the F1x4 frequency for codon $i$ and is comprised of the nucleotides $x$, $y$ and $z$. It is easy to show that, if applied to all 61 codons, 4 unique nucleotide frequency values will result, which can be readily incorporated into the matrix given in equation \eqref{eq:MG94_omega} to reveal the Fnuc parameterization.
 
 		
-\begin{acknowledgments}
+%\begin{acknowledgments}
 	This work was supported by the army and by NIH. Computational resources were provided by CCBB.
-\end{acknowledgments}
+% \end{acknowledgments}
 		
 
 		
@@ -296,10 +299,10 @@ which is clearly negative.
 \bibliography{bibliography}
 		
 		
-\end{article}
+%\end{article}
 	
 	
-\section*{Figures and Tables }
+\section*{Figures and Tables}
 
 \vspace{2cm}
 	
@@ -321,7 +324,7 @@ which is clearly negative.
 
 \begin{figure}[htbp]
 	\centerline{\includegraphics[width=8.7cm]{figures/MainText/nyp_bias_r2.pdf}}
-	\caption{\label{nyp_bias_r2} (A) Estimator bias and (B) $r^2$ values between $dN/dS$ and $\omega$ MLEs across model frequency parameterizations, for each set of nucleotide mutation rates. Negative biases indicate $\omega$ estimates that are, on average, lower than $dN/dS$. For all frequency parameterizations, bias generally increases as mutation rates become increasingly asymmetric. Even so, MG-style models tend to yield far less biased $\omega$ estimates than do MG-style models.}	
+	\caption{\label{nyp_bias_r2} (A) Estimator bias and (B) $r^2$ values between $dN/dS$ and $\omega$ MLEs across model frequency parameterizations, for each set of nucleotide mutation rates. Negative biases indicate $\omega$ estimates that are, on average, lower than $dN/dS$. For all frequency parameterizations, bias generally increases as mutation rates become increasingly asymmetric. Even so, MG-style models tend to yield far less biased $\omega$ estimates than do GY-style models.}	
 \end{figure}
 
 \vspace{2cm}
@@ -348,7 +351,7 @@ which is clearly negative.
 
 
 \begin{figure}[htbp]
-	\centerline{\includegraphics[width=4cm]{figures/MainText/simtree.pdf}}
+	\centerline{\includegraphics[width=6cm]{figures/MainText/simtree.pdf}}
 	\caption{\label{tree} Phylogeny used for all simulated alignments.}	
 \end{figure}
 
@@ -356,7 +359,7 @@ which is clearly negative.
 \clearpage
 
 	
-\section{Supplementary Information}
+\section*{Supplementary Information}
 
 \vspace{2cm}
 
