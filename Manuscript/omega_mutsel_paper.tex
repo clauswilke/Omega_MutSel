@@ -28,13 +28,18 @@
 
 %\begin{article}
 		
+\section*{Significance Statement} %max 120 words, currently 182. Bad news.
+Two broad modeling frameworks are commonly used to infer the strength of natural selection in protein-coding sequences. The first estimates the evolutionary rate ratio $dN/dS$, the ratio of nonsynonymous to synonymous substitution rates, while the second estimates scaled selection coefficients, which indicate the selective response to specific mutations. However, it is unclear whether $dN/dS$ and scaled selection coefficients contain overlapping or distinct information about selection strength. Therefore, we establish a formal mathematical relationship between these two quantities. We find that, when computed from scaled selection coefficients values, $dN/dS \leq 1$ if synonymous changes are evolutionarily neutral, but $dN/dS$ can be greater than 1 when selection induces codon bias, even though models estimating scaled selection coefficients assume a static fitness landscape. We additionally find that, when mutational bias is strong, $dN/dS$ inferred using standard maximum likelihood (ML) methods is highly biased. Through examining the behavior of several $dN/dS$ ML models, we find that the best-fitting model (based on AIC) is never the model which most accurately estimates $dN/dS$, and therefore relying on solely model fit for model selection can be counterproductive and misleading.
+
+
 \begin{abstract} 
 %$dN/dS$ models have been developed to a high level of sophistication and are a staple of modern-day comparative sequence analysis.
 The evolutionary rate ratio $dN/dS$, representing the ratio nonsynonymous to synonymous substitution rates, is widely used to infer the strength of natural selection in protein-coding sequences.  Recently, mutation-selection-balance (MutSel) models have become a popular alternative to the $dN/dS$ framework. MutSel models estimate scaled selection coefficients, indicating the selective response to particular codon and/or amino-acid changes, from phylogenetic data. However, it remains unknown how these two modeling frameworks relate to one another. Do $dN/dS$ estimates reveal similar or distinct information from scaled selection coefficients? To answer this question, we derive a formal mathematical relationship to calculate $dN/dS$ from scaled selection coefficients. Using this framework, we prove that, when synonymous changes are neutral, MutSel models strictly produce $dN/dS \leq 1$. Alternatively, if selection acts on synonymous changes, $dN/dS$ can readily be greater than 1, even though positive selection is not occurring. In addition, we use this relationship to examine the extent to which $dN/dS$ estimated using maximum likelihood (ML) agree with $dN/dS$ computed from selection coefficients. This analysis serves as a a novel and robust strategy for assessing the performance of ML $dN/dS$ inference frameworks. We find that ML methods yield biased $dN/dS$ estimates in the presence of mutational asymmetry, and this bias can be ameliorated by fitting models which more closely match the mechanistic process which generated the data. Moreover, we show that the best-fitting model, based on AIC scores, is not necessarily the model with the least bias and highest precision for parameter estimates of interest, and thus selecting models based solely on fit can be counterproductive and positively misleading. 
 \end{abstract}
 		
 %\keywords{dN/dS | mutation-selection-balance models | scaled selection coefficients | Markov models of sequence evolution}
-		
+
+
 \section*{Introduction}
 		
 The oldest and most-widely used method to infer selection pressure in protein-coding genes calculates the evolutionary rate ratio $dN/dS$, which represents the ratio of non-synonymous to synonymous substitution rates. This metric indicates how quickly a protein's constituent amino acids change, relative to synonymous changes, and it is commonly used to identify protein sites that experience purifying selection ($dN/dS<1$), evolve neutrally ($dN/dS\approx1$), or experience positive, diversifying selection ($dN/dS>1$) \cite{NielsenYang1998, Yangetal2000, KosakovskyPondFrost2005b, Huelsenbecketal2006}. In phylogenetic contexts, $dN/dS$ is typically calculated using a maximum likelihood (ML) approach \cite{GoldmanYang1994,MuseGaut1994,NielsenYang1998,Yang2006}. ML methods assume an explicit continuous time Markov-process model of sequence evolution and maximum likelihood estimates (MLEs) of the parameter $\omega$, which represents the quantity $dN/dS$ (although we note that other styles of these models use separate parameters for nonsynonymous and synonymous substitution rates \cite{MuseGaut1994,KosakovskyPondMuse2005}). These $dN/dS$ models have become a staple of comparative sequence analysis since their introduction in the 1990s (see ref \cite{Anisimova2009} for a comprehensive review), and we will refer to them as $\omega$-based models throughout this paper.
@@ -167,9 +172,9 @@ P_i = \frac{e^{F_i}}{\sum e^{F_k}},
 
 
 \subsection*{Alignment simulations.}
-We simulated protein-coding sequences as a continuous-time Markov process using standard methods \cite{Yang2006} according to the Halpern-Bruno MutSel model \cite{HalpernBruno1998}. In simplified form, this model's instantaneous rate matrix $Q$ is given by
+We simulated protein-coding sequences as a continuous-time Markov process using standard methods \cite{Yang2006} according to the Halpern-Bruno MutSel model \cite{HalpernBruno1998}. In simplified form, this model's instantaneous rate matrix $Q = q_{ij}$ is populated by
 \begin{equation}\label{eq:HBmatrix}
-Q_{ij} = \left\{ 
+q_{ij} = \left\{ 
 \begin{array}{rl}
 \mu_{ij} \frac{S_{ij}}{1-1/S_{ij}} &\mbox{single nucleotide change} \\\\
 0                                  &\mbox{multiple nucleotide changes} \\             
@@ -190,9 +195,9 @@ q_{ij} =  \left\{
 
 		
 \subsection*{Maximum likelihood inference of dN/dS.}
-For the 200 alignments simulated with symmetric mutation rates, we inferred $dN/dS$ using the M0 model \cite{Yangetal2000}, as implemented in the HyPhy batch language \cite{KosakovskyPondetal2005}. The M0 model uses the GY94 instantaneous rate matrix,
+For the 200 alignments simulated with symmetric mutation rates, we inferred $dN/dS$ using the M0 model \cite{Yangetal2000}, as implemented in the HyPhy batch language \cite{KosakovskyPondetal2005}. The M0 model uses the GY94 instantaneous rate matrix, which is populated by elements
 \begin{equation}\label{eq:GY94}
-Q_{ij} = \left\{ 
+q_{ij} = \left\{ 
 	\begin{array}{rl}
 	\pi_j                  &\mbox{synonymous transversion} \\
 	\kappa \pi_j           &\mbox{synonymous transition} \\
@@ -200,8 +205,7 @@ Q_{ij} = \left\{
  	\omega \kappa \pi_j    &\mbox{nonsynonymous transition} \\
 	0                      &\mbox{multiple nucleotide changes} \\             
 	\end{array} \right.,
-\end{equation}
-where $\kappa$ is the transition-transversion bias, $\pi_j$ is the equilibrium frequency of the target codon $j$, and $\omega$ represents $dN/dS$ \cite{GoldmanYang1994,NielsenYang1998}. Importantly, this model's $\pi$ parameters are intended to represent those codon frequencies which would exist in absence of selection pressure generated by mutation alone \cite{GoldmanYang1994,MuseGaut1994,YN00,Yang2006}. Thus, when inferring $\omega$ on datasets which used symmetric mutation rates, we assigned the value $1/61$ to all parameters $\pi_i$, as all codons are  equally probable in the absence of mutational bias.
+\end{equation} for the substitution codon $i$ to codon $j$, where $\kappa$ is the transition-transversion bias, $\pi_j$ is the equilibrium frequency of the target codon $j$, and $\omega$ represents $dN/dS$ \cite{GoldmanYang1994,NielsenYang1998}. Importantly, this model's $\pi$ parameters are intended to represent those codon frequencies which would exist in absence of selection pressure generated by mutation alone \cite{GoldmanYang1994,MuseGaut1994,YN00,Yang2006}. Thus, when inferring $\omega$ on datasets which used symmetric mutation rates, we assigned the value $1/61$ to all parameters $\pi_i$, as all codons are  equally probable in the absence of mutational bias.
 
 Alternatively, when inferring $\omega$ for alignments simulated with experimental fitness and mutation rates, we used several different model parameterizations, including GY-style \cite{GoldmanYang1994} (target codon frequency) and MG-style \cite{MuseGaut1994} (target nucleotide frequency) parameterizations. Codon frequency parameterizations considered include F61 \cite{GoldmanYang1994}, F3x4 \cite{GoldmanYang1994}, CF3x4 \cite{KosakovskyPond2010}, and F1x4 \cite{MuseGaut1994}. We additionally implemented two varieties of MG-style models; the first, MG1, employs four parameters for nucleotide frequencies (one per nucleotide) and the second, MG3, employs twelve nucleotide frequency parameters, with four nucleotide frequency parameters for each of the three codon positions. Note that all models included the parameters $\kappa$ and $\omega$. 
 
@@ -239,7 +243,7 @@ which is clearly negative.
 
 \section*{Appendix 2}
 GY-style matrices may be expressed in the framework of the general-time reversible (GTR) model, in which the instantaneous matrix $Q$ can be obtained from a $61 \times 61$ symmetric substitution rate matrix and a $1\times61$ vector containing the equilibrium codon frequencies, which correspond to the stationary distribution of the Markov chain. On the other hand, MG-style rate matrices explicitly consider nucleotide, not codon, frequencies, and thus do not clearly follow this paradigm. We now describe how the MG-style matrix can be rewritten in a form that follows the GTR framework. 
-MG-style matrices follow the general format, for a the substitution from codon $i$ to $j$, 
+MG-style matrix elements, for a the substitution from codon $i$ to $j$, are generally given by 
 \begin{equation}\label{eq:MGstyle}
 Q_{ij} = \left\{ 
 \begin{array}{rl}
@@ -253,9 +257,9 @@ Q_{ij} = \left\{
 To begin, we note that mutation is a nucleotide-level, and not a codon-level process, and the mutation process can be represented by a $4 \times 4$ symmetric matrix of mutation rates $\mu_{xy}$ and a vector of stationary nucleotide frequencies $\pi_y$. If the target is nucleotide $y$, the instantaneous substutition rate matrix $Q$ must incorporate the factor $\mu_{xy}\pi_y$ to properly reflect the mechanism of mutation, even in a codon framework. Substitution can additionally be described by a symmetric $61\times61$ matrix. We further note that the MG-style matrix yields the stationary codon frequency $\pi_i = \pi_{i_1}\pi_{i_2}\pi_{i_3}C$ for a given codon $i$, where $C = 1 - \Pi_\text{stop}$ and $\Pi_\text{stop} = \pi_\text{T}\pi_\text{A}\pi_\text{G} + \pi_\text{T}\pi_\text{G}\pi_\text{A} + \pi_\text{T}\pi_\text{A}\pi_\text{A}$ \cite{MuseGaut1994}. 
 
 
-We can therefore write the mutation rate $\mu_{xy}\pi_y$ instead as to $\mu_{xy} / (\pi_m\pi_n) \times C$, where $\pi_m$ and $\pi_n$ are the nucleotides which do not change in a given instantaneous codon substitution. This allows us to rewrite the rate instantaneous matrix as 
+We can therefore write the mutation rate $\mu_{xy}\pi_y$ instead as to $\mu_{xy} / (\pi_m\pi_n) \times C$, where $\pi_m$ and $\pi_n$ are the nucleotides which do not change in a given instantaneous codon substitution. This allows us to rewrite the rate instantaneous matrix elements as 
 \begin{equation}
-Q_{ij} = \left\{ 
+q_{ij} = \left\{ 
 \begin{array}{rl}
 \frac{\mu_{ij}C}{\pi_{m_{ij}}\pi_{n_{ij}}}\pi_j               &\mbox{synonymous change} \\\\
 \frac{\mu_{ij}C}{\pi_{m_{ij}}\pi_{n_{ij}}}\omega\pi_j         &\mbox{nonsynonymous change} \\\\
