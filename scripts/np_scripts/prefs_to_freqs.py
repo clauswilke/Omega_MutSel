@@ -1,3 +1,24 @@
+'''  
+SJS (stephanie.spielman@gmail.com). 
+Script to generate codon frequency data, for a variety of model parameterizations, from experimental datasets.
+
+USAGE: python prefs_to_freqs.py <dataset> <0/1> . dataset is either np, yeast, or polio, depending on which dataset you'd like to get info for. The second argument tells whether you would like to derive experimental model giving the position-specific frequency distributions (1), or simply read in the file containing them (0).
+
+Dependencies - numpy, scipy.
+
+Word to the wise  - you must have GNU sed on your system to run this script, and it must be called with the command "sed" itself (not gsed, etc.)  
+    PLEASE NOTE! If you are on a Mac, the native sed behavior will *not work*. Instead, you have to grab GNU sed from homebrew and then add this line (or similar) to your .bash_profile - alias sed="/usr/local/Cellar/gnu-sed/4.2.2/bin/sed".
+
+
+What does the code do?
+First, we determine the equilibrium frequencies of the system on a per site basis. As we use amino acid preference data, we assign all synonymous codons the same fitness.
+Second, we find the F61, F1x4, F3x4 frequencies. These use the average dataset frequencies, analogous to taking global alignment frequencies.
+Third, we set up the hyphy batch file which makes use of these frequencies. 
+Fourth, we generate the MG1 and MG3 matrix files.
+
+'''
+
+
 import sys
 import subprocess
 import shutil
@@ -247,17 +268,15 @@ def create_batchfile(basefile, outfile, pos_freqs, f61, f1x4, f3x4):
     
 
 def main():
-    # First, we determine the equilibrium frequencies of the system on a per site basis. As we use amino acid preference data, we assign all synonymous codons the same fitness.
-    # Second, we find the F61, F1x4, F3x4 frequencies, as well as the MG1 and MG3 matrices. These use the average dataset frequencies, analogous to taking global alignment frequencies.
-    # Third, we set up the hyphy batch file which makes use of these frequencies. Note that the Fnuc matrices are saved to a separate matrix file, and are not placed directly into the hyphy batchfiles.
-    
+
     # Parse input arguments and set up input/outfile files accordingly
     dataset, mudict, compute = parse_input(sys.argv)    
-    data_dir      = "../experimental_data/"
-    codon_freqs_outfile    = data_dir + dataset + "_codon_eqfreqs.txt"
-    raw_batchfile = "globalDNDS_raw_exp.bf"
-    batch_outfile = '../../hyphy_files/globalDNDS_' + dataset + '.bf'
-    mg_outfile  = '../../hyphy_files/MG_' + dataset + '.mdl'
+    data_dir            = "../experimental_data/"
+    codon_freqs_outfile = data_dir + dataset + "_codon_eqfreqs.txt"
+    raw_batchfile       = "globalDNDS_raw_exp.bf"
+    batch_outfile       = '../../hyphy_files/globalDNDS_' + dataset + '.bf'
+    mg_outfile          = '../../hyphy_files/MG_' + dataset + '.mdl'
+    
     
     # Compute codon equilibrium frequencies from amino acid preference data, if compute is True. Else, load the files of eq freqs which have already been calculated.
     # np_prefs are those taken from Bloom 2014 MBE paper. The np_prefs are directly from the paper's Supplementary_file_1.xls and refer to equilbrium amino acid propenisties. The best interpretation of these experimental propensities is metropolis.
