@@ -288,7 +288,7 @@ Q_{ij} = \left\{
 	
 \begin{figure}[htbp]
 	\centerline{\includegraphics[width=8.7cm]{figures/MainText/dnds_variance.pdf}}
-	\caption{\label{dnds_variance} $dN/dS$ decreases in proportion to amino-acid level selection strength. $dN/dS$ is plotted against the $\sigma^2 $ of the simulated distribution of amino-acid scaled selection coefficients. Higher values of $\sigma^2$ indicate larger fitness differences among amino acids, whereas the limiting value of $\sigma^2 = 0$ indicates that all amino acids have the same fitness. (A) Synonymous codons have equal fitness values ($r^2=0.83$). (B) Synonymous codons have different fitness values ($r^2=0.45$). Note that panel B, but not A, shows $dN/dS$ values greater than 1, in spite of the steady-state evolutionary process.}
+	\caption{\label{dnds_variance} $dN/dS$ decreased in proportion to amino-acid level selection strength. $dN/dS$ is plotted against the $\sigma^2 $ of the simulated distribution of amino-acid scaled selection coefficients. Higher values of $\sigma^2$ indicate larger fitness differences among amino acids, whereas the limiting value of $\sigma^2 = 0$ indicates that all amino acids have the same fitness. (A) Synonymous codons have equal fitness values ($r^2=0.83$). (B) Synonymous codons have different fitness values ($r^2=0.45$). Note that panel B, but not A, shows $dN/dS$ values greater than 1, in spite of the steady-state evolutionary process.}
 \end{figure}
 		
 		
@@ -296,7 +296,7 @@ Q_{ij} = \left\{
 		
 \begin{figure}[htbp]
 	\centerline{\includegraphics[width=8.7cm]{figures/MainText/regression_convergence.pdf}}
-	\caption{\label{reg_conv} Combined modeling approach to assess performance of $dN/dS$ inference frameworks. (A) Protein-coding alignments are simulated in the MutSel modeling framework. $dN/dS$ can then be calculated from scaled selection coefficients as well as through a ML inference framework. Comparing resulting quantities reveals the accuracy in the chosen $dN/dS$ inference framework. (B) Regression between $dN/dS$ values as calculated from scaled selection coefficients and as inferred using the M0 model \cite{GoldmanYang1994,NielsenYang1998,Yangetal2000}. Each point corresponds to a single simulated alignment, and the red line is the $x=y$ line. (C) Convergence of $\omega$ MLEs to the true $dN/dS$ value. The y-axis indicates the relative error of the maximum likelihood $dN/dS$ estimate, and the x-axis indicates the number of positions in the simulated alignment. As the number of positions, and hence the size of the data set, increases, the maximum likelihood estimates converge to the $dN/dS$ values calculated using equations \eqref{eq:pi_i}-\eqref{eq:dS}. The red line is the $y=0$ line, indicating no error.}
+	\caption{\label{reg_conv} Combined modeling approach to assess performance of $dN/dS$ inference frameworks. (A) Protein-coding alignments are simulated in the MutSel modeling framework. $dN/dS$ can then be calculated from scaled selection coefficients as well as through a ML inference framework. Comparing resulting quantities reveals the accuracy in the chosen $dN/dS$ inference framework. (B) Regression between $dN/dS$ values as calculated from scaled selection coefficients and as inferred using the M0 model \cite{GoldmanYang1994,NielsenYang1998,Yangetal2000}. Each point corresponds to a single simulated alignment, and the red line is the $x=y$ line. (C) Convergence of $\omega$ MLEs to the true $dN/dS$ value. The y-axis indicates the relative error of the maximum likelihood $dN/dS$ estimate, and the x-axis indicates the number of positions in the simulated alignment. As the number of positions, and hence the size of the data set, increases, the maximum likelihood estimates converged to the $dN/dS$ values calculated using equations \eqref{eq:KN}-\eqref{eq:dS}. The red line is the $y=0$ line, indicating no error.}
 \end{figure}
 	
 \vspace{2cm}
@@ -304,7 +304,7 @@ Q_{ij} = \left\{
 
 \begin{figure}[htbp]
 	\centerline{\includegraphics[width=8.7cm]{figures/MainText/nyp_bias_r2.pdf}}
-	\caption{\label{nyp_bias_r2} Estimator bias and precision of $\omega$ estimates for various model frequency parameterizations. (A) Estimator bias and (B) $r^2$ values between $dN/dS$ and $\omega$ MLEs across model frequency parameterizations, for each set of nucleotide mutation rates. To calculate bias, we fit a linear model, with $\omega$ as the response and $dN/dS$ as the response, with a fixed slope of 1, and the resulting intercept value is the bias quantity. Negative biases indicate $\omega$ estimates that are, on average, lower than $dN/dS$. For all frequency parameterizations, bias generally increases as mutation rates become increasingly asymmetric. Even so, MG-style models tend to yield far less biased $\omega$ estimates than do GY-style models.}	
+	\caption{\label{nyp_bias_r2} Estimator bias and precision of $\omega$ estimates for various model frequency parameterizations. (A) Estimator bias and (B) $r^2$ values between $dN/dS$ and $\omega$ MLEs across model frequency parameterizations, for each set of nucleotide mutation rates. To calculate bias, we fit a linear model, with $\omega$ as the response and $dN/dS$ as the response, with a fixed slope of 1, and the resulting intercept value is the bias quantity. Negative biases indicate $\omega$ estimates that were, on average, lower than $dN/dS$. For all frequency parameterizations, bias generally increased as mutation rates became increasingly asymmetric. Even so, MG-style models tended to yield far less biased $\omega$ estimates than do GY-style models.}	
 \end{figure}
 
 \vspace{2cm}
@@ -324,7 +324,7 @@ Q_{ij} = \left\{
 		F3x4 & -14807.2 & -17385.3 & -19384.6 \\ 
 		\noalign{\smallskip}\hline\noalign{\smallskip} 
 	\end{tabular}
-	Based on AIC scores, the F61 parameterization strongly outperforms all other model parameterizations for all mutation rates, even so the F61 framework yields neither the most accurate nor the most precise parameter estimate. Note that the order of frequency models shown in the table corresponds to the model ranking for NP, and the ranking differs somewhat for yeast and polio datasets. AIC is computed as $AIC = 2(k - \ln(L))$, where $k$ is the number of free parameters of the model, and $\ln(L)$ is the log-likelihood. As codon and/or nucleotide frequency parameters are directly estimated from the data, all models have 3 free parameters ($\omega$, $\kappa$, and a global branch length scaling parameter).
+	Based on AIC scores, the F61 parameterization strongly outperforms all other model parameterizations for all mutation rates, even so the F61 framework yields neither the most accurate nor the most precise parameter estimate. Note that the order of frequency models shown in the table corresponds to the model ranking for NP, and the ranking differs somewhat for yeast and polio datasets. AIC is computed as $AIC = 2(k - \ln(L))$, where $k$ is the number of free parameters of the model, and $\ln(L)$ is the log-likelihood \cite{Akaike1974,BurnhamAnderson2004}. As codon and/or nucleotide frequency parameters were directly estimated from the data, all models have 3 free parameters ($\omega$, $\kappa$, and a global branch length scaling parameter).
 \end{table}
 
 \vspace{2cm}
@@ -378,7 +378,7 @@ Q_{ij} = \left\{
 	\includegraphics[width=9.5in]{figures/SI/nyp_regression.pdf}
 	\vspace{0.5cm}
 	
-	Figure S1. Regressions for inferred $\omega$ estimates and $dN/dS$ values, as calculated from scaled selection coefficients, for datasets simulated using experimental fitnesses and mutation rates. Each point represents an alignment, and red lines are the $x=y$ line.
+	Figure S1. Regressions for inferred $\omega$ estimates and $dN/dS$ values, as calculated from scaled selection coefficients, for datasets simulated using experimental fitnesses and mutation rates. Each point represents an alignment, and each red line is that $x=y$ line.
 \end{landscape}
 
 
