@@ -72,18 +72,19 @@ Let $f_i$ be the fitness of codon $i$, and let the selection coefficient acting 
 u_{ij} \approx \frac{2s_{ij}}{1 - e^{-2N_es_{ij}}} = \frac{1}{N_e}\frac{2N_es_{ij}}{1 - e^{-2N_es_{ij}}}
 \end{equation} \cite{Kimura1962,HalpernBruno1998,YangNielsen2008}. We further define $S_{ij} = 2N_es_{ij}$ as the scaled selection coefficient for this change \cite{YangNielsen2008}. The probability of a substitution from codon $i$ to $j$ is therefore
 \begin{equation}\label{eq:q_ij}
-q_{ij} = N_e\mu_{ij}u_{ij} = \mu_{ij}\frac{S_{ij}}{1 - e^{-S_{ij}}} , 
-\end{equation} where $\mu_{ij}$ is the nucleotide mutation rate for mutation producing codon $j$ from codon $i$ \cite{HalpernBruno1998,SellaHirsh2005}.
+q_{ij} = N_em_{ij}u_{ij} = m_{ij}\frac{S_{ij}}{1 - e^{-S_{ij}}} , 
+\end{equation} where $m_{ij}$ is the codon mutation rate \cite{HalpernBruno1998,SellaHirsh2005}. The codon mutation rate $m_ij$ is identical to the nucleotide mutation rate $\mu_{s_it_j}$, where $s_i$ represents the source nucleotide in codon $i$, and $t_j$ represents the target nucleotide in codon $j$.
+
 We now show how $S_{ij}$ can be written in terms of mutation rates and stationary (equilibrium) codon frequencies $P_i$. Given detailed balance (reversibility), we have 
 \begin{equation}\label{eq:DB}
 q_{ij}P_i = q_{ji}P_j .
 \end{equation} From equations \eqref{eq:q_ij} and \eqref{eq:DB}, we can write the ratio of substitution probabilities as 
 \begin{equation}\label{ratio_q_ij}
-\frac{P_i}{P_j} = \frac{\mu_{ji} S_{ji} (1-e^{-S_{ij}})} {\mu_{ij} S_{ij} (1-e^{-S_{ji}})} .
+\frac{P_i}{P_j} = \frac{m_{ji} S_{ji} (1-e^{-S_{ij}})} {m_{ij} S_{ij} (1-e^{-S_{ji}})} .
 \end{equation} Using $S_{ij} = -S_{ji}$, we find that
 \begin{equation}\label{eq:s_pmu}
-S_{ij} = \ln\bigg{(} \frac{P_j\mu_{ji}}{P_i\mu_{ij}} \bigg{)} 
-\end{equation} \cite{HalpernBruno1998}. These equations establish a relationship between scaled selection coefficients and the stationary codon frequencies of the Markov chain. Moreover, in the specific case of symmetric mutation rates $\mu_{ij} = \mu_{ji}$, we have $S_{ij} = \ln\big{(}P_j/P_i\big{)}$ \cite{SellaHirsh2005}. 
+S_{ij} = \ln\bigg{(} \frac{P_jm_{ji}}{P_im_{ij}} \bigg{)} 
+\end{equation} \cite{HalpernBruno1998}. These equations establish a relationship between scaled selection coefficients and the stationary codon frequencies of the Markov chain. Moreover, in the specific case of symmetric mutation rates $m_{ij} = m_{ji}$, we have $S_{ij} = \ln\big{(}P_j/P_i\big{)}$ \cite{SellaHirsh2005}. 
 
 
 		
@@ -91,19 +92,19 @@ S_{ij} = \ln\bigg{(} \frac{P_j\mu_{ji}}{P_i\mu_{ij}} \bigg{)}
 
 Using the theory laid out in the previous section, we establish specific expressions for nonsynonymous and synonymous evolutionary rates to obtain the value for the evolutionary rate ratio $dN/dS$. We write the nonsynonymous rate $K_\text{N}$ as 
 \begin{equation}\label{eq:KN}
-	K_\text{N} = N_e \sum_i \sum_{j \in {\cal N}_i} P_i \mu_{ij} u_{ij} \,,
+	K_\text{N} = N_e \sum_i \sum_{j \in {\cal N}_i} P_i m_{ij} u_{ij} \,,
 \end{equation}
 where ${\cal N}_i$ is the set of codons that are nonsynonymous to codon $i$ and differ from it by one nucleotide. To normalize $K_\text{N}$, we divide it by the number of nonsynonymous sites, which we calculate according to the mutational opportunity definition of a site \cite{GoldmanYang1994, Yang2006} as 
 \begin{equation}\label{eq:LN}
-	L_\text{N} = \sum_i \sum_{j \in {\cal N}_i} P_i \mu_{ij}\,, 
+	L_\text{N} = \sum_i \sum_{j \in {\cal N}_i} P_i m_{ij}\,, 
 \end{equation} and thus we find that 
 \begin{equation}\label{eq:dN}
-	dN = \frac{K_\text{N}}{L_\text{N}}=\frac{N_e \sum_i \sum_{j \in {\cal N}_i} P_i \mu_{ij} u_{ij} } {\sum_i \sum_{j \in {\cal N}_i}P_i \mu_{ij}}\,.
+	dN = \frac{K_\text{N}}{L_\text{N}}=\frac{N_e \sum_i \sum_{j \in {\cal N}_i} P_i m_{ij} u_{ij} } {\sum_i \sum_{j \in {\cal N}_i}P_i m_{ij}}\,.
 \end{equation} Similarly, for $dS$, the synonymous evolutionary rate $K_\text{S}$ per synonymous site $L_\text{S}$, we find
 \begin{equation}\label{eq:dS}
-	dS = \frac{K_\text{S}}{L_\text{S}}=\frac{ N_e \sum_i \sum_{j \in {\cal S}_i} P_i \mu_{ij} u_{ij} } {\sum_i \sum_{j \in {\cal S}_i} P_i \mu_{ij} }\,,
+	dS = \frac{K_\text{S}}{L_\text{S}}=\frac{ N_e \sum_i \sum_{j \in {\cal S}_i} P_i m_{ij} u_{ij} } {\sum_i \sum_{j \in {\cal S}_i} P_i m_{ij} }\,,
 \end{equation}
-where ${\cal S}_i$ is the set of codons that are synonymous to codon $i$ and differ from it by one nucleotide substitution. The quantities $K_\text{S}$ and $L_\text{S}$ are defined as in Eqs.~\eqref{eq:KN} and \eqref{eq:LN} but sum over $j\in {\cal S}_i$ instead of $j\in {\cal N}_i$. Moreover, if we assume that nucleotide mutation rates are symmetric (i.e.\ $\mu_{ij} = \mu_{ji}$) and that all synonymous codons have equal fitness (i.e.\ synonymous mutations are neutral), we find the synonymous fixation rate $u_{ij | j \in {\cal S}_i} = 1/N_e$ \cite{CrowKimura1970}. Under this circumstance, the value for $dS$ reduces to 1.
+where ${\cal S}_i$ is the set of codons that are synonymous to codon $i$ and differ from it by one nucleotide substitution. The quantities $K_\text{S}$ and $L_\text{S}$ are defined as in Eqs.~\eqref{eq:KN} and \eqref{eq:LN} but sum over $j\in {\cal S}_i$ instead of $j\in {\cal N}_i$. Moreover, if we assume that mutation rates are symmetric and that all synonymous codons have equal fitness (i.e.\ synonymous mutations are neutral), we find the synonymous fixation rate $u_{ij | j \in {\cal S}_i} = 1/N_e$ \cite{CrowKimura1970}. Under this circumstance, the value for $dS$ reduces to 1.
 		
 				
 \subsection*{MutSel models strictly describe purifying selection.}
@@ -132,7 +133,7 @@ Using the selection coefficients and symmtric mutation rates from the previous s
 We found that $dN/dS$ values agree nearly perfectly with $\omega$ MLEs (Figure~\ref{reg_conv}B). This agreement was neither influenced by the presence of codon bias nor by biased nucleotide composition (simulated alignments featured GC contents ranging from 0.21-0.89). Additionally, Figure~\ref{reg_conv}C demonstrates that $\omega$ converged to the true $dN/dS$ value as the size of the data set, represented by simulated alignment length, increased. These results unequivocally showed that the $dN/dS$ quantity is fully contained within MutSel model parameters, and importantly that $\omega$-based model-inference methods behave exactly as expected (when nucleotide mutation is symmetric), yielding precise $dN/dS$ estimates. This finding has important implications for modeling choices; although the MutSel framework might model the sequence evolution in a way that more mechanistically matches the evolutionary process, $\omega$-based models may suffice to model selective forces in phylogenetic data.
 
 
-\subsection*{A better title.}
+\subsection*{a better header needed.}
 We next sought to test the accuracy of $\omega$-based models using more realistic parameter values. To this end, we determined codon fitness distributions from 498 unique distributions of experimentally-derived, site-specific amino acid fitnesses for H3N2 influenza nucleoprotein (NP), given by ref. \cite{Bloom2014a}. We combined each of these fitness distributions with three sets of experimentally-determined mutation rates, either for NP \cite{Bloom2014a}, yeast \cite{Zhu2014}, or polio virus \cite{Acevedo2014}, to determine $498 \times 3 = 1494$ distinct distributions of steady-state codon frequencies (see \emph{Methods} section for details). While all three mutation matrices were asymmetric, each featured a differing degree of mutational bias; in the absence of amino-acid level selection, the GC contents that the NP, yeast, and polio mutation rates would generate are 0.518, 0.336, and 0.192, respectively. For each resulting set of stationary codon frequencies, in combination with its respective set of mutation rates, we calculated $dN/dS$ and simulated alignments from which we inferred $\omega$.
 
 $\omega$-based models account for nucleotide mutational bias by incorporating either target codon \cite{GoldmanYang1994} or target nucleotide \cite{MuseGaut1994} frequencies; these frameworks are known, respectively, as GY-style and MG-style models \cite{KosakovskyPond2010}. For example, the instantaneous rate matrix element giving the substitution probability from codon AAA to AAG would contain the target codon frequency $\pi_\text{AAG}$ in GY-style models but the target nucleotide frequency $\pi_\text{G}$ in MG-style models. Previous works have shown that MG-style and GY-style models can yield different $\omega$ estimates \cite{KosakovskyPondMuse2005,Yap2010}, so we inferred $\omega$ according to a variety of frequency parameterizations. For GY-style models, we used the frequency estimators F61 \cite{GoldmanYang1994}, F3x4 \cite{GoldmanYang1994}, CF3x4 \cite{KosakovskyPond2010}, and F1x4 \cite{MuseGaut1994}. For MG-style models, we considered both a parameterization in which four global nucleotide frequency parameters were used \cite{MuseGaut1994} and a parameterization which employed twelve nucleotide frequency parameters to allow for different frequencies at each codon position \cite{KosakovskyPondMuse2005}. We term the former framework MG1, and the latter MG3. Note that our MG1 corresponds to the original MG-style model \cite{MuseGaut1994}, whereas our MG3 corresponds to the so-called MG94xHKY84 model \cite{KosakovskyPondMuse2005}. (In Appendix 2 we show how the MG-style models can be written in a GY-style framework.)
@@ -169,7 +170,7 @@ We examined the relationship between $dN/dS$ and scaled selection coefficients b
 We then computed stationary codon frequencies as 
 \begin{equation}\label{eq:boltzmann}
 P_i = \frac{e^{F_i}}{\sum e^{F_k}}, 
-\end{equation} where the sum in the denominator runs over all 61 sense codons \cite{SellaHirsh2005}. Equation \eqref{eq:boltzmann} gives the analytically precise stationary frequencies for a MutSel model, under the assumption of symmetric nucleotide mutation rates, i.e.\ where $\mu_{xy} = \mu_{yx}$ \cite{SellaHirsh2005}. We used equations \eqref{eq:KN} - \eqref{eq:dS} to compute $dN/dS$ for each resulting set of stationary codon frequencies. For these calculations, we assumed the HKY85 \cite{HKY85} mutation model, and accordingly we set the mutation rate for transitions as $\mu\kappa$, and the rate for all transversions as $\mu$. We used the value $\mu = 10^{-6}$ for all $dN/dS$ calculations, and we drew a unique value for $\kappa$ from $\mathcal{U}[1,6]$ for each set of codon frequencies.
+\end{equation} where the sum in the denominator runs over all 61 sense codons \cite{SellaHirsh2005}. Equation \eqref{eq:boltzmann} gives the analytically precise stationary frequencies for a MutSel model, under the assumption of symmetric mutation rates \cite{SellaHirsh2005}. We used equations \eqref{eq:KN} - \eqref{eq:dS} to compute $dN/dS$ for each resulting set of stationary codon frequencies. For these calculations, we assumed the HKY85 \cite{HKY85} nucleotide mutation model, and accordingly we set the mutation rate for transitions as $\mu\kappa$, and the rate for all transversions as $\mu$. We used the value $\mu = 10^{-6}$ for all $dN/dS$ calculations, and we drew a unique value for $\kappa$ from $\mathcal{U}[1,6]$ for each set of codon frequencies.
 
 
 \subsection*{Alignment simulations.}
@@ -177,10 +178,10 @@ We simulated protein-coding sequences as a continuous-time Markov process using 
 \begin{equation}\label{eq:HBmatrix}
 q_{ij} = \left\{ 
 \begin{array}{rl}
-\mu_{ij} \frac{S_{ij}}{1-1/S_{ij}} &\mbox{single nucleotide change} \\\\
+m_{ij} \frac{S_{ij}}{1-1/S_{ij}} &\mbox{single nucleotide change} \\\\
 0                                  &\mbox{multiple nucleotide changes} \\             
 \end{array} \right.,
-\end{equation} for a mutation from codon $i$ to $j$, where $\mu_{ij}$ is the nucleotide mutation rate for the change between codons $i$ and $j$, $P_i$ is the stationary frequency for codon $i$, and the scaled selection coefficient $S_{ij}$ is defined in equation \eqref{eq:s_pmu}. All alignments presented here were simulated along a 4-taxon phylogeny (Figure~\ref{tree}), beginning with a root sequence generated in proportion to  stationary codon frequencies \cite{Yang2006}. Unless otherwise stated, all simulated alignments contained 500,000 codon positions. A single evolutionary model was applied to all positions in the simulated sequences. While this lack of site-wise heterogeneity is unrealistic for real sequence evolution, it allowed us to verify our derived relationship between scaled selection coefficients and $dN/dS$ with a sufficiently sized data set.
+\end{equation} for a mutation from codon $i$ to $j$, where $m_{ij}$ is the mutation rate, $P_i$ is the stationary frequency for codon $i$, and the scaled selection coefficient $S_{ij}$ is defined in equation \eqref{eq:s_pmu}. All alignments presented here were simulated along a 4-taxon phylogeny (Figure~\ref{tree}), beginning with a root sequence generated in proportion to  stationary codon frequencies \cite{Yang2006}. Unless otherwise stated, all simulated alignments contained 500,000 codon positions. A single evolutionary model was applied to all positions in the simulated sequences. While this lack of site-wise heterogeneity is unrealistic for real sequence evolution, it allowed us to verify our derived relationship between scaled selection coefficients and $dN/dS$ with a sufficiently sized data set.
 
 	
 \subsection*{Computation of stationary frequencies for experimental data sets.}
@@ -188,8 +189,8 @@ We used experimentally-determined site-specific amino acid fitness parameters ($
 \begin{equation}
 q_{ij} =  \left\{ 
 \begin{array}{rl}
-  \frac{F_j}{F_i}\mu_{ij} &\mbox{single nucleotide change, where $F_j \geq F_i$} \\
-  \mu_{ij}                &\mbox{single nucleotide change, where $F_j < F_i$}  \\ 
+  \frac{F_j}{F_i}m_{ij} &\mbox{single nucleotide change, where $F_j \geq F_i$} \\
+  m_{ij}                &\mbox{single nucleotide change, where $F_j < F_i$}  \\ 
   0                       &\mbox{multiple nucleotide changes} \\        
 \end{array} \right.,
 \end{equation} for a substitution from codon $i$ to codon $j$, where $F_i$ is the fitness of codon $i$ \cite{Bloom2014a,Bloom2014b}. We calculated $F_i$ values by simply assigning a given amino acid's experimental fitness $F_a$ to each of its consistituent codons; thus, all synonymous changes were neutral. We determined the stationary codon frequencies for each resulting experimental model from the matrix's eigenvector corresponding to the eigenvalue 0. Finally, we simulated alignments for each set of stationary frequencies and corresponding mutation rates according to the Halpern-Bruno model (equation \eqref{eq:HBmatrix}).   
@@ -216,11 +217,11 @@ All code is freely available from \texttt{https://github.com/clauswilke/Omega\_M
 
 
 \section*{Appendix 1}
-We prove that $dN/dS \leq 1$ when calculated from scaled selection coefficients. We assume that nucleotide mutation rates are symmetric ($\mu_{xy} = \mu_{yx}$) and that synonymous codons have the same fitness (synonymous changes are neutral). As described in the main text of this paper, these assumptions yield $dS = 1$, and hence we have to show that $dN = K_\text{N}\big{/}L_\text{N} \leq 1$. To this end, we note that the summation series defining $dN$ can be rearranged such that the substitution probability from codon $i$ to $j$ is always added to the substitution probability from codon $j$ to $i$. It can be shown the sum of each of these pairs is smaller than the corresponding number of nonsynonymous sites $L_\text{N}$, and hence $dN/dS \leq 1$.
+We prove that $dN/dS \leq 1$ when calculated from scaled selection coefficients. We assume that mutation rates are symmetric ($m_{ij} = m_{ji}$) and that synonymous codons have the same fitness (synonymous changes are neutral). As described in the main text of this paper, these assumptions yield $dS = 1$, and hence we have to show that $dN = K_\text{N}\big{/}L_\text{N} \leq 1$. To this end, we note that the summation series defining $dN$ can be rearranged such that the substitution probability from codon $i$ to $j$ is always added to the substitution probability from codon $j$ to $i$. It can be shown the sum of each of these pairs is smaller than the corresponding number of nonsynonymous sites $L_\text{N}$, and hence $dN/dS \leq 1$.
 
 For this proof, we consider the pair of nonsynonymous codons $i$ and $j$, whose respective stationary frequencies $P_i$ and $P_j$ satisfy $P_i \leq P_j$ and $P_j > 0$. As follows from equations \eqref{eq:q_ij} and \eqref{eq:s_pmu}, the sum of the probability weights of evolving from codon $i$ to $j$ and from codon $j$ to $i$ is
 \begin{equation}
-N_e\mu_{ij} u_{ij} + N_e\mu_{ji} u_{ji}  = \frac{2P_iP_j[\log(P_i) - \log(P_j)]}{P_i - P_j} \,.
+N_em_{ij} u_{ij} + N_em_{ji} u_{ji}  = \frac{2P_iP_j[\log(P_i) - \log(P_j)]}{P_i - P_j} \,.
 \end{equation}
 This quantity represents the $K_\text{N}$ (numerator) calculation for $dN$. To prove $dN \leq 1$, we must show that this quantity is less than or equal to $P_i + P_j$, which represents $L_\text{N}$ (the denominator) in the $dN$ calculation. To this end, we introduce the function 
 \begin{equation}\label{eq:Fxy}
@@ -251,21 +252,17 @@ MG-style matrix elements, for a the substitution from codon $i$ to $j$, are gene
 \begin{equation}\label{eq:MGstyle}
 Q_{ij} = \left\{ 
 \begin{array}{rl}
-\mu_{xy}\pi_{y}        &\mbox{synonymous change} \\
-\omega\mu_{xy}\pi_{y}    &\mbox{nonsynonymous change} \\
-0                           &\mbox{multiple nucleotide changes}       
+\theta_{s_it_j}\pi_{t_j}          &\mbox{synonymous change} \\
+\omega \theta_{s_it_j}\pi_{t_j}   &\mbox{nonsynonymous change} \\
+0                             &\mbox{multiple nucleotide changes}       
 \end{array} \right. ,
-\end{equation} where $\mu_{xy}$ is the nucleotide mutation rate corresponding to the single nucleotide change from $x$ to $y$ which occurred to change codon $i$ to $j$, $\pi_{y}$ is the frequency of the target nucleotide $y$ in this substitution, and $\omega$ is the ratio of nonsynonymous to synonymous substitution rates.
-
-To begin, we note that mutation is a nucleotide-level, and not a codon-level process. Mutation can be represented by a $4 \times 4$ symmetric matrix $M = \mu_{xy}\pi_y$. Thus, if the target is nucleotide $y$, the codon substitution rate matrix $Q$ must incorporate the factor $\mu_{xy}\pi_y$ to properly reflect the underlying mechanism of mutation. As usual, codon substitution can additionally be described by a symmetric $61\times61$ matrix. We further note that the MG-style matrix yields the stationary codon frequency $\pi_i = \pi_{i_1}\pi_{i_2}\pi_{i_3}C$ for a given codon $i$, where $C = 1 - \Pi_\text{stop}$ and $\Pi_\text{stop} = \pi_\text{T}\pi_\text{A}\pi_\text{G} + \pi_\text{T}\pi_\text{G}\pi_\text{A} + \pi_\text{T}\pi_\text{A}\pi_\text{A}$ \cite{MuseGaut1994}. 
-
-Therefore, to write the MG-style matrix in the GTR framework, we simply rewrite the term $\mu_{xy}\pi_y$ as $\mu_{xy} / (\pi_m\pi_n) \times C$, where $\pi_m$ and $\pi_n$ are the nucleotides which do not change in a given instantaneous codon substitution. This allows us to rewrite the rate instantaneous matrix as 
+\end{equation} where $\omega$ is the ratio of nonsynonymous to synonymous substitution rates, and the product $\theta_{s_it_j}\pi_{t_j}$ corresponds to a nucleotide-level mutation rate $\mu_{s_it_j}$, where $s_i$ is the source nucleotide in codon $i$, and $t_j$ is the target nucleotide in codon $j$. We therefore desire a framework by which we can write this matrix \eqref{eq:MGstyle} in terms of codon substitution rates and target \emph{codon} frequencies. To this end, we note that the MG-style matrix yields the stationary codon frequency $\pi_i = \pi_{i_1}\pi_{i_2}\pi_{i_3}C$ for a given codon $i$, where $C = 1 - \Pi_\text{stop}$ and $\Pi_\text{stop} = \pi_\text{T}\pi_\text{A}\pi_\text{G} + \pi_\text{T}\pi_\text{G}\pi_\text{A} + \pi_\text{T}\pi_\text{A}\pi_\text{A}$ \cite{MuseGaut1994}. Therefore, we can simply rewrite the term $\theta_{s_it_j}\pi_{t_j}$ as $[\theta_{s_it_j} / (\pi_m\pi_n)] \times C$, where $\pi_m$ and $\pi_n$ are the nucleotides which do not change in a given instantaneous codon substitution. This allows us to rewrite the rate instantaneous matrix as 
 \begin{equation}
 Q_{ij} = \left\{ 
 \begin{array}{rl}
-\frac{\mu_{xy}C}{\pi_m\pi_n}\pi_j               &\mbox{synonymous change} \\\\
-\frac{\mu_{xy}C}{\pi_m\pi_n}\omega\pi_j         &\mbox{nonsynonymous change} \\\\
-0                                                     &\mbox{multiple nucleotide changes} \\           
+\frac{\theta_{s_it_j}}{\pi_m\pi_n}C\pi_j           &\mbox{synonymous change} \\\\
+\frac{\theta_{s_it_j}}{\pi_m\pi_n}C\omega\pi_j     &\mbox{nonsynonymous change} \\\\
+0                                              &\mbox{multiple nucleotide changes} \\           
 \end{array} \right.
 \end{equation} for a substitution from codon $i$ to codon $j$, and this matrix clearly conforms to the GTR framework.
 		
