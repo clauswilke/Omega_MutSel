@@ -22,7 +22,7 @@ mtext(expression(omega), side = 2, at = 1, cex=2.5, line=2.75)
 lines(c(0,1.95), c(0,1.95) ,col='red', lwd=2.25)
 mtext('B', side = 3, at = -0.55, cex = 3)
 
-conv2 <- conv[conv$seqlen <=5e5,]
+conv2 <- conv[conv$seqlen <=5e5,] # for plot aesthetic 
 plot(conv2$seqlen, conv2$w_err, pch=20, cex=1.2, cex.lab=1.7, xlab = 'Alignment Length', ylab = 'Relative Error', log='x', ylim=c(-1, 1), xaxt='n', yaxt='n', frame.plot=F)
 axis(side = 1, at = c(5e2, 5e3, 5e4, 5e5), cex.axis = 1.4, lwd=2.5)
 axis(side = 2, at = c(-1, -0.5, 0, 0.5, 1), cex.axis = 1.54, lwd=2.5)
@@ -46,13 +46,13 @@ plot(nobias$sd, nobias$dnds, xlim=c(0,4), ylim=c(0,2), cex=1.3, cex.lab=1.35, ce
 mtext(expression(dN/dS), side = 2, at = 1, cex=1.7, las=0, line=2.5)
 abline(h=1, col='gray25', lwd=2.5)
 mtext('A', side = 3, at = -1, cex = 2.2)
-text(2, 1.98, 'No Codon Bias', cex=1.5)
+text(2, 1.97, 'No Synonymous Selection', cex=1.3)
 
 plot(bias$sd, bias$dnds, xlim=c(0,4), ylim=c(0,2), cex=1.3, cex.lab = 1.35, cex.axis = 1.5, pch=20, ylab='', xlab = expression(paste("Variance of selection strength (",sigma^2,")")), frame.plot = F)
 mtext(expression(dN/dS), side = 2, at = 1, cex=1.7, las=0, line=2.5)
 abline(h=1, col='gray25', lwd=2.5)
 mtext('B', side = 3, at = -1, cex = 2.2)
-text(2, 2, 'Codon Bias', cex=1.5)
+text(2, 1.97, 'Synonymous Selection', cex=1.3)
 
 dev.off()
 
@@ -117,7 +117,7 @@ text(5.72, 0.12, 'Polio', cex=1)
 plot(1:length(fspecs), polio_r2, xaxt='n', yaxt='n', col='blue', ylab='', pch=20, cex=point_size, ylim=c(0,1), xlab='', cex.axis=axis_size, frame.plot=F) #ylab = expression(r^2),
 axis(side=1, at=1:length(fspecs), labels = names, las=1, cex.axis=xlab_size, lwd=axis_lwd)
 axis(side=2, at=c(0, 0.2, 0.4, 0.6, 0.8, 1.0), cex.axis=axis_size, lwd=axis_lwd)
-mtext(expression(r^2), side = 2, at = 0.5, cex=ylab_size+0.25, las=0, line=2.1)
+mtext(expression(paste("Precision (",r^2, ")",sep='')), side = 2, at = 0.5, cex=ylab_size, las=0, line=2.1)
 points(2:length(fspecs), np_r2[2:length(fspecs)], pch=20, cex=point_size)
 points(2:length(fspecs), yeast_r2[2:length(fspecs)], col='red', pch=20, cex=point_size)
 points(0.95, np_r2[1], pch=20, cex=point_size)
