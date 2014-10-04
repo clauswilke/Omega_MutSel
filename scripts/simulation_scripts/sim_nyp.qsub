@@ -12,8 +12,8 @@ source ~/.bash_profile
 
 # Set up directories
 DATASET=$JOB_NAME   # np, yeast, polio
-SIMDIR=/home/sjs3495/MutSel/src
-SCRIPTDIR=/home/sjs3495/Omega_MutSel/scripts/simulation_scripts
+SIMDIR=$HOME/pyvolve/src
+SCRIPTDIR=$HOME/Omega_MutSel/scripts/simulation_scripts
 WDIR=/share/WilkeLab/work/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
 RDIR=/share/WilkeLab/work/sjs3495/Omega_MutSel_rawdata/${DATASET}
 
@@ -26,9 +26,9 @@ fi
 cd $WDIR
 
 # Copy scripts, data files
-cp /home/sjs3495/Omega_MutSel/scripts/simulation_scripts/run_sim_nyp.py .
-cp /home/sjs3495/Omega_MutSel/scripts/simulation_scripts/functions_simandinf.py .
-cp /home/sjs3495/Omega_MutSel/scripts/experimental_data/${DATASET}_codon_eqfreqs.txt .
+cp $HOME/Omega_MutSel/scripts/simulation_scripts/run_sim_nyp.py .
+cp $HOME/Omega_MutSel/scripts/simulation_scripts/functions_simandinf.py .
+cp $HOME/Omega_MutSel/scripts/experimental_data/${DATASET}_codon_eqfreqs.txt .
 
 # Run
 module load python

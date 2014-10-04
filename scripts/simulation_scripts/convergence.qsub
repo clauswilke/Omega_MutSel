@@ -14,10 +14,10 @@ source ~/.bash_profile
 
 
 # Set up directories
-SIMDIR=/home/sjs3495/MutSel/src
-SCRIPTDIR=/home/sjs3495/Omega_MutSel/scripts/simulation_scripts
+SIMDIR=$HOME/pyvolve/src
+SCRIPTDIR=$HOME/Omega_MutSel/scripts/simulation_scripts
 WDIR=/share/WilkeLab/work/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
-RDIR=/home/sjs3495/$JOB_NAME
+RDIR=$HOME/$JOB_NAME
 
 mkdir -p $WDIR
 if [ ! -d $WDIR ]
@@ -28,13 +28,13 @@ fi
 cd $WDIR
 
 # Copy scripts
-cp /home/sjs3495/Omega_MutSel/scripts/simulation_scripts/run_convergence.py .
-cp /home/sjs3495/Omega_MutSel/scripts/simulation_scripts/functions_simandinf.py .
+cp $HOME/Omega_MutSel/scripts/simulation_scripts/run_convergence.py .
+cp $HOME/Omega_MutSel/scripts/simulation_scripts/functions_simandinf.py .
 
 # Copy Hyphy executable, files
-cp /home/sjs3495/bin/bin/HYPHYMP .
-cp /home/sjs3495/Omega_MutSel/hyphy_files/GY94.mdl .
-cp /home/sjs3495/Omega_MutSel/hyphy_files/globalDNDS_fequal.bf .
+cp $HOME/bin/bin/HYPHYMP .
+cp $HOME/Omega_MutSel/hyphy_files/GY94.mdl .
+cp $HOME/Omega_MutSel/hyphy_files/globalDNDS_fequal.bf .
 
 # Run
 module load python

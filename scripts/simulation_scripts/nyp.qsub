@@ -16,7 +16,7 @@ FNUCFILE=Fnuc_${DATASET}.mdl
 source ~/.bash_profile
 
 # Set up directories
-SCRIPTDIR=/home/sjs3495/Omega_MutSel/scripts/simulation_scripts
+SCRIPTDIR=$HOME/Omega_MutSel/scripts/simulation_scripts
 WDIR=/share/WilkeLab/work/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
 RDIR=/share/WilkeLab/work/sjs3495/Omega_MutSel_rawdata/${DATASET}
 
@@ -31,16 +31,16 @@ cd $WDIR
 
 # Copy scripts, data files
 cp $RDIR/seqs${SGE_TASK_ID}.fasta .
-cp /home/sjs3495/Omega_MutSel/scripts/simulation_scripts/run_nyp.py .
-cp /home/sjs3495/Omega_MutSel/scripts/simulation_scripts/functions_simandinf.py .
-cp /home/sjs3495/Omega_MutSel/scripts/experimental_data/${DATASET}_codon_eqfreqs.txt .
+cp $HOME/Omega_MutSel/scripts/simulation_scripts/run_nyp.py .
+cp $HOME/Omega_MutSel/scripts/simulation_scripts/functions_simandinf.py .
+cp $HOME/Omega_MutSel/scripts/experimental_data/${DATASET}_codon_eqfreqs.txt .
 
 # Copy hyphy executable, files
-cp /home/sjs3495/bin/bin/HYPHYMP .
-cp /home/sjs3495/Omega_MutSel/hyphy_files/CF3x4.bf .
-cp /home/sjs3495/Omega_MutSel/hyphy_files/GY94.mdl .
-cp /home/sjs3495/Omega_MutSel/hyphy_files/$BATCHFILE batchfile.bf
-cp /home/sjs3495/Omega_MutSel/hyphy_files/$FNUCFILE fnuc.mdl
+cp $HOME/bin/bin/HYPHYMP .
+cp $HOME/Omega_MutSel/hyphy_files/CF3x4.bf .
+cp $HOME/Omega_MutSel/hyphy_files/GY94.mdl .
+cp $HOME/Omega_MutSel/hyphy_files/$BATCHFILE batchfile.bf
+cp $HOME/Omega_MutSel/hyphy_files/$FNUCFILE fnuc.mdl
 
 # Run
 module load python
