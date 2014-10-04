@@ -59,7 +59,7 @@ def simulate(f, seqfile, tree, mu_dict, length, simulator_path):
     model = misc.Model()
     params = {'state_freqs':f, 'mu': mu_dict}
     model.params = params
-    mat = matrix_builder.mutSel_Matrix(model)
+    mat = MatrixBuilder.mutSel_Matrix(model)
     model.Q = mat.buildQ()
     
     # Confirm, before simulating, that detailed balance is satisfied 
