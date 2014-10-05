@@ -20,7 +20,8 @@ All code written by SJS (contact at stephanie.spielman@gmail.com).
  * [polio.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/datasets/polio.txt)
    * simulations which use experimental NP amino acid fitness data ([Bloom 2014](http://mbe.oxfordjournals.org/content/31/8/1956)) in combination with polio virus mutation rates ([Acevedo 2014](http://www.nature.com/nature/journal/v505/n7485/full/nature12861.html)) ([Figure 3](https://github.com/clauswilke/Omega_MutSel/blob/master/Manuscript/figures/MainText/nyp_bias_r2.pdf), [Tables 1, S1, and S2](https://github.com/clauswilke/Omega_MutSel/blob/master/Manuscript/figures/latex_tables.txt), and [Figure S1](https://github.com/clauswilke/Omega_MutSel/blob/master/Manuscript/figures/SI/nyp_regression.pdf))
 
-* scripts/ Contains scripts used in analysis. [NOTE: all simulated alignments were created using a custom sequence simulation library, [pyvolve](https://github.com/sjspielman/pyvolve). See within for details.]
+* scripts/ 
+Contains scripts used in analysis. [NOTE: all simulated alignments were created using a custom sequence simulation library, [pyvolve](https://github.com/sjspielman/pyvolve). See within for details.]
 
  * experimental_data/
    * [nucleoprotein_amino_preferences.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/scripts/experimental_data/nucleoprotein_amino_preferences.txt)
