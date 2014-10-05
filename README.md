@@ -5,9 +5,11 @@ Repository for "The relationship between dN/dS and scaled selection coefficients
 All code written by SJS (contact at stephanie.spielman@gmail.com).
 
 ## Description of Contents ##
+- - - -
+
+
 
 __datasets/__
-- - - -
 Contains tab-delimited summary files for simulated datasets.  All simulated alignments available from TBD (for now, email stephanie.spielman@gmail.com).
  * [no_synsel.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/datasets/no_synsel.txt)
    * simulations with symmetric mutation rates and in which synonymous codons all have same fitness ([Figure 1A](https://github.com/clauswilke/Omega_MutSel/blob/master/Manuscript/figures/MainText/dnds_variance.pdf), [Figure 2B](https://github.com/clauswilke/Omega_MutSel/blob/master/Manuscript/figures/MainText/regression_convergence.pdf))
@@ -25,8 +27,10 @@ Contains tab-delimited summary files for simulated datasets.  All simulated alig
 
 
 
+
+
+
 __scripts/__
-- - - -
 Contains scripts used in analysis. [NOTE: all simulated alignments were created using a custom sequence simulation library, [pyvolve](https://github.com/sjspielman/pyvolve). See within for details.]
 
  * experimental_data/
@@ -60,8 +64,9 @@ Contains scripts used in analysis. [NOTE: all simulated alignments were created 
 
 
 
-__hyphy_files/__
-- - - -       
+
+
+__hyphy_files/__ 
 Contains files used in HYPHY inference.
    * [globalDNDS_fequal.bf](https://github.com/clauswilke/Omega_MutSel/blob/master/hyphy_files/globalDNDS_fequal.bf) 
      * hyphy batchfile to infer omega according to GY94 M0 model with Fequal (1/61 for all codons) frequency parameterization. Used to determined omega for no[synsel.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/datasets/conv.txt), [synsel.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/datasets/conv.txt), [conv.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/datasets/conv.txt) .
