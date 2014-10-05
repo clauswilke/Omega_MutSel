@@ -6,7 +6,9 @@ All code written by SJS (contact at stephanie.spielman@gmail.com).
 
 ## Description of Contents ##
 
-* datasets/  Contains tab-delimited summary files for simulated datasets.  All simulated alignments available from ...
+datasets/
+- - - -
+Contains tab-delimited summary files for simulated datasets.  All simulated alignments available from ...
  * [no_synsel.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/datasets/no_synsel.txt)
    * simulations with symmetric mutation rates and in which synonymous codons all have same fitness ([Figure 1A](https://github.com/clauswilke/Omega_MutSel/blob/master/Manuscript/figures/MainText/dnds_variance.pdf), [Figure 2B](https://github.com/clauswilke/Omega_MutSel/blob/master/Manuscript/figures/MainText/regression_convergence.pdf))
  * [synsel.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/datasets/synsel.txt)
@@ -24,8 +26,7 @@ scripts/
 - - - -
 Contains scripts used in analysis. [NOTE: all simulated alignments were created using a custom sequence simulation library, [pyvolve](https://github.com/sjspielman/pyvolve). See within for details.]
 
- experimental_data/
- - - - -
+ * experimental_data/
    * [nucleoprotein_amino_preferences.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/scripts/experimental_data/nucleoprotein_amino_preferences.txt)
      * This file corresponds exactly to supplementary_file_1.xls from of [Bloom 2014](http://mbe.oxfordjournals.org/content/31/8/1956). Gives amino acid preference/fitness data for each of the 498 positions in NP. Each row is a position, and each column is the amino acid preference (alphabetical)
     * [np_codon_eqfreqs.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/scripts/experimental_data/np_codon_eqfreqs.txt)
@@ -53,7 +54,9 @@ Contains scripts used in analysis. [NOTE: all simulated alignments were created 
     * [functions_omega_mutsel.py](https://github.com/clauswilke/Omega_MutSel/blob/master/scripts/simulation_scripts/functions_omega_mutsel.py)
       * Contains functions used by scripts in this directory.
 
- * hyphy_files/        Contains files used in HYPHY inference.
+hyphy_files/ 
+- - - -       
+Contains files used in HYPHY inference.
    * [globalDNDS_fequal.bf](https://github.com/clauswilke/Omega_MutSel/blob/master/hyphy_files/globalDNDS_fequal.bf) 
      * hyphy batchfile to infer omega according to GY94 M0 model with Fequal (1/61 for all codons) frequency parameterization. Used to determined omega for no[synsel.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/datasets/conv.txt), [synsel.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/datasets/conv.txt), [conv.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/datasets/conv.txt) .
     * [globalDNDS_np.bf](https://github.com/clauswilke/Omega_MutSel/blob/master/hyphy_files/globalDNDS_np.bf)
