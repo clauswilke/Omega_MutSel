@@ -304,7 +304,7 @@ Q_{ij} = \left\{
 		
 \begin{figure}[htbp]
 	\centerline{\includegraphics[width=8.7cm]{figures/MainText/regression_convergence.pdf}}
-	\caption{\label{reg_conv} Combined modeling approach to assess performance of $dN/dS$ inference frameworks. (A) Protein-coding alignments are simulated in the MutSel modeling framework. $dN/dS$ can then be calculated from scaled selection coefficients as well as through a ML inference framework. Comparing resulting quantities reveals the accuracy of the chosen $dN/dS$ inference framework. (B) Regression between $dN/dS$ values as calculated from scaled selection coefficients and as inferred using the M0 model \cite{GoldmanYang1994,NielsenYang1998,Yangetal2000}. Each point corresponds to a single simulated alignment, and the red line is the $x=y$ line. (C) Convergence of $\omega$ MLEs to the true $dN/dS$ value. The y-axis indicates the relative error of the maximum likelihood $dN/dS$ estimate, and the x-axis indicates the number of positions in the simulated alignment. As the number of positions and hence the size of the data set increases, the maximum likelihood estimates converges to the $dN/dS$ values calculated using equations \eqref{eq:KN}-\eqref{eq:dS}. The red line is the $y=0$ line, indicating no error.}
+	\caption{\label{reg_conv} Combined modeling approach to assess performance of $dN/dS$ inference frameworks. (A) Protein-coding alignments are simulated in the MutSel modeling framework. $dN/dS$ can then be calculated (``predict") from scaled selection coefficients as well as through a ML inference framework (``infer"). Comparing resulting quantities reveals the accuracy of the chosen $dN/dS$ inference framework. (B) Regression between predicted $dN/dS$ values and inferred $\omega$ MLEs. Each point corresponds to a single simulated alignment, and the red line is the $x=y$ line. (C) Convergence of $\omega$ MLEs to the true $dN/dS$ value. The y-axis indicates the relative error of the $\omega$ MLE, and the x-axis indicates the number of positions in the simulated alignment. As the number of positions and hence the size of the data set increases, the $\omega$ converges to the $dN/dS$ values calculated using equations \eqref{eq:KN}-\eqref{eq:dS}. The red line is the $y=0$ line, indicating no error.}
 \end{figure}
 	
 \vspace{2cm}
@@ -312,14 +312,14 @@ Q_{ij} = \left\{
 
 \begin{figure}[htbp]
 	\centerline{\includegraphics[width=8.7cm]{figures/MainText/nyp_bias_r2.pdf}}
-	\caption{\label{nyp_bias_r2} Estimator bias and precision of $\omega$ estimates for various model frequency parameterizations. (A) Estimator bias and (B) $r^2$ values between $dN/dS$ and $\omega$ MLEs across model frequency parameterizations, for each set of nucleotide mutation rates. To calculate bias, we fit a linear model, with $\omega$ as the response and $dN/dS$ as the predictor, with a fixed slope of 1, and the resulting intercept value represents the bias. Negative biases indicate $\omega$ estimates that are, on average, lower than $dN/dS$. For all frequency parameterizations, bias generally increases as mutation rates became increasingly asymmetric. Even so, MG-style models tend to yield far less biased $\omega$ estimates than do GY-style models.}	
+	\caption{\label{nyp_bias_r2} Estimator bias and precision of $\omega$ estimates for various model frequency parameterizations. (A) Estimator bias and (B) Precision ($r^2$) values between $dN/dS$ and $\omega$ MLEs across model frequency parameterizations, for each set of nucleotide mutation rates. To calculate bias, we fit a linear model with $\omega$ as the response and $dN/dS$ as the predictor, with a fixed slope of 1, and the resulting intercept value represents the bias. Negative biases indicate $\omega$ estimates that are, on average, lower than $dN/dS$. Note that all standard errors for bias are smaller than the symbol size.}	
 \end{figure}
 
 \vspace{2cm}
 
 
 \begin{table}[htbp]
-	\caption {\label{tab:dAIC} Mean $\Delta$AIC for datasets simulated with NP, Yeast, or Polio mutation rates.}
+	\caption {\label{tab:dAIC} Mean $\Delta$AIC for datasets simulated with NP, yeast, or polio virus mutation rates.}
 	\begin{tabular}{l c c c}
 		\hline\noalign{\smallskip}
 		\multicolumn{1}{c}{Frequencies} & NP & Yeast & Polio \\
@@ -351,7 +351,7 @@ Q_{ij} = \left\{
 
 \vspace{2cm}
 
-\noindent Table S1. Estimator bias of $\omega$ MLEs and the true $dN/dS$ values, for all nucleotide mutation rates and model frequency parameterizations examined. Negative bias values indicate that $\omega$ MLEs are, on average, lower than $dN/dS$. All biases are statistically significant (different from 0), with all $P < 2\times10^{-16}$ except for the estimator bias associated with yeast mutation rates for MG3, where $P = 5.4\times10^{-5}$.
+\noindent Table S1. Estimator bias of $\omega$ MLEs and the true $dN/dS$ values, for all nucleotide mutation rates and model frequency parameterizations examined. All biases are statistically significant (different from 0), with all $P < 2\times10^{-16}$ except for the estimator bias associated with yeast mutation rates for MG3, where $P = 5.4\times10^{-5}$.
 \begin{table}[htbp]
 	\begin{tabular}{c c c c c c c}
 		\hline\noalign{\smallskip}
@@ -386,7 +386,7 @@ Q_{ij} = \left\{
 	\includegraphics[width=9.5in]{figures/SI/nyp_regression.pdf}
 	\vspace{0.5cm}
 	
-	Figure S1. Regressions for inferred $\omega$ estimates and $dN/dS$ values, as calculated from scaled selection coefficients, for datasets simulated using experimental fitnesses and mutation rates. Each point represents an alignment, and each red line is that $x=y$ line.
+	Figure S1. Regressions of $\omega$ MLEs on the true $dN/dS$ values, as calculated from scaled selection coefficients, for datasets simulated using experimental fitnesses and mutation rates. Each point represents an alignment, and each red line is the $x=y$ line.
 \end{landscape}
 
 
