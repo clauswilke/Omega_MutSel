@@ -32,7 +32,7 @@ cd $WDIR
 # Copy scripts, data files
 cp $RDIR/seqs${SGE_TASK_ID}.fasta .
 cp $HOME/Omega_MutSel/scripts/simulation_scripts/run_nyp.py .
-cp $HOME/Omega_MutSel/scripts/simulation_scripts/functions_simandinf.py .
+cp $HOME/Omega_MutSel/scripts/simulation_scripts/functions_omega_mutsel.py .
 cp $HOME/Omega_MutSel/scripts/experimental_data/${DATASET}_codon_eqfreqs.txt .
 
 # Copy hyphy executable, files

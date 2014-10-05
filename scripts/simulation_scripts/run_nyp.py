@@ -33,7 +33,7 @@ dnds = derive_dnds(codon_freqs_dict, mu_dict)
 # Maximum likelihood omega inference across a variety of frequency specifications.
 print "Conducting ML inference with HyPhy"
 
-fspecs = ['f61',  'f1x4',  'f3x4',  'cf3x4',  'fnuc1',  'fnuc3']
+fspecs = ['f61',  'f1x4',  'f3x4',  'cf3x4',  'mg1',  'mg3']
 k = 3. # all models have 3 free parameters (w,k,t). note that t is ok to be global, because simulation trees all have same branch lengths, so in fact t should be a global (not local/branch-specific) parameter.
 lnliks, omegas, kappas = run_hyphy_nyp(batchfile, seqfile, treefile, cpu, fspecs)  
 AICs = 2*(k - lnliks)

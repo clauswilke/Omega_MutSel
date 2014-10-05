@@ -30,7 +30,7 @@ cd $WDIR
 
 # Copy scripts
 cp $HOME/Omega_MutSel/scripts/simulation_scripts/run_siminf.py .
-cp $HOME/Omega_MutSel/scripts/simulation_scripts/functions_simandinf.py .
+cp $HOME/Omega_MutSel/scripts/simulation_scripts/functions_omega_mutsel.py .
 
 # Copy Hyphy executable, files
 cp $HOME/bin/bin/HYPHYMP .
