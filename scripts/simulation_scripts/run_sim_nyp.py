@@ -9,7 +9,7 @@ if (len(sys.argv) != 4):
 rep = sys.argv[1]         # which rep we're on, for saving files. needs to run from 1-498, since 498 sites.
 simdir = sys.argv[2]      # directory of simulation library
 dataset = sys.argv[3]     # either np, yeast, or polio. determines the mutation scheme and eq freqs
-from functions_simandinf import *
+from functions_omega_mutsel import *
 
 seqfile   = "seqs"+str(rep)+".fasta"
 write_treefile(treefile)

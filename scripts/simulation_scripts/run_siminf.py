@@ -1,6 +1,6 @@
 # SJS. stephanie.spielman@gmail.com
 # Generic code for simulating and deriving dN/dS via selection coeffcients and hyphy ML.
-# Be sure to cp src/ directory (simulator), hyphy files, and the functions_simandinf.py script into working directory
+# Be sure to cp src/ directory (simulator), hyphy files, and the functions_omega_mutsel.py script into working directory
 # NOTE: very little (ok, none) sanity checking for input args..
 
 ######## Input parameters ########
@@ -13,7 +13,7 @@ simdir = sys.argv[2]      # directory of simulation library
 cpu = sys.argv[3]         # hyphy can use
 bias = float(sys.argv[4]) # codon bias, yes or no?
 sys.path.append(simdir)
-from functions_simandinf import *
+from functions_omega_mutsel import *
 
 
 # Set up output files and parameters

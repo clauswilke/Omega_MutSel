@@ -10,7 +10,7 @@ rep = sys.argv[1]         # which rep we're on, for saving files. needs to run f
 cpu = sys.argv[2]         # hyphy can use
 dataset = sys.argv[3]     # either np, yeast, or polio. determines the mutation scheme and eq freqs
 
-from functions_simandinf import *
+from functions_omega_mutsel import *
 
 batchfile = 'batchfile.bf'
 seqfile   = "seqs"+str(rep)+".fasta"

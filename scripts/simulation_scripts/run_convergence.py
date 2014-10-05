@@ -10,7 +10,7 @@ rep = sys.argv[1]
 simdir = sys.argv[2]
 cpu = sys.argv[3]
 sys.path.append(simdir)
-from functions_simandinf import *
+from functions_omega_mutsel import *
 
 # Set up output files and parameters
 seqfile   = "seqs"+str(rep)+".fasta"
