@@ -20,10 +20,12 @@ All code written by SJS (contact at stephanie.spielman@gmail.com).
  * [polio.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/datasets/polio.txt)
    * simulations which use experimental NP amino acid fitness data ([Bloom 2014](http://mbe.oxfordjournals.org/content/31/8/1956)) in combination with polio virus mutation rates ([Acevedo 2014](http://www.nature.com/nature/journal/v505/n7485/full/nature12861.html)) ([Figure 3](https://github.com/clauswilke/Omega_MutSel/blob/master/Manuscript/figures/MainText/nyp_bias_r2.pdf), [Tables 1, S1, and S2](https://github.com/clauswilke/Omega_MutSel/blob/master/Manuscript/figures/latex_tables.txt), and [Figure S1](https://github.com/clauswilke/Omega_MutSel/blob/master/Manuscript/figures/SI/nyp_regression.pdf))
 
-* scripts/ 
+scripts/
+- - - -
 Contains scripts used in analysis. [NOTE: all simulated alignments were created using a custom sequence simulation library, [pyvolve](https://github.com/sjspielman/pyvolve). See within for details.]
 
- * experimental_data/
+ experimental_data/
+ - - - -
    * [nucleoprotein_amino_preferences.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/scripts/experimental_data/nucleoprotein_amino_preferences.txt)
      * This file corresponds exactly to supplementary_file_1.xls from of [Bloom 2014](http://mbe.oxfordjournals.org/content/31/8/1956). Gives amino acid preference/fitness data for each of the 498 positions in NP. Each row is a position, and each column is the amino acid preference (alphabetical)
     * [np_codon_eqfreqs.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/scripts/experimental_data/np_codon_eqfreqs.txt)
