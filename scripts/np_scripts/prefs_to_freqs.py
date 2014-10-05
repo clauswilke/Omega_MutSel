@@ -15,6 +15,7 @@ First, we determine the equilibrium frequencies of the system on a per site basi
 Second, we find the F61, F1x4, F3x4 frequencies. These use the average dataset frequencies, analogous to taking global alignment frequencies.
 Third, we set up the hyphy batch file which makes use of these frequencies. 
 Fourth, we generate the MG1 and MG3 matrix files.
+Fifth, we find the mean mu_xy/mu_yx ("asymmetry factor") for the given set of mutation rates, and print to screen.
 
 '''
 
@@ -265,7 +266,25 @@ def create_batchfile(basefile, outfile, pos_freqs, f61, f1x4, f3x4):
         assert(setupf == 0), "couldn't properly add in frequencies"
 
            
-    
+def compute_asym(mudict):
+    ''' Compute average mu_xy / mu_yx '''
+    x = 0  
+    completed = []
+    ratios = np.zeros(6) 
+    for source in nucindex.keys():
+        for target in nucindex.keys():
+            if source == target or source+target in completed or target+source in completed:
+                continue
+            else:
+                ratio = mudict[source + target] / mudict[target + source] 
+                if ratio >= 1.:
+                    completed.append(source + target)
+                    ratios[x] = ratio
+                else:
+                    completed.append(target + source)
+                    ratios[x] = 1./ratio
+                x+=1  
+    return np.mean(ratios)  
 
 def main():
 
@@ -294,7 +313,6 @@ def main():
         print "Loading equilibrium frequency data"
         final_codon_freqs = np.loadtxt(codon_freqs_outfile)
 
-
     # Calculate frequency parameterizations
     print "Calculating frequency parameterizations F61, F1x4, F3x4."
     f61_freqs = np.mean(final_codon_freqs, axis=0)
@@ -316,6 +334,10 @@ def main():
     # Use nucleotide and positional nucleotide frequencies to construct MG-style matrices
     print "Building and saving the MG-style matrices"
     build_mg_matrices(nuc_freqs, pos_nuc_freqs, mg_outfile)
+
+
+    # Finally, determine the asymmetry for each set of mutation rates. Simply print this to screen.
+    print "The asymmetry factor is", compute_asym(mudict)
 
     
 main() 
