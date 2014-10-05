@@ -38,7 +38,7 @@ All code written by SJS (contact at stephanie.spielman@gmail.com).
     * [globalDNDS_raw_exp.bf](https://github.com/clauswilke/Omega_MutSel/blob/master/hyphy_files/globalDNDS_raw_exp.bf)
       * Template batchfile used by [prefs_to_freqs.py](https://github.com/clauswilke/Omega_MutSel/blob/master/scripts/np_scripts/prefs_to_freqs.py) to create [globalDNDS_{np/yeast/polio}.bf](https://github.com/clauswilke/Omega_MutSel/tree/master/hyphy_files) files.
 
- * simulation_scripts/   Scripts in this directory were created to run specifically on The University of Texas at Austin's Center for Computational Biology and Bioinformatics cluster, [Phylocluster](http://ccbb.biosci.utexas.edu/resources.html). All files w/ extension ".qsub" are job submission scripts corresponding to a particular python script, such that _xyz_.qsub goes with run__xyz_.py.
+ * simulation_scripts/   Scripts in this directory were created to run specifically on The University of Texas at Austin's Center for Computational Biology and Bioinformatics cluster, [Phylocluster](http://ccbb.biosci.utexas.edu/resources.html). All files w/ extension ".qsub" are job submission scripts corresponding to a particular python script, such that _xyz_.qsub goes with run\__xyz_.py.
    * [run_sim_nyp.py](https://github.com/clauswilke/Omega_MutSel/blob/master/scripts/simulation_scripts/run_sim_nyp.py)
      * simulate alignments which use NP amino acid fitness data and either NP, yeast, or polio mutation rates
     * [run_nyp.py](https://github.com/clauswilke/Omega_MutSel/blob/master/scripts/simulation_scripts/run_nyp.py)
