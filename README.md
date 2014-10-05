@@ -6,9 +6,9 @@ All code written by SJS (contact at stephanie.spielman@gmail.com).
 
 ## Description of Contents ##
 
-datasets/
+__datasets/__
 - - - -
-Contains tab-delimited summary files for simulated datasets.  All simulated alignments available from ...
+Contains tab-delimited summary files for simulated datasets.  All simulated alignments available from TBD (for now, email stephanie.spielman@gmail.com).
  * [no_synsel.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/datasets/no_synsel.txt)
    * simulations with symmetric mutation rates and in which synonymous codons all have same fitness ([Figure 1A](https://github.com/clauswilke/Omega_MutSel/blob/master/Manuscript/figures/MainText/dnds_variance.pdf), [Figure 2B](https://github.com/clauswilke/Omega_MutSel/blob/master/Manuscript/figures/MainText/regression_convergence.pdf))
  * [synsel.txt](https://github.com/clauswilke/Omega_MutSel/blob/master/datasets/synsel.txt)
@@ -25,7 +25,7 @@ Contains tab-delimited summary files for simulated datasets.  All simulated alig
 
 
 
-scripts/
+__scripts/__
 - - - -
 Contains scripts used in analysis. [NOTE: all simulated alignments were created using a custom sequence simulation library, [pyvolve](https://github.com/sjspielman/pyvolve). See within for details.]
 
@@ -60,7 +60,7 @@ Contains scripts used in analysis. [NOTE: all simulated alignments were created 
 
 
 
-hyphy_files/ 
+__hyphy_files/__
 - - - -       
 Contains files used in HYPHY inference.
    * [globalDNDS_fequal.bf](https://github.com/clauswilke/Omega_MutSel/blob/master/hyphy_files/globalDNDS_fequal.bf) 
