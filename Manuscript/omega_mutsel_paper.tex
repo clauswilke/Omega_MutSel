@@ -14,7 +14,7 @@
 \begin{document}
 	
 	
-\title{The relationship between scaled selection coefficients and \emph{\normalsize{dN/dS}}}
+\title{The relationship between \emph{\textbf{dN/dS}} and scaled selection coefficients}
 	
 \author{Stephanie J. Spielman\affil{1}{Department of Integrative Biology, Center for Computational Biology and Bioinformatics, and Institute of Cellular and Molecular Biology.
 		The University of Texas at Austin, Austin, TX 78712, USA.} 
@@ -27,16 +27,17 @@
 
 \begin{article}
 
-\section*{Significance Statement} 
-Phylogenetic models that quantify selection strength in protein-coding sequences are among the most rigorous and sophisticated tools in evolutionary studies. While various such frameworks exist, it is virtually unknown how independent approaches relate. Here, we elucidate the relationship between two competing frameworks, $dN/dS$ and selection coefficient models, to discern previously unrecognized model properties and limitations. We prove that MutSel models correspond strictly to regimes of purifying selection ($dN/dS \leq 1$), although selection on synonymous changes can produce spurious signals of positive selection. We additionally find that most $dN/dS$ models infer systematically biased parameter estimates. Moreover, model fit metrics (AIC) cannot necessarily identify which model produces the most accurate inferences, and thus AIC scores maye mislead in model selection. %118 words
-
-
-\bigskip 
 
 \begin{abstract}
 Computational methods discerning the strength of natural selection in protein-coding sequences assume a central role in comparative sequence analyses. Various such models have been proposed, yet how these independent approaches relate to one another, in particular whether inferences made with competing models yield comparable or distinct results, remains entirely unknown. In this study, we elucidate the relationship between two widely-used phylogenetic modeling frameworks: $dN/dS$ models and mutation-selection-balance (MutSel) models, which estimate amino acid and/or codon scaled selection coefficients. We derive a formal mathematical framework to calculate $dN/dS$ directly from selection coefficients, allowing us to gain unprecedented insight into the behaviors, limitations, and applicabilities of these competing models. In particular, we prove that MutSel models correspond strictly to $dN/dS \leq 1$, and thus they cannot accomodate positive, diversifying selection ($dN/dS > 1$). However, if synonymous changes are not neutral, we find that $dN/dS$ computed from selection coefficients can take on arbitrarily high values, even to infinity. This result broadly demonstrates that purifying selection on synonymous codons can erroneously indicate that positive selection is acting. We additionally find that $dN/dS$ models systematically underestimate this quantity from sequence data evolved under an asymmetric mutation model. Strikingly, the best-fitting $dN/dS$ model parameterization, based on AIC, was never the model yielding the least biased and most precise $dN/dS$ estimates. Thus, selecting models based solely on fit can be counterproductive and positively misleading. We conclude that establishing mathematical links among modeling frameworks represents a novel, powerful strategy to pinpoint previously unrecognized model limitations and strengths. %249 words
 \end{abstract}
 
+\bigskip
+
+\section*{Significance Statement} 
+Phylogenetic models that quantify selection strength in protein-coding sequences are among the most rigorous and sophisticated tools in evolutionary studies. While various such frameworks exist, it is virtually unknown how independent approaches relate. Here, we elucidate the relationship between two competing frameworks, $dN/dS$ and selection coefficient models, to discern previously unrecognized model properties and limitations. We prove that MutSel models correspond strictly to regimes of purifying selection ($dN/dS \leq 1$), although selection on synonymous changes can produce spurious signals of positive selection. We additionally find that most $dN/dS$ models infer systematically biased parameter estimates. Moreover, model fit metrics (AIC) cannot necessarily identify which model produces the most accurate inferences, and thus AIC scores maye mislead in model selection. %118 words
+
+\bigskip 
 
 \keywords{dN/dS | mutation-selection-balance models | scaled selection coefficients | Markov models of sequence evolution}
 
