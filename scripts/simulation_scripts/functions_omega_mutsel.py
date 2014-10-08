@@ -42,19 +42,19 @@ def set_mu_dict(dataset):
     
     
 ###################################### SIMULATION CODE ##############################################
-def simulate(f, seqfile, tree, mu_dict, length, simulator_path):
+def simulate(f, seqfile, tree, mu_dict, length, pyvolve_path):
     ''' Simulate single partition according homogeneous mutation-selection model.
     '''
-    sys.path.append(simulator_path)
+    sys.path.append(pyvolve_path)
     import misc
     import newick
     import matrix_builder
     import evolver
     
     try:
-        my_tree = newick.read_tree(file = tree, flags = False)
+        my_tree = newick.read_tree(file = tree)
     except:
-        my_tree = newick.read_tree(tree = tree, flags = False) 
+        my_tree = newick.read_tree(tree = tree) 
           
     model = misc.Model()
     params = {'state_freqs':f, 'mu': mu_dict}
@@ -67,7 +67,7 @@ def simulate(f, seqfile, tree, mu_dict, length, simulator_path):
     assert((f/eigen_freqs).all()  == 1), "Detailed balance not satisfied"
     
     partitions = [(length, {"root_model":model})]        
-    myEvolver = evolver.Evolver(partitions, "root_model" )
+    myEvolver = evolver.Evolver(partitions, "root_model")
     myEvolver.simulate(my_tree)
     myEvolver.write_sequences(outfile = seqfile)
     
