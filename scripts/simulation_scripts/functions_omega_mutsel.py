@@ -57,17 +57,18 @@ def simulate(f, seqfile, tree, mu_dict, length, pyvolve_path):
         my_tree = newick.read_tree(tree = tree) 
           
     model = misc.Model()
-    params = {'state_freqs':f, 'mu': mu_dict}
-    model.params = params
-    mat = MatrixBuilder.mutSel_Matrix(model)
-    model.Q = mat.buildQ()
+    model.params = {'state_freqs':f, 'mu': mu_dict}
+    mat = matrix_builder.mutSel_Matrix(model)
+    model.matrix = mat.assemble_matrix()
     
     # Confirm, before simulating, that detailed balance is satisfied 
-    eigen_freqs = get_eq_from_eig(model.Q)
+    eigen_freqs = get_eq_from_eig(model.matrix)
     assert((f/eigen_freqs).all()  == 1), "Detailed balance not satisfied"
     
-    partitions = [(length, {"root_model":model})]        
-    myEvolver = evolver.Evolver(partitions, "root_model")
+    part = misc.Partition()
+    part.size = length
+    part.model = model     
+    myEvolver = evolver.Evolver(part)
     myEvolver.simulate(my_tree)
     myEvolver.write_sequences(outfile = seqfile)
     
