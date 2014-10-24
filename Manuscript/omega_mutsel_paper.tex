@@ -307,14 +307,14 @@ This work was supported in part by NIH grant R01 GM088344, ARO grant W911NF-12-1
 		
 \begin{figure}[htbp]
 	\centerline{\includegraphics[width=12cm]{figures/MainText/regression_convergence.pdf}}
-	\caption{\label{reg_conv} Combined modeling approach to assess performance of $dN/dS$ inference frameworks. (A) Protein-coding alignments are simulated in the MutSel modeling framework. $dN/dS$ can then be calculated (``predict") from scaled selection coefficients as well as through an ML inference framework (``infer"). Comparing resulting quantities reveals the accuracy of the chosen inference framework. (B) Regression between predicted $dN/dS$ values and inferred $\omega$ MLEs. Each point corresponds to a single simulated alignment, and the red line is the $x=y$ line. (C) Convergence of $\omega$ MLEs to the true $dN/dS$ value. The y-axis indicates the relative error of the $\omega$ MLE, and the x-axis indicates the number of positions in the simulated alignment. As the number of positions and hence the size of the data set increases, $\omega$ converges to the predicted $dN/dS$ value. The red line is the $y=0$ line, indicating no error.}
+	\caption{\label{reg_conv} Combined modeling approach to assess performance of $dN/dS$ inference frameworks. (A) Protein-coding alignments are simulated in the MutSel modeling framework. $dN/dS$ can then be calculated (``predict") from scaled selection coefficients as well as through an ML inference framework (``infer"). Comparing resulting quantities reveals the accuracy of the chosen inference framework. (B) Regression between predicted $dN/dS$ values and inferred $\omega$ MLEs. Each point corresponds to a single simulated alignment, and the solid line is the $x=y$ line. (C) Convergence of $\omega$ MLEs to the true $dN/dS$ value. The y-axis indicates the relative error of the $\omega$ MLE, and the x-axis indicates the number of positions in the simulated alignment. As the number of positions and hence the size of the data set increases, $\omega$ converges to the predicted $dN/dS$ value. The solid line is the $y=0$ line, indicating no error.}
 \end{figure}
 	
 \vspace{2cm}
 	
 
 \begin{figure}[htbp]
-	\centerline{\includegraphics[width=8cm]{figures/MainText/nyp_bias_r2.pdf}}
+	\centerline{\includegraphics[width=12cm]{figures/MainText/nyp_bias_r2.pdf}}
 	\caption{\label{nyp_bias_r2} Estimator bias and precision of $\omega$ estimates for various model frequency parameterizations. (A) Estimator bias and (B) Precision ($r^2$) values between $dN/dS$ and $\omega$ MLEs across model frequency parameterizations, for each set of nucleotide mutation rates. To calculate bias, we fit a linear model with $\omega$ as the response and $dN/dS$ as the predictor, with a fixed slope of 1, and the resulting intercept value represents the bias. Negative biases indicate $\omega$ MLEs that are, on average, lower than $dN/dS$. Note that all standard errors for bias are smaller than the symbol size.}	
 \end{figure}
 
