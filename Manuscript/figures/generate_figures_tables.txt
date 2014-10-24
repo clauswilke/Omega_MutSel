@@ -20,14 +20,14 @@ axis(side = 2, at = c(0, 0.5, 1, 1.5, 2), cex.axis = 1.7, lwd=3)
 text(1.6, 1, expression(paste(r^2, " = 0.994")), cex=1.65)
 mtext(expression(omega), side = 2, at = 1, cex=2.5, line=2.75)
 lines(c(0,1.95), c(0,1.95) ,col='red', lwd=2.25)
-mtext('B', side = 3, at = -0.55, cex = 3)
+mtext('B', side = 3, at = -0.55, cex = 2)
 
 conv2 <- conv[conv$seqlen <=5e5,] # for plot aesthetic 
 plot(conv2$seqlen, conv2$w_err, pch=20, cex=1.2, cex.lab=1.7, xlab = 'Alignment Length', ylab = 'Relative Error', log='x', ylim=c(-1, 1), xaxt='n', yaxt='n', frame.plot=F)
 axis(side = 1, at = c(5e2, 5e3, 5e4, 5e5), cex.axis = 1.4, lwd=2.5)
 axis(side = 2, at = c(-1, -0.5, 0, 0.5, 1), cex.axis = 1.54, lwd=2.5)
 lines(c(5e2-100,1e6-100), c(0,0) ,col='red', lwd=2.25)
-mtext('C', side = 3, at = 80, cex = 3)
+mtext('C', side = 3, at = 80, cex = 2)
 dev.off()
 
 
