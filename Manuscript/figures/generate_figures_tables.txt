@@ -1,6 +1,6 @@
 
-nobias <- read.table('../../datasets/nobias.txt', header=T)
-bias <- read.table('../../datasets/bias.txt', header=T)
+nobias <- read.table('../../datasets/no_synsel.txt', header=T)
+bias <- read.table('../../datasets/synsel.txt', header=T)
 conv <- read.table('../../datasets/conv.txt', header=T)
 np <- read.table('../../datasets/np.txt', header=T)
 yeast<- read.table('../../datasets/yeast.txt', header=T)
@@ -68,7 +68,7 @@ dev.off()
 
 
 ############################ nucleoprotein, yeast, polio r^2 and bias plots #############################
-fspecs <- c("f61", "f3x4", "cf3x4", "f1x4", "fnuc3", "fnuc1")
+fspecs <- c("f61", "f3x4", "cf3x4", "f1x4", "mg1", "mg3")
 names <- c("F61", "F3x4", "CF3x4", "F1x4", "MG3", "MG1")
 np_r2 <- c(); yeast_r2 <- c(); polio_r2 <- c(); np_bias <- c(); yeast_bias <- c(); polio_bias <- c()
 
@@ -88,7 +88,7 @@ for (i in 1:length(fspecs))
 
 pdf('MainText/nyp_bias_r2.pdf', width=3.75, height=5.625, useDingbats=F)
 par(mfrow=c(2,1), mar=c(2, 3.6, 1.35, 0.55)) #bottom, left, top, right
-point_size = 1.75
+point_size = 1.25
 ylab_size = 1.25
 xlab_size = 0.9
 axis_size = 1.
@@ -96,32 +96,32 @@ panel_size = 1.75
 axis_lwd = 2.25
 
 # top panel, bias
-plot(1:length(fspecs), np_bias, pch=20, xaxt='n', yaxt='n', ylim=c(-0.2,0.2), xlab='', ylab = '', cex=point_size, cex.axis=axis_size, frame.plot=F)
+plot(1:length(fspecs), np_bias, pch=15, xaxt='n', yaxt='n', ylim=c(-0.2,0.2), xlab='', ylab = '', cex=point_size, cex.axis=axis_size, frame.plot=F)
 axis(side=1, at=1:length(fspecs), labels = names, las=1, cex.axis=xlab_size, lwd=axis_lwd)
 axis(side=2, at=c(-0.2, -0.1, 0, 0.1, 0.2), cex.axis=axis_size, lwd=axis_lwd)
 mtext("Estimator Bias", side = 2, at = 0, cex=ylab_size, las=0, line=2.25)
-points(1:length(fspecs), yeast_bias, col='red', pch=20, cex=point_size)
-points(1:length(fspecs), polio_bias, col='blue', pch=20, cex=point_size)
+points(1:length(fspecs), yeast_bias, col='red', pch=16, cex=point_size+0.2)
+points(1:length(fspecs), polio_bias, col='blue', pch=17, cex=point_size)
 abline(h=0, lwd=2)
 mtext("A", side = 3, at = -0.3, cex = panel_size)
 
 #legend
-points(5.25, 0.2, pch=20, cex=1)
-points(5.25, 0.16, pch=20, cex=1, col='red')
-points(5.25, 0.12, pch=20, cex=1, col='blue')
+points(5.25, 0.2, pch=15, cex=1)
+points(5.25, 0.16, pch=16, cex=1.2, col='red')
+points(5.25, 0.12, pch=17, cex=1, col='blue')
 text(5.6, 0.2, 'NP', cex=1)
 text(5.75, 0.16, 'Yeast', cex=1)
 text(5.72, 0.12, 'Polio', cex=1)
 
 # bottom panel, r^2
-plot(1:length(fspecs), polio_r2, xaxt='n', yaxt='n', col='blue', ylab='', pch=20, cex=point_size, ylim=c(0,1), xlab='', cex.axis=axis_size, frame.plot=F) #ylab = expression(r^2),
+plot(1:length(fspecs), polio_r2, xaxt='n', yaxt='n', col='blue', ylab='', pch=17, cex=point_size, ylim=c(0,1), xlab='', cex.axis=axis_size, frame.plot=F) #ylab = expression(r^2),
 axis(side=1, at=1:length(fspecs), labels = names, las=1, cex.axis=xlab_size, lwd=axis_lwd)
 axis(side=2, at=c(0, 0.2, 0.4, 0.6, 0.8, 1.0), cex.axis=axis_size, lwd=axis_lwd)
 mtext(expression(paste("Precision (",r^2, ")",sep='')), side = 2, at = 0.5, cex=ylab_size, las=0, line=2.1)
-points(2:length(fspecs), np_r2[2:length(fspecs)], pch=20, cex=point_size)
-points(2:length(fspecs), yeast_r2[2:length(fspecs)], col='red', pch=20, cex=point_size)
-points(0.95, np_r2[1], pch=20, cex=point_size)
-points(1.15, yeast_r2[1], pch=20, col='red', cex=point_size)
+points(2:length(fspecs), np_r2[2:length(fspecs)], pch=15, cex=point_size)
+points(2:length(fspecs), yeast_r2[2:length(fspecs)], col='red', pch=16, cex=point_size+0.2)
+points(0.95, np_r2[1], pch=15, cex=point_size)
+points(1.15, yeast_r2[1], pch=16, col='red', cex=point_size+0.2)
 mtext("B", side = 3, at = -0.3, cex = panel_size)
 
 dev.off()
@@ -178,7 +178,7 @@ dev.off()
 ###### make latex tables!
 # Both the MainText and SI tables are made here and all tables go into latex_tables.txt. 
 
-fspecs <- c("fnuc1",  "fnuc3", "f1x4", "cf3x4", "f3x4", "f61")
+fspecs <- c("mg1",  "mg3", "f1x4", "cf3x4", "f3x4", "f61")
 rownames <- c("MG1", "MG3", "F1x4", "CF3x4", "F3x4", "F61")
 
 sink("latex_tables.txt")
@@ -235,7 +235,7 @@ make_daic_table <- function(dat, fspecs, rownames)
 }
 
 cat("\n\n\n\n%%%%%%%%% dAIC table  %%%%%%%%%%\n")
-fspecs <- c("f61", "cf3x4", "fnuc1", "f1x4", "fnuc3", "f3x4")
+fspecs <- c("f61", "cf3x4", "mg1", "f1x4", "mg3", "f3x4")
 rownames <- c("F61", "CF3x4", "MG1", "F1x4", "MG3", "F3x4")
 for (i in 1:length(fspecs)){
     daic_np <- round( mean(np$aic[np$fspec==fspecs[1]] - np$aic[np$fspec==fspecs[i]]), 2)
