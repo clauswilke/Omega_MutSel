@@ -245,8 +245,28 @@ for (i in 1:length(fspecs)){
     cat(' \\\\ \n')
 }
 
-sink()
 
+
+############################# NYP dBIC tables ###################################
+#BIC COMPUTATION:
+### lnn <- log(500000)  #this many alignment columns
+### dat$bic <- -2*dat$lnlik + dat$k*lnn
+make_dbic_table <- function(dat, fspecs, rownames)
+{
+}
+
+cat("\n\n\n\n%%%%%%%%% dBIC table  %%%%%%%%%%\n")
+fspecs <- c("f61", "cf3x4", "mg1", "f1x4", "mg3", "f3x4")
+rownames <- c("F61", "CF3x4", "MG1", "F1x4", "MG3", "F3x4")
+for (i in 1:length(fspecs)){
+    dbic_np <- round( mean(np$bic[np$fspec==fspecs[1]] - np$bic[np$fspec==fspecs[i]]), 2)
+    dbic_yeast <- round( mean(yeast$bic[yeast$fspec==fspecs[1]] - yeast$bic[yeast$fspec==fspecs[i]]), 2)
+    dbic_polio <- round( mean(polio$bic[polio$fspec==fspecs[1]] - polio$bic[polio$fspec==fspecs[i]]), 2)
+    cat(paste(rownames[i], dbic_np, dbic_yeast, dbic_polio, sep=' & '))
+    cat(' \\\\ \n')
+}
+
+sink()
 
 
 
