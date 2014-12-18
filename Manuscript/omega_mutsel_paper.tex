@@ -328,15 +328,15 @@ This work was supported in part by NIH grant R01 GM088344, ARO grant W911NF-12-1
 		\multicolumn{1}{c}{Frequencies} & NP & Yeast & Polio \\
 		\noalign{\smallskip}\hline\noalign{\smallskip}
 		F61 & 0 & 0 & 0 \\ 
-		CF3x4 & -9627.5 & -7951.8 & -7975.9 \\ 
-		MG1 & -13325.5 & -10042.0 & -5147.6 \\ 
-		F1x4 & -13524.5 & -13658.5 & -15468.3 \\ 
-		MG3 & -14401.3 & -12851.6 & -8624.9 \\ 
-		F3x4 & -14807.2 & -17385.3 & -19384.6 \\ 
+		CF3x4 & -9519.53 & -7843.77 & -9519.53 \\ 
+		MG1 & -13207.5 & -9924.05 & -13207.5 \\ 
+		F1x4 & -13410.54 & -13544.47 & -13410.54 \\ 
+		MG3 & -14287.28 & -12737.57 & -14287.28 \\ 
+		F3x4 & -14699.22 & -17277.3 & -14699.22 \\ 
 		\noalign{\smallskip}\hline\noalign{\smallskip} 	
 	\end{tabular}
 
-\noindent {\footnotesize \textbf{Note:} The order of frequency models shown in the table corresponds to the model ranking for NP, and the ranking differs somewhat for yeast and polio datasets. AIC is computed as $AIC = 2(k - \ln L)$, where $k$ is the number of free parameters of the model, and $\ln L$ is the log-likelihood \citep{Akaike1974,BurnhamAnderson2004}. As codon and/or nucleotide frequency parameters were computed directly from the data, all models have 3 free parameters ($\omega$, $\kappa$, and a global branch-length scaling parameter).}
+\noindent {\footnotesize \textbf{Note:} The order of frequency models shown in the table corresponds to the model ranking for NP, and the ranking differs somewhat for yeast and polio datasets. AIC is computed as $AIC = 2(k - \ln L)$, where $k$ is the number of free parameters of the model, and $\ln L$ is the log-likelihood \citep{Akaike1974,BurnhamAnderson2004}. Number of free parameters for each model are F61, 63; CF3x4, 12; MG1, 6; F1x4, 6; MG3, 12; and F3x4, 12. Note that, for each model, 3 of the parameters are $\omega$, $\kappa$, and a global branch-length scaling parameter, and the remaining parameters are either codon or nucleotide frequencies.}
 \end{table}
 
 \vspace{2cm}
@@ -369,7 +369,7 @@ This work was supported in part by NIH grant R01 GM088344, ARO grant W911NF-12-1
 \end{table}	
 
 
-\vspace{2cm}
+\vspace{2.5cm}
 
 \noindent Table S2. Precision, measured as the squared correlation coefficient $r^2$, of $\omega$ MLEs relative to the true $dN/dS$ values, for all nucleotide mutation rates and model frequency parameterizations examined. All values shown are statistically significant, with all $P < 2\times10^{-16}$ .
 \begin{table}[htbp]
@@ -383,6 +383,25 @@ This work was supported in part by NIH grant R01 GM088344, ARO grant W911NF-12-1
 		\noalign{\smallskip}\hline\noalign{\smallskip}
 	\end{tabular}
 \end{table}	
+
+\vspace{2.5cm}
+
+
+\noindent Table S3. The order of frequency models shown in the table corresponds to the model ranking for NP, and the ranking differs somewhat for yeast and polio datasets. BIC is computed as $BIC = -2\ln L + k\ln n$, where $k$ is the number of free parameters of the model, $\ln L$ is the log-likelihood, and $n$ is the sample size. For all models, $n=500000$, which corresponds to the number of alignment columns. The number of free parameters for each model are F61, 63; CF3x4, 12; MG1, 6; F1x4, 6; MG3, 12; and F3x4, 12. Note that, for each model, 3 of the parameters are $\omega$, $\kappa$, and a global branch-length scaling parameter, and the remaining parameters are either codon or nucleotide frequencies.
+\begin{table}[htbp]
+	\begin{tabular}{l c c c}
+		\hline\noalign{\smallskip}
+		\multicolumn{1}{c}{Frequencies} & NP & Yeast & Polio \\
+		\noalign{\smallskip}\hline\noalign{\smallskip}
+		F61 & 0 & 0 & 0 \\ 
+		CF3x4 & -8918.92 & -7243.16 & -8918.92 \\ 
+		MG1 & -12551.28 & -9267.83 & -12551.28 \\ 
+		F1x4 & -12776.56 & -12910.5 & -12776.56 \\ 
+		MG3 & -13653.31 & -12103.59 & -13653.31 \\ 
+		F3x4 & -14098.61 & -16676.69 & -14098.61 \\ 
+		\noalign{\smallskip}\hline\noalign{\smallskip} 	
+	\end{tabular}
+\end{table}
 
 \newpage
 
