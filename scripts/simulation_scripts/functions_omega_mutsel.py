@@ -46,8 +46,10 @@ def simulate(f, seqfile, tree, mu_dict, length, pyvolve_path):
     ''' Simulate single partition according homogeneous mutation-selection model.
     '''
     sys.path.append(pyvolve_path)
-    import misc
     import newick
+    import genetics
+    import partition
+    import models
     import matrix_builder
     import evolver
     
@@ -56,22 +58,16 @@ def simulate(f, seqfile, tree, mu_dict, length, pyvolve_path):
     except:
         my_tree = newick.read_tree(tree = tree) 
           
-    model = misc.Model()
-    model.params = {'state_freqs':f, 'mu': mu_dict}
-    mat = matrix_builder.mutSel_Matrix(model)
-    model.matrix = mat.assemble_matrix()
+    model = models.Model({'state_freqs':f, 'mu': mu_dict}, "mutsel")
+    model.construct_model()
     
     # Confirm, before simulating, that detailed balance is satisfied 
     eigen_freqs = get_eq_from_eig(model.matrix)
     assert((f/eigen_freqs).all()  == 1), "Detailed balance not satisfied"
     
-    part = misc.Partition()
-    part.size = length
-    part.model = model     
-    myEvolver = evolver.Evolver(part)
-    myEvolver.simulate(my_tree)
-    myEvolver.write_sequences(outfile = seqfile)
-    
+    part = partition.Partition(size = length, models = model)    
+    evolver.Evolver(part, tree = my_tree, seqfile = seqfile, ratefile = None, infofile = None)()
+
 
 def get_eq_from_eig(m):   
     ''' get the equilibrium frequencies from the matrix. the eq freqs are the left eigenvector corresponding to eigenvalue of 0. 
