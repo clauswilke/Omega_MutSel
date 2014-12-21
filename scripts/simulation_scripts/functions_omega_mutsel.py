@@ -49,7 +49,7 @@ def simulate(f, seqfile, tree, mu_dict, length, pyvolve_path):
     import newick
     import genetics
     import partition
-    import models
+    import model
     import matrix_builder
     import evolver
     
