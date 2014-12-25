@@ -70,7 +70,7 @@ dev.off()
 
 
 ############################ nucleoprotein, yeast, polio r^2 and bias plots #############################
-fspecs <- c("f61", "f3x4", "cf3x4", "f1x4", "mg1", "mg3")
+fspecs <- c("f61", "f3x4", "cf3x4", "f1x4", "mg3", "mg1")
 names <- c("F61", "F3x4", "CF3x4", "F1x4", "MG3", "MG1")
 np_r2 <- c(); yeast_r2 <- c(); polio_r2 <- c(); np_bias <- c(); yeast_bias <- c(); polio_bias <- c()
 
