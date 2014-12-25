@@ -97,7 +97,7 @@ axis_size = 1.
 panel_size = 1.5
 axis_lwd = 2.25
 
-# top panel, bias
+# left panel, bias
 plot(1:length(fspecs), np_bias, pch=15, xaxt='n', yaxt='n', ylim=c(-0.2,0.2), xlab='', ylab = '', cex=point_size, cex.axis=axis_size, frame.plot=F)
 axis(side=1, at=1:length(fspecs), labels = names, las=1, cex.axis=xlab_size, lwd=axis_lwd)
 axis(side=2, at=c(-0.2, -0.1, 0, 0.1, 0.2), cex.axis=axis_size, lwd=axis_lwd)
@@ -115,7 +115,7 @@ text(5.6, 0.2, 'NP', cex=1)
 text(5.75, 0.16, 'Yeast', cex=1)
 text(5.72, 0.12, 'Polio', cex=1)
 
-# bottom panel, r^2
+# right panel, r^2
 plot(1:length(fspecs), polio_r2, xaxt='n', yaxt='n', col='blue', ylab='', pch=17, cex=point_size, ylim=c(0,1), xlab='', cex.axis=axis_size, frame.plot=F) #ylab = expression(r^2),
 axis(side=1, at=1:length(fspecs), labels = names, las=1, cex.axis=xlab_size, lwd=axis_lwd)
 axis(side=2, at=c(0, 0.2, 0.4, 0.6, 0.8, 1.0), cex.axis=axis_size, lwd=axis_lwd)
