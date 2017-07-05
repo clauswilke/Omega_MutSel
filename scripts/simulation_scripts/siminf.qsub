@@ -15,8 +15,6 @@ source ~/.bash_profile
 
 
 # Set up directories
-SIMDIR=$HOME/pyvolve/src
-SCRIPTDIR=$HOME/Omega_MutSel/scripts/simulation_scripts
 WDIR=/share/WilkeLab/work/sjs3495/$JOB_NAME-$JOB_ID-$SGE_TASK_ID
 RDIR=$HOME/$JOB_NAME
 
@@ -39,7 +37,7 @@ cp $HOME/Omega_MutSel/hyphy_files/globalDNDS_fequal.bf .
 
 # Run
 module load python
-python run_siminf.py $SGE_TASK_ID $SIMDIR $CPU $BIAS
+python run_siminf.py $SGE_TASK_ID $CPU $BIAS
 
 # Cleanup
 mkdir -p $RDIR

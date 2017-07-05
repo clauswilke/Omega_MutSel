@@ -1,19 +1,18 @@
 # SJS. stephanie.spielman@gmail.com
 # Generic code for simulating and deriving dN/dS via selection coeffcients and hyphy ML.
-# Be sure to cp src/ directory (simulator), hyphy files, and the functions_omega_mutsel.py script into working directory
+# Be sure to cp src/  hyphy files, and the functions_omega_mutsel.py script into working directory
 # NOTE: very little (ok, none) sanity checking for input args..
 
 ######## Input parameters ########
 import sys
-if (len(sys.argv) != 5):
-    print "\n\nUsage: python run_siminf.py <rep> <simdir> <cpu> <bias>\n."
+from functions_omega_mutsel import *
+import random as rn
+if (len(sys.argv) != 4):
+    print "\n\nUsage: python run_siminf.py <rep> <cpu> <bias>\n."
     sys.exit()
 rep = sys.argv[1]         # which rep we're on, for saving files
-simdir = sys.argv[2]      # directory of simulation library
-cpu = sys.argv[3]         # hyphy can use
-bias = float(sys.argv[4]) # codon bias, yes or no?
-sys.path.append(simdir)
-from functions_omega_mutsel import *
+cpu = sys.argv[2]         # hyphy can use
+bias = float(sys.argv[3]) # codon bias, yes or no?
 
 
 # Set up output files and parameters
@@ -21,7 +20,7 @@ seqfile       = "seqs"+str(rep)+".fasta"
 freqfile      = "codonFreqs" + str(rep)+".txt"
 paramfile     = "params"+str(rep)+".txt"
 treefile = 'tree.tre'
-seqlength = 500000
+seqlength = 10 #500000
 if bias != 0.:
     bias = rn.uniform(ZERO,2) # 2 is a good top threshold. dN/dS typically <=2 this way, otherwise it gets absurd. 
 mu = 1e-6
@@ -55,8 +54,9 @@ kvals  = ['free', kappa]
 omegas = np.zeros(2)
 kappas = np.zeros(2)
 for k in range(2):
-    lk, omegas[k], kappas[k] = run_hyphy_fequal(seqfile, treefile, cpu, kvals[k])  
-    lk, omegas[k], kappas[k] = run_hyphy_fequal(seqfile, treefile, cpu, kvals[k])  
+    print seqfile, treefile, cpu, kvals[k] 
+    omegas[k], kappas[k] = run_hyphy_fequal(seqfile, treefile, cpu, kvals[k])  
+    omegas[k], kappas[k] = run_hyphy_fequal(seqfile, treefile, cpu, kvals[k])  
     omega_errors = (dnds - omegas)/dnds
 
 

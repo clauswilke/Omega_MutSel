@@ -10,6 +10,8 @@ import numpy as np
 from random import randint, shuffle
 from scipy import linalg
 
+import pyvolve
+
 
 # Globals
 ZERO = 1e-8
@@ -42,64 +44,21 @@ def set_mu_dict(dataset):
     
     
 ###################################### SIMULATION CODE ##############################################
-def simulate(f, seqfile, tree, mu_dict, length, pyvolve_path):
+def simulate(f, seqfile, tree, mu_dict, length):
     ''' Simulate single partition according homogeneous mutation-selection model.
     '''
-    sys.path.append(pyvolve_path)
-    import newick
-    import genetics
-    import partition
-    import model
-    import matrix_builder
-    import evolver
     
     try:
-        my_tree = newick.read_tree(file = tree)
+        my_tree = pyvolve.read_tree(file = tree)
     except:
-        my_tree = newick.read_tree(tree = tree) 
-          
-    model = models.Model({'state_freqs':f, 'mu': mu_dict}, "mutsel")
-    model.construct_model()
-    
-    # Confirm, before simulating, that detailed balance is satisfied 
-    eigen_freqs = get_eq_from_eig(model.matrix)
-    assert((f/eigen_freqs).all()  == 1), "Detailed balance not satisfied"
-    
-    part = partition.Partition(size = length, models = model)    
-    evolver.Evolver(part, tree = my_tree, seqfile = seqfile, ratefile = None, infofile = None)()
+        my_tree = pyvolve.read_tree(tree = tree) 
 
+    model = pyvolve.Model("MutSel", {'state_freqs':f, 'mu': mu_dict})
 
-def get_eq_from_eig(m):   
-    ''' get the equilibrium frequencies from the matrix. the eq freqs are the left eigenvector corresponding to eigenvalue of 0. 
-        Code here is largely taken from Bloom. See here - https://github.com/jbloom/phyloExpCM/blob/master/src/submatrix.py, specifically in the fxn StationaryStates
-    '''
-    (w, v) = linalg.eig(m, left=True, right=False)
-    max_i = 0
-    max_w = w[max_i]
-    for i in range(1, len(w)):
-        if w[i] > max_w:
-            max_w = w[i]
-            max_i = i
-    assert( abs(max_w) < 1e-10 ), "Maximum eigenvalue is not close to zero."
-    max_v = v[:,max_i]
-    max_v /= np.sum(max_v)
-    eq_freqs = max_v.real # these are the stationary frequencies
+    part = pyvolve.Partition(size = length, models = model)    
+    e = pyvolve.Evolver(partitions = part, tree = my_tree)
+    e(seqfile = seqfile, ratefile = None, infofile = None)
     
-    # SOME SANITY CHECKS
-    assert np.allclose(np.zeros(61), np.dot(eq_freqs, m)) # should be true since eigenvalue of zero
-    pi_inv = np.diag(1.0 / eq_freqs)
-    s = np.dot(m, pi_inv)
-    assert np.allclose(m, np.dot(s, np.diag(eq_freqs)), atol=1e-10, rtol=1e-5), "exchangeability and equilibrium does not recover matrix"
-    
-    # And for some impressive overkill, double check pi_i*q_ij = pi_j*q_ji
-    for i in range(61):
-        pi_i = eq_freqs[i]
-        for j in range(61):
-            pi_j = eq_freqs[j]
-            forward  = pi_i * m[i][j] 
-            backward = pi_j * m[j][i]
-            assert(-1e-8 < (forward - backward) < ZERO), "Detailed balance violated."    
-    return eq_freqs
 
 ################################### FUNCTIONS TO SET UP SCALED SEL fitness, CODON FREQUENCIES #########################################
 def set_codon_freqs(sd, freqfile, bias):
@@ -119,7 +78,7 @@ def set_codon_freqs(sd, freqfile, bias):
     # Draw amino acid ssc values and assign randomly to amino acids.
     aminos = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y"]
     shuffle(aminos)  # To randomly assign coefficients, shuffle aminos acids.
-    aa_fitness = dict(zip(aminos, draw_amino_fitness(np.random.normal(loc = 0, scale = sd, size = 20))))
+    aa_fitness = dict(zip(aminos, np.random.normal(loc = 0, scale = sd, size = 20)))
 
     # Convert amino acid coefficients to codon coefficients
     codon_fitness = aa_to_codon_fitness(aa_fitness, bias)
@@ -132,8 +91,8 @@ def set_codon_freqs(sd, freqfile, bias):
     np.savetxt(freqfile, codon_freqs)
     
     # Determine gc content
-    fobj = UserFreqs(by = 'codon', freqs = codon_freqs_dict)
-    nuc_freq = fobj.calcFreqs(type = 'nuc')
+    f = pyvolve.CustomFrequencies("codon", freq_dict = codon_freqs_dict)
+    nuc_freq = f.compute_frequencies(type = "nucleotide")
     gc = nuc_freq[1] + nuc_freq[2]
     
     # Determine entropy
@@ -258,14 +217,14 @@ def run_hyphy_fequal(seqfile, treefile, cpu, kappa):
             
     # Set up kappa in the matrices file
     if kappa != 'free':
-        sedkappa = "sed 's/k/"+str(kappa)+"/g' matrices_raw.mdl > matrices.mdl"
+        sedkappa = "sed 's/k/"+str(kappa)+"/g' GY94_raw.mdl > GY94_raw.mdl"
         runsedkappa = subprocess.call(sedkappa, shell=True)
         assert(runsedkappa == 0), "couldn't set up kappa"
     else:
-        shutil.copy('matrices_raw.mdl', 'matrices.mdl')
+        shutil.copy('GY94_raw.mdl', 'GY94.mdl')
    
     # Run hyphy.
-    runhyphy = subprocess.call( "./HYPHYMP globalDNDS_fequal.bf CPU="+cpu+" > hyout.txt", shell = True)
+    runhyphy = subprocess.call( "HYPHYMP globalDNDS_fequal.bf CPU="+cpu+" > hyout.txt", shell = True)
     assert (runhyphy == 0), "hyphy fail"
     
     lk, w, k = parse_output_GY94("hyout.txt")
