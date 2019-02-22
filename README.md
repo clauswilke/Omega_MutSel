@@ -2,7 +2,7 @@ Omega_MutSel
 ============
 
 Repository for "The relationship between dN/dS and scaled selection coefficients", Stephanie J. Spielman and Claus O. Wilke.
-All code written by SJS (contact at stephanie.spielman@gmail.com).
+All code written by SJS (contact at spielman@rowan.edu).
 
 ## Description of Contents ##
 - - - -
